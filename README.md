@@ -20,9 +20,9 @@ contracts behind every screen that isn't backed by a real endpoint yet.
 - Node.js 20.19+ (Expo's Metro bundler in `apps/mobile` warns below this —
   see [Known issues](#known-issues))
 - npm 10+ (this repo uses npm workspaces, not pnpm/yarn)
-- The `napayment` backend running locally for any screen that calls a real
-  endpoint (i.e. everything except the dev-store-backed onboarding steps —
-  see doc F9) — see its own README for `docker compose up -d` + `./mvnw spring-boot:run`
+- The `napayment` backend running locally — every screen calls a real
+  endpoint now (see doc F9 for the small remaining set that doesn't exist
+  yet) — see its own README for `docker compose up -d` + `./mvnw spring-boot:run`
 
 ## Getting started
 

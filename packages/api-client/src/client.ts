@@ -1,4 +1,4 @@
-import { apiRequest, type ApiClientConfig, toPageQuery } from "./http";
+import { apiRequest, apiRequestBinary, type ApiClientConfig, toPageQuery } from "./http";
 import type * as T from "./types";
 
 /**
@@ -31,6 +31,17 @@ export function createBackendClient(config: ApiClientConfig) {
           method: "POST",
           body,
         }),
+      /** FR-5a: signup variant that attaches the new user to the inviting business under the invite's role. */
+      signupViaInvite: (body: T.AcceptInviteRequest) =>
+        apiRequest<T.AuthResponse>(config, "/api/v1/auth/signup/accept-invite", {
+          method: "POST",
+          body,
+        }),
+    },
+
+    users: {
+      /** No profile-read endpoint existed before this - closed the doc F9 gap. */
+      me: () => apiRequest<T.UserResponse>(config, "/api/v1/users/me"),
     },
 
     roles: {
@@ -64,6 +75,60 @@ export function createBackendClient(config: ApiClientConfig) {
           method: "DELETE",
           query: { cidr },
         }),
+      getWebhookConfig: () =>
+        apiRequest<T.WebhookConfigResponse>(config, "/api/v1/api-keys/webhook-config"),
+      updateWebhookConfig: (body: T.WebhookConfigRequest) =>
+        apiRequest<T.WebhookConfigResponse>(config, "/api/v1/api-keys/webhook-config", {
+          method: "PUT",
+          body,
+        }),
+    },
+
+    business: {
+      getKycDetails: () =>
+        apiRequest<T.BusinessKycDetailsResponse | null>(config, "/api/v1/business/kyc/details"),
+      updateKycDetails: (body: T.BusinessKycDetailsRequest) =>
+        apiRequest<T.BusinessKycDetailsResponse>(config, "/api/v1/business/kyc/details", {
+          method: "PUT",
+          body,
+        }),
+      getContact: () =>
+        apiRequest<T.BusinessContactResponse>(config, "/api/v1/business/contact"),
+      updateContact: (body: T.BusinessContactRequest) =>
+        apiRequest<T.BusinessContactResponse>(config, "/api/v1/business/contact", {
+          method: "PUT",
+          body,
+        }),
+    },
+
+    kyc: {
+      getOwnerIdentity: () =>
+        apiRequest<T.OwnerIdentityResponse | null>(config, "/api/v1/kyc/owner-identity"),
+      updateOwnerIdentity: (body: T.OwnerIdentityRequest) =>
+        apiRequest<T.OwnerIdentityResponse>(config, "/api/v1/kyc/owner-identity", {
+          method: "PUT",
+          body,
+        }),
+      listDocuments: () =>
+        apiRequest<T.KycDocumentResponse[]>(config, "/api/v1/kyc/documents"),
+      /** `file` is a FormData already carrying `type` and `file` parts - see http.ts's FormData pass-through. */
+      uploadDocument: (form: FormData) =>
+        apiRequest<T.KycDocumentResponse>(config, "/api/v1/kyc/documents", {
+          method: "POST",
+          body: form,
+        }),
+      /** Returns the raw Response so the caller can stream the file through rather than buffering it. */
+      downloadDocument: (id: string) =>
+        apiRequestBinary(config, `/api/v1/kyc/documents/${id}/download`),
+      submit: () => apiRequest<T.KycSubmitResponse>(config, "/api/v1/kyc/submit", { method: "POST" }),
+    },
+
+    team: {
+      createInvite: (body: T.CreateInviteRequest) =>
+        apiRequest<T.InviteResponse>(config, "/api/v1/team/invitations", { method: "POST", body }),
+      listInvites: () => apiRequest<T.InviteResponse[]>(config, "/api/v1/team/invitations"),
+      revokeInvite: (id: string) =>
+        apiRequest<{ ok: boolean }>(config, `/api/v1/team/invitations/${id}`, { method: "DELETE" }),
     },
 
     virtualAccounts: {
@@ -81,6 +146,14 @@ export function createBackendClient(config: ApiClientConfig) {
           idempotencyKey,
         }),
       get: (id: string) => apiRequest<T.TransactionResponse>(config, `/api/v1/transactions/${id}`),
+      list: (filter?: T.TransactionFilter, params?: T.PageParams) =>
+        apiRequest<T.PageResponse<T.TransactionResponse>>(config, "/api/v1/transactions", {
+          query: { ...filter, ...toPageQuery(params) },
+        }),
+      analytics: (filter?: T.TransactionFilter) =>
+        apiRequest<T.TransactionAnalyticsResponse>(config, "/api/v1/transactions/analytics", {
+          query: { ...filter },
+        }),
     },
 
     bankAccounts: {

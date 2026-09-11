@@ -29,7 +29,7 @@ export function Alert({ className, variant = "info", children, ...props }: Alert
   );
 }
 
-/** Flags a piece of UI as backed by the dev-store, not a real backend endpoint - doc F9. */
+/** Flags a piece of UI as working around a remaining backend gap - doc F9. */
 export function DevGapNotice({ children }: { children: React.ReactNode }) {
   return (
     <Alert variant="dev">

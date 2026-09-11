@@ -21,7 +21,12 @@ export function handleRouteError(error: unknown) {
 }
 
 export async function parseBody<T>(request: Request, schema: ZodSchema<T>): Promise<T> {
-  const json = await request.json();
+  let json: unknown;
+  try {
+    json = await request.json();
+  } catch {
+    throw new ValidationError(["Request body must be valid JSON"]);
+  }
   const parsed = schema.safeParse(json);
   if (!parsed.success) {
     throw new ValidationError(parsed.error.issues.map((i) => i.message));

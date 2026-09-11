@@ -43,10 +43,10 @@ export function BusinessDetailsForm() {
   useEffect(() => {
     if (existing) {
       reset(existing);
-    } else if (me?.profile?.businessName || me?.profile?.cacNumber) {
+    } else if (me?.businessName || me?.cacNumber) {
       reset({
-        registeredName: me.profile.businessName ?? "",
-        cacNumber: me.profile.cacNumber ?? "",
+        registeredName: me.businessName ?? "",
+        cacNumber: me.cacNumber ?? "",
       } as BusinessDetailsInput);
     }
   }, [existing, me, reset]);

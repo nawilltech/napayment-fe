@@ -9,7 +9,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const status = await computeOnboardingStatus(session);
+  const status = await computeOnboardingStatus();
 
   const steps: OnboardingStep[] = [
     { key: "business", label: "Business details", href: "/onboarding/business", done: status.businessDetailsDone },

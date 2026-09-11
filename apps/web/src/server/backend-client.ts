@@ -6,7 +6,7 @@ function baseUrl(): string {
   const url = process.env.NAWILL_API_BASE_URL;
   if (!url) {
     throw new Error(
-      "NAWILL_API_BASE_URL is not set - see .env.example. The Java backend must be reachable server-side for any real (non-dev-store) endpoint.",
+      "NAWILL_API_BASE_URL is not set - see .env.example. The Java backend must be reachable server-side for every endpoint this app calls.",
     );
   }
   return url;

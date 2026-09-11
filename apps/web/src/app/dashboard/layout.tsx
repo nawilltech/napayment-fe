@@ -9,7 +9,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const status = await computeOnboardingStatus(session);
+  const status = await computeOnboardingStatus();
   const activationDone = status.businessDetailsDone && status.kycSubmitted && status.apiKeysDone;
 
   return (

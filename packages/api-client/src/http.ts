@@ -57,18 +57,23 @@ export async function apiRequest<TResponse>(
   const { method = "GET", body, query, idempotencyKey } = options;
   const url = `${config.baseUrl}${path}${buildQuery(query)}`;
 
+  // FormData (multipart upload, e.g. KYC document upload) is passed through
+  // untouched - fetch sets its own Content-Type with the multipart boundary,
+  // which we must NOT override or the backend can't parse the parts.
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...config.extraHeaders,
   };
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (body !== undefined && !isFormData) headers["Content-Type"] = "application/json";
   if (config.accessToken) headers.Authorization = `Bearer ${config.accessToken}`;
   if (idempotencyKey) headers["Idempotency-Key"] = idempotencyKey;
 
   const response = await fetch(url, {
     method,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
   });
 
   if (response.status === 204) {
@@ -83,6 +88,27 @@ export async function apiRequest<TResponse>(
   }
 
   return json as TResponse;
+}
+
+/**
+ * For binary responses (KYC document download) - returns the raw fetch
+ * Response so the caller can stream the body through rather than buffering
+ * and JSON-parsing it. Throws ApiError on a non-2xx JSON error body, same as
+ * apiRequest.
+ */
+export async function apiRequestBinary(
+  config: ApiClientConfig,
+  path: string,
+): Promise<Response> {
+  const response = await fetch(`${config.baseUrl}${path}`, {
+    headers: config.accessToken ? { Authorization: `Bearer ${config.accessToken}` } : undefined,
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    const json = text ? JSON.parse(text) : { message: `Request failed with status ${response.status}` };
+    throw new ApiError(json as ErrorResponse, response.status);
+  }
+  return response;
 }
 
 export function toPageQuery(params?: PageParams) {

@@ -79,6 +79,16 @@ export interface MessageResponse {
   message: string;
 }
 
+/** FR-5a's "join an existing business" signup variant - POST /api/v1/auth/signup/accept-invite. */
+export interface AcceptInviteRequest {
+  token: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  phoneNo: string;
+  password: string;
+}
+
 // ---- Roles / RBAC ----------------------------------------------------------
 
 export interface CreateRoleRequest {
@@ -109,6 +119,8 @@ export const PERMISSIONS = [
   "paymentlinks:read",
   "collection-account:manage",
   "temporaryaccounts:manage",
+  "business:kyc-manage",
+  "business:manage",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -130,6 +142,18 @@ export interface ApiKeyResponse {
 
 export interface IpWhitelistRequest {
   cidr: string;
+}
+
+/** Both optional; either may be blank to clear it. */
+export interface WebhookConfigRequest {
+  callbackUrl?: string;
+  webhookUrl?: string;
+}
+
+export interface WebhookConfigResponse {
+  callbackUrl: string | null;
+  webhookUrl: string | null;
+  updatedAt: string;
 }
 
 // ---- Virtual Accounts ---------------------------------------------------------
@@ -165,6 +189,65 @@ export interface TransactionResponse {
   virtualAccountId: string;
   paymentProcessorId: string;
   createdAt: string;
+}
+
+/**
+ * Shared by GET /transactions and GET /transactions/analytics (backend's
+ * TransactionFilter - both endpoints filter identically, so results never
+ * drift between the list and its analytics). Row-level ownership scoping
+ * (caller only ever sees their own/their business's transactions, or
+ * everything if SUPERADMIN) is automatic server-side - virtualAccountId here
+ * narrows further, it doesn't widen.
+ */
+export interface TransactionFilter {
+  fromDate?: string; // ISO-8601 instant
+  toDate?: string; // ISO-8601 instant
+  status?: TransactionStatus;
+  type?: TransactionType;
+  term?: string; // matched against sessionId
+  virtualAccountId?: string;
+  minAmount?: string;
+  maxAmount?: string;
+}
+
+export interface TransactionSummary {
+  transactionId: string;
+  amount: string;
+  createdAt: string;
+}
+
+export interface TransactionStatusBreakdown {
+  status: TransactionStatus;
+  count: number;
+  volume: string;
+}
+
+export interface TransactionTypeBreakdown {
+  type: TransactionType;
+  count: number;
+  volume: string;
+}
+
+export interface TransactionDailyVolume {
+  date: string; // ISO-8601 date, e.g. "2026-09-11"
+  count: number;
+  volume: string;
+}
+
+export interface TransactionAnalyticsResponse {
+  fromDate: string | null;
+  toDate: string | null;
+  totalCount: number;
+  totalVolume: string;
+  creditVolume: string;
+  debitVolume: string;
+  netVolume: string;
+  averageAmount: string;
+  highest: TransactionSummary | null;
+  lowest: TransactionSummary | null;
+  byStatus: TransactionStatusBreakdown[];
+  byType: TransactionTypeBreakdown[];
+  dailyVolume: TransactionDailyVolume[];
 }
 
 // ---- Bank Accounts / Verification ---------------------------------------------
@@ -338,4 +421,126 @@ export interface PageParams {
   page?: number;
   size?: number;
   term?: string;
+}
+
+// ---- Users -------------------------------------------------------------------------
+
+export type UserType = "USER" | "ADMIN" | "SUPERADMIN" | "PSSP" | "BUSINESS";
+
+/** GET /api/v1/users/me - added specifically to close the doc F9 "no profile-read endpoint" gap. */
+export interface UserResponse {
+  userId: string;
+  businessId: string | null;
+  firstName: string;
+  middleName: string | null;
+  lastName: string;
+  email: string;
+  phoneNo: string;
+  userType: UserType;
+  businessName: string | null;
+  cacNumber: string | null;
+  isVerified: boolean;
+  createdAt: string;
+}
+
+// ---- Business KYC (KYB) --------------------------------------------------------------
+
+export type BusinessType = "LIMITED_LIABILITY" | "SOLE_PROPRIETORSHIP" | "PARTNERSHIP" | "NGO" | "OTHER";
+export type BusinessKycStatus = "NOT_STARTED" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
+
+export interface BusinessKycDetailsRequest {
+  registeredName: string;
+  cacNumber: string;
+  businessType: BusinessType;
+  industry: string;
+  countryId: string;
+  stateId: string;
+  addressLine: string;
+}
+
+export interface BusinessKycDetailsResponse {
+  registeredName: string;
+  cacNumber: string;
+  businessType: BusinessType;
+  industry: string;
+  countryId: string;
+  stateId: string;
+  addressLine: string;
+  updatedAt: string;
+}
+
+// ---- Owner Identity (BVN/NIN) ----------------------------------------------------------
+
+export interface OwnerIdentityRequest {
+  bvn?: string;
+  nin?: string;
+}
+
+export interface OwnerIdentityResponse {
+  bvn: string | null;
+  nin: string | null;
+  verified: boolean;
+}
+
+// ---- KYC Documents -----------------------------------------------------------------------
+
+export type KycDocumentType =
+  | "CAC_CERTIFICATE"
+  | "MEMORANDUM_AND_ARTICLES"
+  | "PROOF_OF_ADDRESS"
+  | "DIRECTOR_VALID_ID";
+
+export interface KycDocumentResponse {
+  id: string;
+  type: KycDocumentType;
+  fileName: string;
+  sizeBytes: number;
+  uploadedAt: string;
+}
+
+export interface KycSubmitResponse {
+  status: BusinessKycStatus;
+  submittedAt: string;
+}
+
+// ---- Team Invitations -----------------------------------------------------------------------
+
+export type RoleTemplate = "ADMIN" | "DEVELOPER" | "ACCOUNT_OFFICER";
+export type InvitationStatus = "PENDING" | "ACCEPTED" | "REVOKED" | "EXPIRED";
+
+export interface CreateInviteRequest {
+  email: string;
+  roleTemplate: RoleTemplate;
+  message?: string;
+}
+
+/**
+ * Note: carries `roleId`, not the `roleTemplate` that created it - the
+ * backend doesn't echo the template back. Resolve `roleId` against
+ * `GET /api/v1/roles` (roles.list) if you need a human-readable role name
+ * for display (doc F6).
+ */
+export interface InviteResponse {
+  id: string;
+  email: string;
+  roleId: string;
+  status: InvitationStatus;
+  inviteUrl: string;
+  invitedAt: string;
+}
+
+// ---- Business Contact ---------------------------------------------------------------------
+
+export interface BusinessContactRequest {
+  disputeEmails: string[];
+  refundEmails: string[];
+  supportEmail?: string;
+  generalEmail: string;
+}
+
+export interface BusinessContactResponse {
+  disputeEmails: string[];
+  refundEmails: string[];
+  supportEmail: string | null;
+  generalEmail: string;
 }

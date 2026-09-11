@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const session = await getSession();
     if (!session) return NextResponse.json({ message: "Not authenticated" }, { status: 401 });
-    const status = await computeOnboardingStatus(session);
+    const status = await computeOnboardingStatus();
     return NextResponse.json(status);
   } catch (error) {
     return handleRouteError(error);

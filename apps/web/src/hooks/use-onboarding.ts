@@ -7,10 +7,18 @@ import type {
   ContactSettingsInput,
   InviteTeamMemberInput,
   KycDocumentType,
-  KycStatus,
   OwnerIdentityInput,
   WebhookConfigInput,
 } from "@napayment/schemas";
+import type {
+  BusinessContactResponse,
+  BusinessKycDetailsResponse,
+  InviteResponse,
+  KycDocumentResponse,
+  KycSubmitResponse,
+  OwnerIdentityResponse,
+  WebhookConfigResponse,
+} from "@napayment/api-client";
 import { api } from "@/lib/api";
 
 export interface OnboardingStatus {
@@ -33,7 +41,7 @@ export function useOnboardingStatus() {
 export function useBusinessDetails() {
   return useQuery({
     queryKey: ["business-details"],
-    queryFn: () => api.get<BusinessDetailsInput | null>("/api/onboarding/business-details"),
+    queryFn: () => api.get<BusinessKycDetailsResponse | null>("/api/onboarding/business-details"),
   });
 }
 
@@ -56,7 +64,7 @@ export function useSaveBusinessDetails() {
 export function useOwnerIdentity() {
   return useQuery({
     queryKey: ["owner-identity"],
-    queryFn: () => api.get<OwnerIdentityInput | null>("/api/onboarding/owner-identity"),
+    queryFn: () => api.get<OwnerIdentityResponse | null>("/api/onboarding/owner-identity"),
   });
 }
 
@@ -65,7 +73,7 @@ export function useSaveOwnerIdentity() {
   return useMutation({
     mutationFn: (input: OwnerIdentityInput) => api.put("/api/onboarding/owner-identity", input),
     onSuccess: () => {
-      toast.success("Identity details saved");
+      toast.success("Identity details saved — verified via the sandbox identity gateway");
       queryClient.invalidateQueries({ queryKey: ["owner-identity"] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -74,18 +82,10 @@ export function useSaveOwnerIdentity() {
 
 // ---- KYC documents --------------------------------------------------------------
 
-export interface KycDocumentMeta {
-  id: string;
-  type: KycDocumentType;
-  fileName: string;
-  sizeBytes: number;
-  uploadedAt: string;
-}
-
 export function useKycDocuments() {
   return useQuery({
     queryKey: ["kyc-documents"],
-    queryFn: () => api.get<KycDocumentMeta[]>("/api/onboarding/kyc/documents"),
+    queryFn: () => api.get<KycDocumentResponse[]>("/api/onboarding/kyc/documents"),
   });
 }
 
@@ -99,7 +99,7 @@ export function useUploadKycDocument() {
       const response = await fetch("/api/onboarding/kyc/documents", { method: "POST", body: form });
       const json = await response.json();
       if (!response.ok) throw new Error(json.message ?? "Upload failed");
-      return json as KycDocumentMeta;
+      return json as KycDocumentResponse;
     },
     onSuccess: () => {
       toast.success("Document uploaded");
@@ -112,7 +112,7 @@ export function useUploadKycDocument() {
 export function useSubmitKyc() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => api.post<{ status: KycStatus }>("/api/onboarding/kyc/submit"),
+    mutationFn: () => api.post<KycSubmitResponse>("/api/onboarding/kyc/submit"),
     onSuccess: () => {
       toast.success("KYC submitted for review");
       queryClient.invalidateQueries({ queryKey: ["onboarding-status"] });
@@ -123,14 +123,8 @@ export function useSubmitKyc() {
 
 // ---- Team invites -------------------------------------------------------------
 
-export interface Invite {
-  id: string;
-  email: string;
-  roleTemplate: string;
-  status: string;
-  inviteUrl: string;
-  invitedAt: string;
-}
+/** roleName is resolved server-side by our own Route Handler - the backend's InviteResponse only carries roleId (doc F6). */
+export type Invite = InviteResponse & { roleName: string };
 
 export function useInvites() {
   return useQuery({
@@ -169,7 +163,7 @@ export function useRevokeInvite() {
 export function useWebhookConfig() {
   return useQuery({
     queryKey: ["webhook-config"],
-    queryFn: () => api.get<WebhookConfigInput>("/api/onboarding/webhook-config"),
+    queryFn: () => api.get<WebhookConfigResponse>("/api/onboarding/webhook-config"),
   });
 }
 
@@ -191,7 +185,7 @@ export function useSaveWebhookConfig() {
 export function useContactSettings() {
   return useQuery({
     queryKey: ["contact-settings"],
-    queryFn: () => api.get<ContactSettingsInput>("/api/onboarding/contact"),
+    queryFn: () => api.get<BusinessContactResponse>("/api/onboarding/contact"),
   });
 }
 
