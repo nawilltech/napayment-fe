@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 /**
- * These schemas back onboarding surfaces the backend does not expose an
- * endpoint for yet (KYC upload, team invites, webhook/callback URL config,
- * contact emails) - see docs/nawill-pay-frontend.md doc F9. They're kept
- * here, in the shared package, on purpose: the *shape* of this data is a
- * product decision independent of which backend endpoint eventually accepts
- * it, and a mobile client will want the same validation rules later.
+ * Client-side validation for the onboarding flow, mirroring the backend's own
+ * Bean Validation constraints on each of these now-real endpoints (business
+ * KYC, owner identity, team invites, webhook config, contact settings - see
+ * docs/nawill-pay-frontend.md doc F6). Kept here, in the shared package, on
+ * purpose: the *shape* of this data is a product decision independent of
+ * which layer validates it, and a mobile client will want the same rules.
  */
 
 // ---- Business KYC ----------------------------------------------------------
@@ -73,6 +73,13 @@ export type KycStatus = (typeof KYC_STATUSES)[number];
 export const ROLE_TEMPLATES = ["ADMIN", "DEVELOPER", "ACCOUNT_OFFICER"] as const;
 export type RoleTemplate = (typeof ROLE_TEMPLATES)[number];
 
+/**
+ * `permissionNames` is reference/display-only now - the backend's own
+ * `RoleTemplate` enum (onboarding-auth-rbac) owns the authoritative mapping
+ * and creates/reuses the role server-side on invite; the frontend used to
+ * resolve this itself via POST /api/v1/roles before that endpoint existed.
+ * Kept here in sync so the description text stays accurate.
+ */
 export const ROLE_TEMPLATE_META: Record<
   RoleTemplate,
   { label: string; description: string; permissionNames: string[] }

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DevGapNotice } from "@/components/ui/alert";
 import { useContactSettings, useSaveContactSettings } from "@/hooks/use-onboarding";
 
 function parseEmails(value: string): string[] {
@@ -55,7 +54,6 @@ export function ContactForm() {
       <CardHeader>
         <CardTitle>Contact</CardTitle>
         <CardDescription>Where we send dispute, refund, and support notifications.</CardDescription>
-        <DevGapNotice>no equivalent field exists on the `Business` entity yet.</DevGapNotice>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>

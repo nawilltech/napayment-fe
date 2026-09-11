@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Download } from "lucide-react";
 import {
   KYC_DOCUMENT_LABELS,
   KYC_DOCUMENT_TYPES,
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DevGapNotice } from "@/components/ui/alert";
+import { StatusBadge } from "@/components/ui/badge";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import {
   useKycDocuments,
@@ -38,7 +39,9 @@ export function KycForm() {
     formState: { errors },
   } = useForm<OwnerIdentityInput>({
     resolver: zodResolver(ownerIdentitySchema),
-    values: ownerIdentity ?? undefined,
+    values: ownerIdentity
+      ? { bvn: ownerIdentity.bvn ?? "", nin: ownerIdentity.nin ?? "" }
+      : undefined,
   });
 
   const allDocumentsUploaded = KYC_DOCUMENT_TYPES.every((type) =>
@@ -47,19 +50,16 @@ export function KycForm() {
 
   return (
     <div className="space-y-6">
-      <DevGapNotice>
-        the backend has no KYC entity/endpoint yet (flagged `TODO(FR-8)` in its own README) — this
-        step saves to a local dev-store so the flow is fully clickable. See{" "}
-        <code>docs/api-contracts/kyc-*.json</code> for the suggested contract.
-      </DevGapNotice>
-
       <Card>
-        <CardHeader>
-          <CardTitle>Owner identity</CardTitle>
-          <CardDescription>
-            FR-8: BVN or NIN verification for the business owner. In production this triggers a
-            real third-party verification call, not just storage.
-          </CardDescription>
+        <CardHeader className="flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle>Owner identity</CardTitle>
+            <CardDescription>
+              FR-8: BVN or NIN verification for the business owner, checked against a sandbox
+              identity provider.
+            </CardDescription>
+          </div>
+          {ownerIdentity && <StatusBadge status={ownerIdentity.verified ? "VERIFIED" : "PENDING_REVIEW"} />}
         </CardHeader>
         <form onSubmit={handleSubmit((values) => saveIdentity.mutate(values))}>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -90,12 +90,22 @@ export function KycForm() {
           {KYC_DOCUMENT_TYPES.map((type) => {
             const uploaded = documents?.find((doc) => doc.type === type);
             return (
-              <FileDropzone
-                key={type}
-                label={KYC_DOCUMENT_LABELS[type]}
-                uploaded={uploaded}
-                onSelect={(file) => upload.mutate({ type: type as KycDocumentType, file })}
-              />
+              <div key={type} className="space-y-1.5">
+                <FileDropzone
+                  label={KYC_DOCUMENT_LABELS[type]}
+                  uploaded={uploaded}
+                  onSelect={(file) => upload.mutate({ type: type as KycDocumentType, file })}
+                />
+                {uploaded && (
+                  <a
+                    href={`/api/onboarding/kyc/documents/${uploaded.id}/download`}
+                    className="flex items-center gap-1 text-xs font-medium text-navy-600 hover:underline"
+                  >
+                    <Download className="size-3" />
+                    Download
+                  </a>
+                )}
+              </div>
             );
           })}
         </CardContent>

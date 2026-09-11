@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert, DevGapNotice } from "@/components/ui/alert";
+import { Alert } from "@/components/ui/alert";
 import { CopyField } from "@/components/ui/copy-field";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -47,7 +47,9 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
   const saveWebhook = useSaveWebhookConfig();
   const webhookForm = useForm<WebhookConfigInput>({
     resolver: zodResolver(webhookConfigSchema),
-    values: webhookConfig,
+    values: webhookConfig
+      ? { callbackUrl: webhookConfig.callbackUrl ?? "", webhookUrl: webhookConfig.webhookUrl ?? "" }
+      : undefined,
   });
 
   return (
@@ -140,11 +142,6 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
         </CardHeader>
         <form onSubmit={webhookForm.handleSubmit((values) => saveWebhook.mutate(values))}>
           <CardContent className="space-y-4">
-            <DevGapNotice>
-              <code>ApiKeyCredential</code> has no callback/webhook URL column yet even though FR-9
-              calls for one — saved to the dev-store today. See{" "}
-              <code>docs/api-contracts/webhook-config.json</code>.
-            </DevGapNotice>
             <div>
               <Label htmlFor="callbackUrl">Test callback URL</Label>
               <Input id="callbackUrl" placeholder="https://example.com/callback" {...webhookForm.register("callbackUrl")} />

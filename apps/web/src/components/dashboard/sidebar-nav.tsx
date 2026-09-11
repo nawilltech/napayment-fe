@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings, ShieldCheck } from "lucide-react";
+import { ArrowLeftRight, Home, Settings, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: Home },
+  { href: "/dashboard/transactions", label: "Transactions", icon: ArrowLeftRight },
   { href: "/onboarding", label: "Activation", icon: ShieldCheck },
   { href: "/dashboard/settings/profile", label: "Settings", icon: Settings, matchPrefix: "/dashboard/settings" },
 ];

@@ -16,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DevGapNotice } from "@/components/ui/alert";
 import { StatusBadge } from "@/components/ui/badge";
 import { CopyField } from "@/components/ui/copy-field";
 import { formatDate } from "@/lib/utils";
@@ -42,12 +41,6 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
 
   return (
     <div className="space-y-6">
-      <DevGapNotice>
-        role assignment is real (each template maps to a real business-scoped role created via{" "}
-        <code>POST /api/v1/roles</code>), but the invite/email envelope is dev-store only — see{" "}
-        <code>docs/api-contracts/team-invites.json</code>.
-      </DevGapNotice>
-
       <Card>
         <CardHeader>
           <CardTitle>Invite a team member</CardTitle>
@@ -98,8 +91,7 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
                 <div>
                   <p className="text-sm font-medium text-navy-900">{invite.email}</p>
                   <p className="text-xs text-navy-500">
-                    {ROLE_TEMPLATE_META[invite.roleTemplate as keyof typeof ROLE_TEMPLATE_META]?.label} ·
-                    invited {formatDate(invite.invitedAt)}
+                    {invite.roleName} · invited {formatDate(invite.invitedAt)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

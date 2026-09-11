@@ -65,3 +65,18 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+/**
+ * FR-5a's "join an existing business" signup variant - no email field: the
+ * backend derives it from the invite token (AcceptInviteRequest has no email
+ * param either), so asking for it here would just be an unused input.
+ */
+export const acceptInviteSchema = z.object({
+  token: z.string().min(1),
+  firstName: z.string().min(1, "Required"),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, "Required"),
+  phoneNo: z.string().min(10, "Enter a valid phone number"),
+  password: strongPasswordSchema,
+});
+export type AcceptInviteInput = z.infer<typeof acceptInviteSchema>;

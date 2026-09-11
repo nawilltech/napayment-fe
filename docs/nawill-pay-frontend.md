@@ -9,7 +9,7 @@ Version 0.2 (Framework selection + architecture, plus the Business Console's onb
 Prepared by: Nawill Technology Ltd — Engineering
 Date: September 2026
 
-**Implementation status (added post-v0.1 of this document):** the Business Console's full onboarding flow — business/individual signup, KYC document upload, team invites, API key + IP whitelist + webhook config, and the corresponding Settings tabs — is built in `apps/web` per this handbook's own architecture (Chapters F2/F4/F8). The Consumer Wallet App (`apps/mobile`) is scaffolded only, per doc F10. Every screen backed by a real backend endpoint calls it through the BFF proxy (doc F2 ADR-FE-2); every screen backed by a gap in doc F9 is served by `apps/web/src/server/dev-store.ts`, a JSON-file dev stand-in, clearly marked `TODO(FE-Gap, doc F9)` at each call site with a suggested contract — see `docs/api-contracts/` for copy-pasteable request/response JSON per gap.
+**Implementation status (added post-v0.1 of this document):** the Business Console's full onboarding flow — business/individual signup, KYC document upload, team invites, API key + IP whitelist + webhook config, and the corresponding Settings tabs — is built in `apps/web` per this handbook's own architecture (Chapters F2/F4/F8), along with a **Transactions** screen (filterable/paginated list + analytics dashboard: stat tiles, a daily-volume bar chart, status/type breakdowns). The Consumer Wallet App (`apps/mobile`) is scaffolded only, per doc F10. Every screen calls a real backend endpoint through the BFF proxy (doc F2 ADR-FE-2) — **`apps/web/src/server/dev-store.ts` (the JSON-file dev stand-in every onboarding screen was originally built against) has been deleted**: the backend closed essentially every doc F9 gap it was covering for (`GET /users/me`, business KYC/KYB, owner BVN/NIN identity, KYC document upload+download, KYC submit, team invitations + a real invite-acceptance signup path, API-key webhook config, business contact settings) in one pass, and every Route Handler that used to read/write it now calls the real endpoint instead. See the revised doc F9 table for what's still actually open (a small remainder, not the original eight gaps) and doc F6 for the endpoints themselves. `docs/api-contracts/` is kept as a historical record of the contracts this integration was built against — each file now links to where it landed.
 
 ---
 
@@ -157,11 +157,11 @@ The backend's own resilience posture already fails open under network/Redis stre
 
 ## Chapter F6 — API Surface Reference
 
-Sourced directly from the backend's controllers/DTOs (not the aspirational master spec) as of the `feat/pagination-and-term-search` branch. This is a snapshot for building the initial `packages/api-client` — once the OpenAPI-codegen step (doc F4) is wired up, that generated schema is the source of truth and this table should be treated as historical.
+Sourced directly from the backend's controllers/DTOs (not the aspirational master spec), current through the `feat(onboarding): implement backend for business onboarding/KYC` commit. This is a snapshot for building the initial `packages/api-client` — once the OpenAPI-codegen step (doc F4) is wired up, that generated schema is the source of truth and this table should be treated as historical.
 
 All paths are prefixed `/api/v1`. Two auth mechanisms: **JWT** (`Authorization: Bearer <token>`, permission-gated via `@PreAuthorize("@auth.can('resource:action')")`, `SUPERADMIN` bypasses all checks) and **API-key/HMAC** (`X-Public-Key` / `X-Timestamp` / `X-Signature` headers — server-to-server only, doc 3 §2.5). Public/no-auth: `auth/signup`, `auth/login`, `auth/forgot-password`, `auth/reset-password`, all of `/pay/**`.
 
-**Pagination coverage is inconsistent today** — flagged in doc F9 as worth normalizing backend-side: paginated-with-search (`term`, `page`, `size`): Roles, Payment Processors, Admin Divisions, Banks, Countries. Paginated-without-search: API Keys (+ IP whitelist), Bank Accounts, Dynamic Accounts, Payment Links, Settlement Accounts, Virtual Accounts. **No list endpoint at all**: Transactions (create + get-by-id only), Settlements (create only, returns the array from that one call), Collection Account (single active record, not a list).
+**Pagination coverage is inconsistent today** — flagged in doc F9 as worth normalizing backend-side: paginated-with-search (`term`, `page`, `size`): Roles, Payment Processors, Admin Divisions, Banks, Countries, **and now Transactions** (its `term` matches `sessionId`). Paginated-without-search: API Keys (+ IP whitelist), Bank Accounts, Dynamic Accounts, Payment Links, Settlement Accounts, Virtual Accounts. **No list endpoint at all**: Settlements (create only, returns the array from that one call), Collection Account (single active record, not a list).
 
 Every paginated response: `{ content: T[]; page: number; size: number; totalElements: number; totalPages: number }` (default `page=0`, `size=20`).
 
@@ -176,10 +176,15 @@ Every paginated response: `{ content: T[]; page: number; size: number; totalElem
 
 `AuthResponse` (used for both signup and login — there is no separate login response type): `{ accessToken, tokenType: "Bearer", expiresInSeconds, userId, businessId }`. `SignupRequest` presence of `businessName` triggers a business signup. `ForgotPasswordResponse.resetToken` is returned **directly in the API response** today, not emailed/SMS'd (doc F9 gap).
 
+`POST /signup/accept-invite` — FR-5a's "join an existing business" variant, added alongside the team-invitations feature below. `AcceptInviteRequest { token, firstName, middleName?, lastName, phoneNo, password }` → 201 `AuthResponse` (same shape as signup/login). No `email` field — the backend derives it from the invitation the token resolves to. Rejects with `400 INVALID_INVITE` if the token doesn't resolve to a `PENDING` invitation, `400 EMAIL_TAKEN`/`400 PHONE_TAKEN` on a collision. Attaches the new user to the inviting business under the invitation's role; does **not** provision a new virtual account (the business already has one, shared across every user on it).
+
+### Users — `/users` (JWT, no specific permission — any authenticated caller reading their own record)
+`GET /me` → `UserResponse { userId, businessId, firstName, middleName, lastName, email, phoneNo, userType, businessName, cacNumber, isVerified, createdAt }`. Added specifically to close the "no profile-read endpoint" gap doc F9 originally flagged — every screen that shows the signed-in user's name/email now reads this live instead of a cached signup snapshot.
+
 ### RBAC / Roles — `/roles` (`roles:manage`, JWT)
 `POST /` and `GET /` (`term?, page, size`, business-scoped). `CreateRoleRequest { name, permissionNames[] }` → `RoleResponse { id, name, businessId, permissionNames[] }`.
 
-Full permission catalog (no central constants class exists backend-side — literals only): `transactions:create/read`, `virtualaccounts:read`, `processors:configure/read`, `roles:manage`, `users:read`, `settlements:read/manage`, `apikeys:manage`, `paymentlinks:manage/read`, `collection-account:manage` (unassigned — SUPERADMIN-only), `temporaryaccounts:manage`, and `collect:create`/`withdraw:create` (synthesized only by the API-key filter, never in the DB).
+Full permission catalog (no central constants class exists backend-side — literals only): `transactions:create/read`, `virtualaccounts:read`, `processors:configure/read`, `roles:manage`, `users:read`, `settlements:read/manage`, `apikeys:manage`, `paymentlinks:manage/read`, `collection-account:manage` (unassigned — SUPERADMIN-only), `temporaryaccounts:manage`, `business:kyc-manage`, `business:manage` (both new, seeded onto `BUSINESS_OWNER`), and `collect:create`/`withdraw:create` (synthesized only by the API-key filter, never in the DB).
 
 ### API Keys — `/api-keys` (`apikeys:manage`, JWT)
 | Method & path | Notes |
@@ -190,6 +195,34 @@ Full permission catalog (no central constants class exists backend-side — lite
 | `POST /ip-whitelist` | `{ cidr }` → 201 |
 | `GET /ip-whitelist` | `page, size` → `PageResponse<string>` |
 | `DELETE /ip-whitelist?cidr=` | 204 |
+| `PUT /webhook-config` | `WebhookConfigRequest { callbackUrl?, webhookUrl? }` (either may be blank to clear it) → `WebhookConfigResponse { callbackUrl, webhookUrl, updatedAt }` — closed the FR-9 "configure a webhook URL" gap; adds those two columns to `ApiKeyCredential`, not a separate entity |
+| `GET /webhook-config` | → `WebhookConfigResponse` |
+
+### Business KYC (KYB) — `/business/kyc/details` (`business:kyc-manage`, JWT)
+`PUT /` — `BusinessKycDetailsRequest { registeredName, cacNumber, businessType, industry, countryId, stateId, addressLine }` → `BusinessKycDetailsResponse` (same fields + `updatedAt`). `businessType` enum: `LIMITED_LIABILITY | SOLE_PROPRIETORSHIP | PARTNERSHIP | NGO | OTHER`. `GET /` → same response, or `null` (200, empty body) if never submitted. Note: the response has **no `kycStatus` field** — see doc F9 for the small resulting gap.
+
+### Owner Identity (BVN/NIN) — `/kyc/owner-identity` (`business:kyc-manage`, JWT)
+`PUT /` — `OwnerIdentityRequest { bvn?, nin? }` (exactly one required, 11 digits each) → `OwnerIdentityResponse { bvn, nin, verified }`. Verified via `IdentityVerificationGateway`/`SandboxIdentityVerificationGateway` (always approves — same sandboxed-for-now posture as `PaymentProcessorGateway`, doc 2 §7 ADR-6). Numbers are encrypted at rest and masked in logs. `GET /` → same shape, or `null` if never submitted.
+
+### KYC Documents & Submission — `/kyc/documents`, `/kyc/submit` (`business:kyc-manage`, JWT)
+| Method & path | Notes |
+|---|---|
+| `POST /kyc/documents` | `multipart/form-data`: `type` (`CAC_CERTIFICATE \| MEMORANDUM_AND_ARTICLES \| PROOF_OF_ADDRESS \| DIRECTOR_VALID_ID`) + `file` (max 10MB) → 201 `KycDocumentResponse { id, type, fileName, sizeBytes, uploadedAt }` |
+| `GET /kyc/documents` | → `KycDocumentResponse[]` (plain array, not paginated — only 4 document types ever exist) |
+| `GET /kyc/documents/{id}/download` | → binary stream, `Content-Disposition: attachment`; ownership-checked, never a public URL. Stored via `FileStorageGateway`/`LocalFileStorageGateway` (local disk today, swappable to S3/MinIO behind the same interface) |
+| `POST /kyc/submit` | no body → `KycSubmitResponse { status, submittedAt }`. `400`s if business details are incomplete or any of the 4 document types is missing |
+
+### Team Invitations — `/team/invitations` (`roles:manage`, JWT)
+| Method & path | Notes |
+|---|---|
+| `POST /` | `CreateInviteRequest { email, roleTemplate, message? }` → 201 `InviteResponse { id, email, roleId, status, inviteUrl, invitedAt }` |
+| `GET /` | → `InviteResponse[]` (plain array, business-scoped) |
+| `DELETE /{id}` | → `{ ok: true }` |
+
+`roleTemplate` is `ADMIN \| DEVELOPER \| ACCOUNT_OFFICER` — the backend's own `RoleTemplate` enum now owns the permission-set mapping and creates/reuses a business-scoped role by name (`findOrCreateRole`) server-side; the frontend used to do this itself via `POST /api/v1/roles` before this endpoint existed (doc F9, resolved). **`InviteResponse` carries `roleId`, not `roleTemplate`** — it isn't echoed back, so resolve `roleId` against `GET /roles` for a display name (`apps/web`'s own Route Handler does this merge server-side). Invite emails send via `EmailGateway`/`SmtpEmailGateway` (SMTP config in `.env`) — best-effort, a send failure is logged but never fails the invite itself.
+
+### Business Contact — `/business/contact` (`business:manage`, JWT)
+`PUT /` — `BusinessContactRequest { disputeEmails[], refundEmails[], supportEmail?, generalEmail }` → `BusinessContactResponse` (same shape). `GET /` → same, defaulting to `{ disputeEmails: [], refundEmails: [], supportEmail: "", generalEmail: <caller's account email> }` if nothing's been saved yet — never `null`.
 
 ### Virtual Accounts — `/virtual-accounts` (`virtualaccounts:read`, JWT)
 `GET /` only (`page, size`) → `PageResponse<VirtualAccountResponse { id, accountNumber, userId, businessId, currency, balance }>`. No create endpoint — provisioning is signup-triggered only (FR-1).
@@ -198,9 +231,15 @@ Full permission catalog (no central constants class exists backend-side — lite
 | Method & path | Permission | Notes |
 |---|---|---|
 | `POST /` | `transactions:create` | `@Idempotent`; `CreateTransactionRequest { virtualAccountId, paymentProcessorId, transactionType: CREDIT\|DEBIT, amount }` → 201 |
-| `GET /{id}` | `transactions:read` | ownership-checked; **no list endpoint** |
+| `GET /{id}` | `transactions:read` | ownership-checked |
+| `GET /` | `transactions:read` | Paginated + filterable list — **implemented** (was a doc F9 gap, closed). `page, size` plus every filter below. |
+| `GET /analytics` | `transactions:read` | Aggregates over the same filtered set as the list (shares one `Specification`, so the two can never disagree) — not paginated, returns one summary object. |
+
+Shared filter query params (both `GET /` and `GET /analytics`): `term?` (matched against `sessionId`), `status?` (`TransactionStatus`), `type?` (`TransactionType`), `virtualAccountId?` (narrows further — omit it and scoping still defaults to the caller's own transactions), `fromDate?`/`toDate?` (ISO-8601 instant, `fromDate` ≤ `toDate` or `400 INVALID_DATE_RANGE`), `minAmount?`/`maxAmount?` (minor units, `minAmount` ≤ `maxAmount` or `400 INVALID_AMOUNT_RANGE`). **Row-level ownership scoping is automatic and cannot be widened by the client**: a non-SUPERADMIN caller only ever sees transactions on virtual accounts they or their business own, regardless of filters passed. No `sort` param exists — list order is DB-default (unspecified), not guaranteed by `createdAt`.
 
 `TransactionResponse { id, amount, charge, transactionStatus, transactionType, sessionId, virtualAccountId, paymentProcessorId, createdAt }`. Enums: `TransactionStatus = PENDING\|PROCESSING\|PAID\|FAILED\|ON_HOLD`, `TransactionType = CREDIT\|DEBIT`.
+
+`TransactionAnalyticsResponse { fromDate, toDate, totalCount, totalVolume, creditVolume, debitVolume, netVolume, averageAmount, highest: {transactionId, amount, createdAt} | null, lowest: {...} | null, byStatus: [{status, count, volume}], byType: [{type, count, volume}], dailyVolume: [{date, count, volume}] }`. Computed in application code over the full filtered set (not a DB `GROUP BY`) — fine at current volumes, per the backend's own commit note; revisit if per-business transaction counts grow large.
 
 ### Bank Accounts & Verification — `/bank-accounts`, `/banks/resolve-account`
 `POST /bank-accounts` (`settlements:manage`) — `CreateBankAccountRequest { bankId, accountNumber, accountName }` → `BankAccountResponse`. `GET /bank-accounts` (`settlements:read`, `page, size`). Account name is always re-resolved server-side via `BankVerificationService` (live Paystack `GET /bank/resolve` call, doc `payments.md`) — never trusts client-supplied `accountName` for the *stored* value; `GET /banks/resolve-account` (`settlements:manage`) previews the resolved name before submission.
@@ -266,8 +305,9 @@ Each screen cites the backend process flow it drives (doc 4 Part C) so a screen'
 |---|---|---|
 | Sign up (individual or business) | doc 4 §C.1 | `POST /auth/signup` |
 | Log in / Forgot / Reset password | doc 4 §C.1 | `/auth/login`, `/auth/forgot-password`, `/auth/reset-password` |
-| Dashboard home (balance, recent activity) | — | `GET /virtual-accounts`, `GET /transactions/{id}` per recent id |
-| Transactions | doc 4 §C.2 | `GET /transactions/{id}` (no list yet — doc F9) |
+| Onboarding wizard — business details, KYC (owner identity + documents), submit for review | doc 4 §C.1, FR-8 | `/business/kyc/details`, `/kyc/owner-identity`, `/kyc/documents`, `/kyc/submit` — **built** |
+| Dashboard home (balance, recent activity) | — | `GET /virtual-accounts`, `GET /users/me`, `GET /transactions` (recent 5) |
+| Transactions — list, filters, analytics | doc 4 §C.2 | `GET /transactions`, `GET /transactions/analytics`, `GET /transactions/{id}` — **built** |
 | Bank Accounts | doc 4 §C.6 | `POST/GET /bank-accounts`, `GET /banks/resolve-account` |
 | Settlement Accounts & Splits | doc 4 §C.6 | `/settlement-accounts`, `PATCH .../auto-settle` |
 | Settlements (manual trigger + history) | doc 4 §C.6 | `POST /settlements` |
@@ -275,8 +315,8 @@ Each screen cites the backend process flow it drives (doc 4 Part C) so a screen'
 | API Keys & Webhooks | doc 4 §C.7 | `/api-keys`, `/api-keys/ip-whitelist` |
 | Payment Links | doc 4 §C.8 | `/payment-links` |
 | Dynamic Accounts *(+ sandbox simulate-deposit in test mode)* | doc 4 §C.8 | `/temporary-accounts` |
-| Team & Roles | doc 4 §C.4, FR-5a | `/roles` |
-| Settings — Profile / Contact / Accounts / Preferences | — | `/auth/change-password`; rest pending doc F9 |
+| Team & Roles / Invite teammates | doc 4 §C.4, FR-5a | `/roles`, `/team/invitations` — **built** |
+| Settings — Profile / Contact | — | `GET /users/me`, `/auth/change-password`, `/business/contact` — **built**; Accounts/Preferences tabs not built (no backend surface for them yet, not flagged as a gap since nothing in doc 1 calls for them specifically) |
 | Payment Processors *(Supply Admin)* | doc 4 §C.4, FR-6 | `/payment-processors` |
 | Reference-data pickers (bank/country/state selects) | — | `/banks`, `/countries`, `/countries/{id}/states` |
 | Reports *(blocked on backend)* | doc 4 §C.3 | none yet — doc F9 |
@@ -286,14 +326,14 @@ Each screen cites the backend process flow it drives (doc 4 Part C) so a screen'
 
 | Screen | Backend flow | Key endpoints |
 |---|---|---|
-| Onboarding (signup, KYC tier 1) | doc 4 §C.1 | `POST /auth/signup`; KYC endpoints don't exist yet — doc F9 |
+| Onboarding (signup, KYC tier 1) | doc 4 §C.1 | `POST /auth/signup` + the full KYC endpoint set (doc F6) now exist backend-side; not built on mobile yet, scaffold only (doc F10) |
 | Home (balance, virtual account number) | — | `GET /virtual-accounts` |
-| Transaction history | doc 4 §C.2 | blocked on a list endpoint — doc F9 |
+| Transaction history | doc 4 §C.2 | `GET /transactions` now exists (doc F6) — unblocked backend-side; not built on mobile yet, scaffold only (doc F10) |
 | Collect (share payment link / dynamic account) | doc 4 §C.8 | `/payment-links`, `/temporary-accounts` |
-| Send to another Nawill user | doc 4 §C.2 (partial) | **no endpoint yet** — doc F9, highest-priority gap |
-| Notifications | doc 1 FR-Notif-1 | not implemented backend-side — doc F9 |
-| Security (2FA, change password, biometric app-lock) | doc 1 FR-8 | `/auth/change-password`; 2FA endpoints don't exist yet |
-| Profile / Settings | — | pending doc F9 |
+| Send to another Nawill user | doc 4 §C.2 (partial) | **no endpoint yet** — doc F9, highest-priority remaining gap |
+| Notifications | doc 1 FR-Notif-1 | invite emails now send for real (`EmailGateway`); no general in-app/push notification system yet — doc F9 |
+| Security (2FA, change password, biometric app-lock) | doc 1 FR-8 | `/auth/change-password` is real; 2FA endpoints don't exist yet — doc F9 |
+| Profile / Settings | — | `GET /users/me`, `/business/contact` now exist backend-side (doc F6); not built on mobile yet, scaffold only (doc F10) |
 
 ---
 
@@ -330,7 +370,8 @@ napayment-fe/
 │                                account holder's personal info), local reference only
 └── docs/
     ├── nawill-pay-frontend.md  This document
-    └── api-contracts/           JSON request/response contracts for every doc F9 gap
+    └── api-contracts/           Historical contracts - the backend has since implemented
+                                  nearly all of them for real (doc F9)
 ```
 
 ### Naming conventions
@@ -364,26 +405,33 @@ These are the two anchor points; a full Tailwind scale (`navy-50`…`navy-900`, 
 
 ## Chapter F9 — Backend Gaps the Frontend Will Need
 
-Per direction not to limit the UI to what the backend documents today: these are gaps identified while building this handbook, ordered by how soon the frontend blocks on them. Each should become its own backend ticket, citing the relevant `FR-x` the way every existing backend module does. Where a concrete request/response contract was worked out while building the Console's onboarding flow against these gaps, it's linked below and lives as copy-pasteable JSON under `docs/api-contracts/`.
+Per direction not to limit the UI to what the backend documents today: these are gaps identified while building this handbook, ordered by how soon the frontend blocks on them. Each should become its own backend ticket, citing the relevant `FR-x` the way every existing backend module does.
+
+**Update: the backend closed nearly the entire original table in one pass** (`feat(onboarding): implement backend for business onboarding/KYC`) — `GET /users/me`, business KYC/KYB, owner BVN/NIN identity (sandboxed verification), KYC document upload/download, KYC submit, team invitations, a real invite-acceptance signup path, API-key webhook config, and business contact settings all now exist (doc F6). `apps/web/src/server/dev-store.ts`, the JSON-file stand-in every one of those screens was built against, has been **deleted** — every Route Handler that used to read/write it now calls the real endpoint. `docs/api-contracts/` is kept as a historical record of the contracts this integration was built against, not a current gap list.
+
+What's left, resolved-or-not:
 
 | Gap | Blocks | Notes |
 |---|---|---|
-| **CORS configuration** | ~~The Console calling the API from a browser at all~~ Worked around, not fully resolved | Still no CORS setup in `SecurityConfig`/`application.yml`, but the built Console never calls the backend from the browser at all — every request routes through a Next.js Route Handler acting as a BFF (doc F2 ADR-FE-2, `apps/web/src/server/backend-client.ts`), which is a server-to-server call. Still worth fixing backend-side for any *other* future browser-based client. |
-| **`GET /users/me` (or equivalent profile read)** | Displaying the signed-in user's name/email/phone anywhere | Not previously called out explicitly — found while wiring the Console's header and Settings → Profile. `AuthResponse` (signup/login) returns only `{ accessToken, userId, businessId, ... }`, no profile fields. Stopgap: `apps/web/src/server/dev-store.ts` caches what the signup form itself submitted, keyed by `userId`. Contract: `docs/api-contracts/users-me.json`. |
-| **Transaction list endpoint** | Transaction history screens on both Console and Wallet App | `TransactionController` only has `POST /` and `GET /{id}` — no `GET /transactions` at all. The built dashboard home explicitly shows this as blocked rather than faking a list. |
-| **Refresh-token rotation** | Session length / re-login frequency | README lists this as explicitly out of scope for v0.1 (doc 3 §2.1 describes the target design already). Access-token-only means a 10–15 min forced re-login today; the built session cookie (doc F2 ADR-FE-2) expires in lockstep with it. |
-| **Peer-to-peer send** | The Wallet App's core "transfer money" flow (FR-Auth-1) | Today's transaction/collect endpoints only credit/debit the *caller's own* virtual account; there's no "send from my account to another Nawill user's account" endpoint. |
-| **"Join an existing business" signup path** | Team invite acceptance actually creating a staff account | Distinct from peer-to-peer send, above. `POST /api/v1/auth/signup` always creates a brand-new business (or a plain individual) — there's no way for an invited user to sign up *under* the inviting business_id with their assigned role. The built `/invite/[token]` accept page marks the invite accepted in the dev-store only; it cannot create the real account. Contract sketch: `docs/api-contracts/team-invites.json`. |
-| **KYC endpoints (business details, owner BVN/NIN, document upload, submit-for-review)** | Onboarding → KYC step, FR-8/FR-8a's ₦50,000 enhanced-KYC trigger | README explicitly flags FR-8/FR-8a as `TODO` — no KYC entity/endpoint exists in the controller set at all yet. The built Console implements the full upload UI against a dev-store stand-in (local disk under `.data/uploads/`). Contracts: `docs/api-contracts/business-details.json`, `owner-identity.json`, `kyc-documents.json`, `kyc-submit.json`. |
-| **Team invitation endpoints + email dispatch** | Onboarding → Invite your team step, FR-5a | No invitation concept exists (only `POST /api/v1/roles`, which the Console *does* call for real — see doc F6). The invite envelope itself (token, email delivery, accept flow) is dev-store only. Contract: `docs/api-contracts/team-invites.json`. |
-| **API key webhook/callback URL fields** | Onboarding → API Keys & Webhooks step, FR-9 | `ApiKeyCredential` has no callback/webhook URL column despite FR-9 calling for one. Contract: `docs/api-contracts/webhook-config.json`. |
-| **Business contact settings** | Settings → Contact tab | No equivalent field on the `Business` entity. Contract: `docs/api-contracts/contact-settings.json`. |
-| **2FA endpoints** | Security settings screen, FR-8 | Flagged `TODO` in the backend README, no endpoints exist. Not yet built on the frontend either (Settings → Profile only exposes change-password, which is real). |
-| **Notification delivery** | In-app/push notification screen, FR-Notif-1; also blocks real invite-email delivery above | `ForgotPasswordResponse.resetToken` is returned directly in the API response today rather than emailed/SMS'd — notification dispatch isn't wired up yet at all. The built forgot-password screen surfaces this token directly in the UI with an explicit dev-gap notice, rather than pretending an email was sent. |
+| ~~**CORS configuration**~~ Not actually a blocker | — | Still no CORS setup in `SecurityConfig`/`application.yml`, but the Console never calls the backend from the browser — every request routes through the BFF (doc F2 ADR-FE-2). Still worth fixing for any *other* future browser-based client. |
+| ~~**`GET /users/me`**~~ **Resolved** | — | Closed — see doc F6 "Users." The Console's header and Settings → Profile now read it live; `dev-store`'s signup-time profile cache is gone. |
+| ~~**Transaction list endpoint**~~ **Resolved** | — | `GET /transactions` + `GET /transactions/analytics` — see doc F6. Consumed by `/dashboard/transactions` and the dashboard home's recent-activity preview. Still unbuilt on the **Wallet App** specifically (scaffold only, doc F10) — that's a frontend gap now, not a backend one. |
+| ~~**Business KYC/KYB, owner identity, document upload+download, KYC submit**~~ **Resolved** | — | All four — see doc F6 "Business KYC," "Owner Identity," "KYC Documents & Submission." The Console's KYC step (`kyc-form.tsx`) now calls all of them for real, plus a new "Download" link per document the dev-store version couldn't offer. |
+| ~~**Team invitation endpoints**~~ **Resolved** | — | `POST/GET/DELETE /team/invitations` — see doc F6. Role assignment was already real before this (`POST /roles`); now the invitation envelope, expiry, and status are too. |
+| **"Join an existing business" signup path** | ~~Team invite acceptance actually creating a staff account~~ **Resolved** | `POST /auth/signup/accept-invite` now exists (doc F6) — attaches the new user to the inviting business under the invite's role. The `/invite/[token]` page is a real signup form now, not a dev-store "mark accepted" stub. |
+| **Public "resolve invite by token" endpoint** | Showing who invited you / which business / which role *before* the accept-invite form is submitted | New, smaller gap surfaced *by* closing the one above: `accept-invite`'s own request has no need for it (the backend derives the email from the token server-side), but the UI can't show any of that context up front without a public `GET`. The built accept-invite page just collects details and submits blind, with an in-UI note explaining why. |
+| **`kycStatus` not in the `GET /business/kyc/details` response** | Showing an exact "Pending Review" vs "Verified" vs "Rejected" badge after reload | The `Business` entity has `kycStatus` (confirmed in source), but no response DTO exposes it outside the one-time `KycSubmitResponse`. The onboarding-status checklist approximates "submitted" as "all 4 documents present" instead (see `apps/web/src/server/onboarding-status.ts`) — accurate except for the narrow window between uploading the last document and actually clicking submit. |
+| ~~**API key webhook/callback URL fields**~~ **Resolved** | — | `PUT/GET /api-keys/webhook-config` — see doc F6. |
+| ~~**Business contact settings**~~ **Resolved** | — | `PUT/GET /business/contact` — see doc F6. |
+| **Refresh-token rotation** | Session length / re-login frequency | Still out of scope backend-side (doc 3 §2.1 describes the target design). Access-token-only means a 10–15 min forced re-login; the session cookie (doc F2 ADR-FE-2) expires in lockstep with it. |
+| **Peer-to-peer send** | The Wallet App's core "transfer money" flow (FR-Auth-1) | Still open. Today's transaction/collect endpoints only credit/debit the *caller's own* virtual account. |
+| **2FA endpoints** | Security settings screen, FR-8 | Still open. Settings → Profile only exposes change-password, which is real. |
+| **Notification delivery beyond email** | In-app/push notification screen, FR-Notif-1 | Partially closed — invite emails now send for real via `EmailGateway`/`SmtpEmailGateway` (best-effort, logged on failure). `ForgotPasswordResponse.resetToken` is still returned directly in the API response rather than emailed; the forgot-password screen still surfaces it in-UI with an explicit dev-gap notice. |
 | **Reporting/statement export (FR-Report-1)** | Reports screen | No reporting module/endpoints exist yet. |
 | **Audit log read endpoint** | Admin "Audit Logs" screen (doc 4 §C.5) | `UserChangeLog`/activity logging exists in the design (doc 2 §4.2) but there's no `GET` surface for the frontend to read it back. |
-| **Consistent pagination** | Predictable `<DataTable>` behavior across every list screen | See doc F6 — several list endpoints (API Keys, Bank Accounts, Dynamic Accounts, Payment Links, Settlement Accounts, Virtual Accounts) are paginated but don't yet support `term` search, unlike Roles/Processors/Reference-Data. |
+| **Consistent pagination** | Predictable `<DataTable>` behavior across every list screen | See doc F6 — several list endpoints (API Keys, Bank Accounts, Dynamic Accounts, Payment Links, Settlement Accounts, Virtual Accounts) are paginated but don't yet support `term` search. The new KYC Documents and Team Invitations endpoints add to the "no pagination at all" group instead (plain arrays) — reasonable given the bounded item counts (4 document types; a business's own team is small), but worth a conscious call, not an oversight, when someone next touches either. |
 | **Admin/superadmin cross-business views** | SUPERADMIN portal screens (FR-3, doc 4 §C.4) | Every current list endpoint scopes to the caller's own business/virtual account; there's no "list all businesses" / "list all transactions platform-wide" surface for the analytics dashboard FR-3 describes. |
+| ~~**Invited-teammate 403s crashing Server Components**~~ **Fixed frontend-side, not a backend gap** | Any page an invited teammate visits that calls an owner/role-gated endpoint | Found live: a team member who accepted an invite hit an unhandled `ApiError` crash on `/dashboard`, because none of the `ADMIN`/`DEVELOPER`/`ACCOUNT_OFFICER` role templates (doc F6) grant `business:kyc-manage`, and `DEVELOPER` grants neither `virtualaccounts:read` nor `transactions:read` — all correct backend-side (those *are* owner/role-scoped on purpose), but `computeOnboardingStatus()` and the dashboard home page called them unguarded in a Server Component, where an uncaught rejection crashes the whole render instead of failing one query in isolation the way a client-side hook would. Fixed by wrapping every such call in `apps/web/src/server/safe-call.ts`'s `safeCall()`, which degrades a `401`/`403` to `undefined` (re-throwing anything else) instead of crashing — `computeOnboardingStatus()` then treats an inaccessible check as "done, don't nag a teammate with a checklist they have no permission to act on," and the dashboard's transaction/balance cards render an explicit "your role doesn't include this" state instead of data. **Any new Server Component that calls an owner-or-role-gated endpoint needs the same wrapper** — this is a pattern to repeat, not a one-off fix. |
 
 ---
 
@@ -393,8 +441,8 @@ Mirrors the backend's own release-tagged requirements table (doc 1 §6), so fron
 
 | Release | Theme | Depends on | Status |
 |---|---|---|---|
-| **FE v0.1 — Console shell + full onboarding** | Auth (signup/login/forgot/reset/change-password), the full onboarding wizard (business details, KYC upload, team invites, API keys/webhooks, review), dashboard shell, Settings (Profile/Contact/Team/API Keys), Virtual Account balance display | Backend v0.1 — CORS wasn't actually a blocker, see doc F9's revised note | **Built** (`apps/web`) |
+| **FE v0.1 — Console shell + full onboarding** | Auth (signup/login/forgot/reset/change-password), the full onboarding wizard (business details, KYC upload, team invites, API keys/webhooks, review), dashboard shell, Settings (Profile/Contact/Team/API Keys), Virtual Account balance display, filterable/paginated Transactions + analytics | Backend v0.1 — CORS wasn't actually a blocker, see doc F9's revised note | **Built** (`apps/web`) |
 | **FE v0.1.x — Settlement, links & dynamic accounts** | Bank Accounts / Settlement Accounts / Settlements / Payment Links / Dynamic Accounts screens (beyond the API Keys work already shipped in v0.1 above) | Backend v0.1.x (already implemented backend-side) | Not started |
 | **FE v0.2 — Team, processors, reconciliation views** | Payment Processor config (Supply Admin), reconciliation-mismatch review screen (Team & Roles UI already shipped in v0.1 above, against a real `POST /api/v1/roles`) | Backend v0.2 (FR-6, FR-7, FR-Recon-1/2, FR-5a) | Not started |
-| **FE v0.3 — Wallet App launch, reporting, offline hardening** | Consumer Wallet App v1 (needs peer-to-peer send, doc F9), Reports screen, full offline-outbox rollout (doc F5) | Backend v0.3 (FR-Notif-1, FR-Report-1, NFR-2, NFR-10) + doc F9's send/KYC/2FA/notification gaps | Mobile is scaffolded only (`apps/mobile`) |
+| **FE v0.3 — Wallet App launch, reporting, offline hardening** | Consumer Wallet App v1 — the backend's KYC/onboarding endpoints are already there to build against (doc F6); still needs peer-to-peer send (doc F9) for the core transfer flow. Also: Reports screen, full offline-outbox rollout (doc F5) | Backend v0.3 (FR-Notif-1, FR-Report-1, NFR-2, NFR-10) + doc F9's remaining send/2FA/reporting gaps | Mobile is scaffolded only (`apps/mobile`) |
 | **FE v1.0 — Multi-currency** | Currency selector, FX-aware amount displays | Backend v1.0 | Not started |

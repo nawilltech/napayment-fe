@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { DevGapNotice } from "@/components/ui/alert";
 import { useChangePassword, useMe } from "@/hooks/use-auth";
 
 export function ProfileForm() {
@@ -26,27 +25,23 @@ export function ProfileForm() {
       <Card>
         <CardHeader>
           <CardTitle>Personal information</CardTitle>
-          <DevGapNotice>
-            there is no <code>GET /users/me</code> on the backend yet — this is cached from what
-            you submitted at signup. See <code>docs/api-contracts/users-me.json</code>.
-          </DevGapNotice>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label>Full name</Label>
-            <Input disabled value={me?.profile ? `${me.profile.firstName} ${me.profile.lastName}` : ""} />
+            <Input disabled value={me ? `${me.firstName} ${me.lastName}` : ""} />
           </div>
           <div>
             <Label>Email</Label>
-            <Input disabled value={me?.profile?.email ?? ""} />
+            <Input disabled value={me?.email ?? ""} />
           </div>
           <div>
             <Label>Phone number</Label>
-            <Input disabled value={me?.profile?.phoneNo ?? ""} />
+            <Input disabled value={me?.phoneNo ?? ""} />
           </div>
           <div>
             <Label>Business</Label>
-            <Input disabled value={me?.profile?.businessName ?? "—"} />
+            <Input disabled value={me?.businessName ?? "—"} />
           </div>
         </CardContent>
       </Card>

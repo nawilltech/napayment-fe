@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type {
+  AcceptInviteInput,
   BusinessSignupInput,
   ChangePasswordInput,
   ForgotPasswordInput,
@@ -11,25 +12,13 @@ import type {
   LoginInput,
   ResetPasswordInput,
 } from "@napayment/schemas";
+import type { UserResponse } from "@napayment/api-client";
 import { api } from "@/lib/api";
-
-interface MeResponse {
-  userId: string;
-  businessId: string;
-  profile: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNo: string;
-    businessName?: string;
-    cacNumber?: string;
-  } | null;
-}
 
 export function useMe() {
   return useQuery({
     queryKey: ["me"],
-    queryFn: () => api.get<MeResponse>("/api/auth/me"),
+    queryFn: () => api.get<UserResponse>("/api/auth/me"),
     retry: false,
   });
 }
@@ -103,6 +92,19 @@ export function useChangePassword() {
     mutationFn: (input: ChangePasswordInput) =>
       api.post<{ message: string }>("/api/auth/change-password", input),
     onSuccess: () => toast.success("Password updated"),
+    onError: (error: Error) => toast.error(error.message),
+  });
+}
+
+export function useAcceptInvite() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: (input: AcceptInviteInput) =>
+      api.post<{ userId: string; businessId: string }>("/api/auth/accept-invite", input),
+    onSuccess: () => {
+      toast.success("Welcome to the team — let's get you set up.");
+      router.push("/dashboard");
+    },
     onError: (error: Error) => toast.error(error.message),
   });
 }

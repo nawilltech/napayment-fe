@@ -15,10 +15,8 @@ export function DashboardHeader() {
   const { data: me } = useMe();
   const logout = useLogout();
 
-  const displayName = me?.profile
-    ? `${me.profile.firstName} ${me.profile.lastName}`
-    : "Your account";
-  const businessLabel = me?.profile?.businessName ?? "Individual account";
+  const displayName = me ? `${me.firstName} ${me.lastName}` : "Your account";
+  const businessLabel = me?.businessName ?? "Individual account";
 
   return (
     <header className="flex items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3 sm:px-6">
