@@ -1,0 +1,35 @@
+{
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/v1/kyc/documents",
+      "contentType": "multipart/form-data",
+      "fields": { "type": "CAC_CERTIFICATE | MEMORANDUM_AND_ARTICLES | PROOF_OF_ADDRESS | DIRECTOR_VALID_ID", "file": "binary, max 10MB, application/pdf | image/png | image/jpeg" },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "3fa2c1e0-0000-0000-0000-000000000001",
+          "type": "CAC_CERTIFICATE",
+          "fileName": "cac-certificate.pdf",
+          "sizeBytes": 245678,
+          "uploadedAt": "2026-09-11T10:00:00Z"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/kyc/documents",
+      "response": {
+        "status": 200,
+        "body": [
+          { "id": "3fa2c1e0-0000-0000-0000-000000000001", "type": "CAC_CERTIFICATE", "fileName": "cac-certificate.pdf", "sizeBytes": 245678, "uploadedAt": "2026-09-11T10:00:00Z" },
+          { "id": "3fa2c1e0-0000-0000-0000-000000000002", "type": "PROOF_OF_ADDRESS", "fileName": "utility-bill.jpg", "sizeBytes": 189234, "uploadedAt": "2026-09-11T10:05:00Z" }
+        ]
+      }
+    }
+  ],
+  "auth": "JWT",
+  "permission": "business:kyc-manage",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/kyc/documents/route.ts",
+  "productionNote": "Real implementation should stream to encrypted object storage (S3-compatible) and scan for malware before accepting, per docs/nawill-pay-frontend.md doc F9. The dev-store writes to local disk under .data/uploads/<businessId>/ - fine for a demo, not for production."
+}

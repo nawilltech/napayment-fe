@@ -1,0 +1,41 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+
+# expo / react native
+.expo/
+apps/mobile/dist/
+apps/mobile/web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# build
+dist/
+build/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# dev-only local data store (see apps/web/src/server/dev-store)
+.data/
+
+# reference screenshots: third-party (Paystack) UI captures containing the account
+# holder's personal info (name/email/phone) - keep local only, never commit
+assets/reference-screenshots/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+.turbo/
+coverage/

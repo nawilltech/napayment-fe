@@ -1,0 +1,23 @@
+{
+  "endpoint": "GET /api/v1/users/me",
+  "auth": "JWT",
+  "permission": "none (any authenticated user reading their own record)",
+  "why": "There is no profile-read endpoint on the backend today. AuthResponse (signup/login) only returns { accessToken, tokenType, expiresInSeconds, userId, businessId } - no name/email/phone. The frontend currently caches what the signup form itself submitted (apps/web/src/server/dev-store.ts saveProfile/getProfile) as a stopgap.",
+  "response": {
+    "status": 200,
+    "body": {
+      "userId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "businessId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+      "firstName": "Ushahemba",
+      "middleName": null,
+      "lastName": "Shir",
+      "email": "owner@nawilltechltd.com",
+      "phoneNo": "+2349018515257",
+      "userType": "USER",
+      "businessName": "Nawill Technology Ltd",
+      "cacNumber": "RC1234567",
+      "isVerified": false,
+      "createdAt": "2026-09-11T03:15:00Z"
+    }
+  }
+}

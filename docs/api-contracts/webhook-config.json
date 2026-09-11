@@ -1,0 +1,23 @@
+{
+  "endpoint": "PUT /api/v1/api-keys/webhook-config",
+  "auth": "JWT",
+  "permission": "apikeys:manage",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/webhook-config/route.ts",
+  "schemaChange": "Suggested: add callbackUrl/webhookUrl columns to the ApiKeyCredential entity (napayment/onboarding-auth-rbac/src/main/java/ng/com/nawill/pay/onboarding/apikey/ApiKeyCredential.java) - a new Flyway migration, e.g. V0031__add_webhook_urls_to_api_keys.sql. Keyed by business (one active key pair per business, doc 2 §4.2), so there's no ambiguity about which key a URL belongs to.",
+  "request": {
+    "body": {
+      "callbackUrl": "https://example.com/callback",
+      "webhookUrl": "https://example.com/webhooks/nawill"
+    },
+    "notes": "Both optional; either can be blank to clear it. Real implementation should validate reachability is NOT required at save time (a business may configure this before their endpoint is live)."
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "callbackUrl": "https://example.com/callback",
+      "webhookUrl": "https://example.com/webhooks/nawill",
+      "updatedAt": "2026-09-11T10:00:00Z"
+    }
+  },
+  "relatedBackendWork": "doc 1 FR-Recon-2 already calls for outbound webhooks notifying partners of transaction events - webhookUrl here is exactly the destination that feature would deliver to. Implementing outbound delivery itself is separate, larger work (FR-6/FR-7, backend v0.2)."
+}
