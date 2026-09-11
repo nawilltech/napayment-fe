@@ -28,8 +28,7 @@ export function ReviewSummary() {
       <CardHeader>
         <CardTitle>Review & finish</CardTitle>
         <CardDescription>
-          Your dashboard is usable regardless — completing this earns full activation (matches the
-          &ldquo;Complete activation request&rdquo; flow used by Paystack, our UX reference).
+          Your dashboard is usable regardless — completing this earns full activation.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
