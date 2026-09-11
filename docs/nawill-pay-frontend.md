@@ -15,6 +15,8 @@ Date: September 2026
 
 This document is the frontend counterpart to the backend's `docs/nawill-pay.md` master specification. Citation scheme: **doc F-N** refers to a chapter here; a bare **doc N** (no `F`) refers to the corresponding chapter in the backend spec (e.g. `doc 3 §2.5` is the backend's HMAC auth flow). Requirement IDs (`FR-x`, `NFR-x`) are the backend's own and are reused verbatim rather than renumbered, since the frontend exists to serve them, not redefine them.
 
+**New to the codebase?** Start at [`docs/subjects/README.md`](./subjects/README.md) instead — it's the faster onboarding path (a directory map plus a brief what/why/further-reading for each major technology), and it links back here for anything that needs the full depth this document provides.
+
 ## Table of Contents
 
 - **[Chapter F1 — Scope & Product Surfaces](#chapter-f1--scope--product-surfaces)**

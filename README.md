@@ -9,11 +9,16 @@ Monorepo for Nawill Pay's two client surfaces, built against the
 - **`apps/mobile`** — the Consumer Wallet App (Expo/React Native).
   **Scaffolded only** — see [`apps/mobile/README.md`](apps/mobile/README.md).
 
+**New to this repo? Start at [`docs/subjects/README.md`](docs/subjects/README.md)**
+— the developer onboarding path: a directory map, and a brief explanation +
+justification + further-reading links for every major technology used
+(Next.js, auth, state management, styling, security, tooling).
+
 See [`docs/nawill-pay-frontend.md`](docs/nawill-pay-frontend.md) for the full
 architecture handbook (framework decisions + rationale, state management,
 API integration, screen inventory, roadmap) and
-[`docs/api-contracts/`](docs/api-contracts/) for the suggested backend
-contracts behind every screen that isn't backed by a real endpoint yet.
+[`docs/api-contracts/`](docs/api-contracts/) for the historical backend
+contracts this was built against (see that folder's own README for status).
 
 ## Prerequisites
 
