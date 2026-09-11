@@ -1,0 +1,35 @@
+{
+  "endpoint": "PUT /api/v1/business/kyc/details",
+  "auth": "JWT",
+  "permission": "business:kyc-manage (new permission, seed alongside the migration that adds this)",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/business-details/route.ts",
+  "request": {
+    "body": {
+      "registeredName": "Nawill Technology Ltd",
+      "cacNumber": "RC1234567",
+      "businessType": "LIMITED_LIABILITY",
+      "industry": "Financial Services",
+      "countryId": "b7f2b5b0-1234-4a1a-9c3e-000000000001",
+      "stateId": "9a1c1e40-1234-4a1a-9c3e-000000000002",
+      "addressLine": "12 Admiralty Way, Lekki Phase 1"
+    },
+    "notes": "countryId/stateId are real reference-data UUIDs - GET /api/v1/countries and GET /api/v1/countries/{id}/states?level=1 first. businessType is a new enum: LIMITED_LIABILITY | SOLE_PROPRIETORSHIP | PARTNERSHIP | NGO | OTHER."
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "registeredName": "Nawill Technology Ltd",
+      "cacNumber": "RC1234567",
+      "businessType": "LIMITED_LIABILITY",
+      "industry": "Financial Services",
+      "countryId": "b7f2b5b0-1234-4a1a-9c3e-000000000001",
+      "stateId": "9a1c1e40-1234-4a1a-9c3e-000000000002",
+      "addressLine": "12 Admiralty Way, Lekki Phase 1",
+      "updatedAt": "2026-09-11T10:00:00Z"
+    }
+  },
+  "getResponse": {
+    "status": 200,
+    "body": "same shape as the PUT response, or null if never submitted"
+  }
+}

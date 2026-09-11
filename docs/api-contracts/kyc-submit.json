@@ -1,0 +1,18 @@
+{
+  "endpoint": "POST /api/v1/kyc/submit",
+  "auth": "JWT",
+  "permission": "business:kyc-manage",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/kyc/submit/route.ts",
+  "behavior": "Moves the business's KYC record from being assembled to PENDING_REVIEW. Should notify an admin review queue (FR-3's admin portal) via the Kafka event backbone (doc 2 §1.2 - e.g. a kyc.submitted event), the same pattern used for payment.received etc.",
+  "validation": "Rejects with 400 if business details are incomplete or any of the 4 required document types is missing.",
+  "request": { "body": null },
+  "successResponse": {
+    "status": 200,
+    "body": { "status": "PENDING_REVIEW", "submittedAt": "2026-09-11T10:10:00Z" }
+  },
+  "errorResponse": {
+    "status": 400,
+    "body": { "message": "Missing documents: PROOF_OF_ADDRESS, DIRECTOR_VALID_ID" }
+  },
+  "statusEnum": ["NOT_STARTED", "PENDING_REVIEW", "VERIFIED", "REJECTED"]
+}

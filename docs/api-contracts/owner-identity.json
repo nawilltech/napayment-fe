@@ -1,0 +1,16 @@
+{
+  "endpoint": "PUT /api/v1/kyc/owner-identity",
+  "auth": "JWT",
+  "permission": "business:kyc-manage",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/owner-identity/route.ts",
+  "important": "In production this must trigger a real BVN/NIN verification call against a third-party identity provider (doc 1 §5 assumptions) before marking `verified: true` - it should not just store the raw number. The dev-store stand-in does exactly that (stores only) and always returns verified: false.",
+  "request": {
+    "body": { "bvn": "12345678901", "nin": null },
+    "alternative": { "bvn": null, "nin": "12345678901" },
+    "notes": "Exactly one of bvn/nin required, both 11 digits (CBN standard)."
+  },
+  "response": {
+    "status": 200,
+    "body": { "bvn": "12345678901", "nin": null, "verified": false }
+  }
+}

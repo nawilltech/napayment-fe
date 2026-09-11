@@ -1,0 +1,24 @@
+{
+  "endpoint": "PUT /api/v1/business/contact",
+  "auth": "JWT",
+  "permission": "business:manage (or reuse an existing business-owner-scoped permission)",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/contact/route.ts",
+  "request": {
+    "body": {
+      "disputeEmails": ["disputes@business.com"],
+      "refundEmails": [],
+      "supportEmail": "support@business.com",
+      "generalEmail": "owner@business.com"
+    },
+    "notes": "generalEmail is required; the rest are optional arrays/strings. Defaults generalEmail to the signed-up account email on first read if nothing's been saved yet."
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "disputeEmails": ["disputes@business.com"],
+      "refundEmails": [],
+      "supportEmail": "support@business.com",
+      "generalEmail": "owner@business.com"
+    }
+  }
+}

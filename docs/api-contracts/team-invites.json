@@ -1,0 +1,58 @@
+{
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/v1/team/invitations",
+      "permission": "roles:manage",
+      "request": {
+        "body": {
+          "email": "jane@business.com",
+          "roleTemplate": "ADMIN",
+          "message": "Join us on Nawill Pay"
+        },
+        "notes": "roleTemplate is one of ADMIN | DEVELOPER | ACCOUNT_OFFICER (frontend-defined presets, apps/web mapped these to real POST /api/v1/roles calls with specific permissionNames - see packages/schemas/src/onboarding.ts ROLE_TEMPLATE_META). A real backend implementation could keep these as presets or accept an arbitrary roleId instead."
+      },
+      "response": {
+        "status": 201,
+        "body": {
+          "id": "inv_3fa2c1e0",
+          "email": "jane@business.com",
+          "roleTemplate": "ADMIN",
+          "roleId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+          "status": "PENDING",
+          "inviteUrl": "/invite/8f14e45f-ceea-4c9e-8e3f-000000000001",
+          "invitedAt": "2026-09-11T10:00:00Z"
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/team/invitations",
+      "permission": "roles:manage",
+      "response": {
+        "status": 200,
+        "body": [
+          {
+            "id": "inv_3fa2c1e0",
+            "email": "jane@business.com",
+            "roleTemplate": "ADMIN",
+            "status": "PENDING",
+            "inviteUrl": "/invite/8f14e45f-ceea-4c9e-8e3f-000000000001",
+            "invitedAt": "2026-09-11T10:00:00Z"
+          }
+        ]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/team/invitations/{id}",
+      "permission": "roles:manage",
+      "response": { "status": 200, "body": { "ok": true } }
+    }
+  ],
+  "auth": "JWT",
+  "servedFromDevStoreAt": "apps/web/src/app/api/onboarding/invites/route.ts, .../invites/[id]/route.ts",
+  "statusEnum": ["PENDING", "ACCEPTED", "REVOKED", "EXPIRED"],
+  "biggestGap": "There is no 'join an existing business' signup path on the backend (POST /api/v1/auth/signup always creates a brand-new business or a plain individual). A real invitation flow needs a second signup variant, e.g. POST /api/v1/auth/signup/accept-invite { token, firstName, lastName, phoneNo, password } that attaches the new user to the inviting business_id with the invite's role - see apps/web/src/app/api/onboarding/invites/accept/route.ts's comment for where the frontend currently stops short.",
+  "notificationGap": "FR-Notif-1: sending the invite email itself isn't wired up anywhere yet - the frontend just displays inviteUrl for the business owner to copy/share manually."
+}
