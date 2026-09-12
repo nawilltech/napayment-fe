@@ -7,7 +7,7 @@ import { handleRouteError, parseBody } from "@/server/route-helpers";
 export async function POST(request: Request) {
   try {
     const body = await parseBody(request, acceptInviteSchema);
-    const auth = await publicBackendClient().auth.signupViaInvite(body);
+    const auth = await (await publicBackendClient()).auth.signupViaInvite(body);
 
     await setSession({
       accessToken: auth.accessToken,

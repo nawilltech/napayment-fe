@@ -6,7 +6,7 @@ import { handleRouteError, parseBody } from "@/server/route-helpers";
 export async function POST(request: Request) {
   try {
     const body = await parseBody(request, resetPasswordSchema);
-    const result = await publicBackendClient().auth.resetPassword(body);
+    const result = await (await publicBackendClient()).auth.resetPassword(body);
     return NextResponse.json(result);
   } catch (error) {
     return handleRouteError(error);
