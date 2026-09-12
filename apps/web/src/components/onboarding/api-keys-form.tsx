@@ -43,7 +43,7 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
   const removeIp = useRemoveIpWhitelist();
   const ipForm = useForm<IpWhitelistEntryInput>({ resolver: zodResolver(ipWhitelistEntrySchema) });
 
-  const { data: webhookConfig } = useWebhookConfig();
+  const { data: webhookConfig } = useWebhookConfig(Boolean(activeKey));
   const saveWebhook = useSaveWebhookConfig();
   const webhookForm = useForm<WebhookConfigInput>({
     resolver: zodResolver(webhookConfigSchema),
@@ -58,8 +58,7 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
         <CardHeader>
           <CardTitle>API keys</CardTitle>
           <CardDescription>
-            FR-9 / FR-ApiKey-1: one active public/secret pair per business, used to HMAC-sign
-            requests to your own collect/withdraw integration (doc 3 §2.5).
+            Use these keys to securely connect your own systems to Nawill Pay.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -97,8 +96,8 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
           <CardHeader>
             <CardTitle>IP whitelist</CardTitle>
             <CardDescription>
-              FR-Security-3: restrict this key to known source IPs. Empty = unrestricted (works
-              immediately, per doc 2 §7 ADR-8).
+              Restrict this key to specific IP addresses. Leave empty to allow requests from
+              anywhere.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -138,27 +137,41 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
       <Card>
         <CardHeader>
           <CardTitle>Callback & webhook URLs</CardTitle>
-          <CardDescription>Test mode configuration for your integration.</CardDescription>
+          <CardDescription>
+            {activeKey
+              ? "Test mode configuration for your integration."
+              : "Generate an API key above first — these URLs are attached to it."}
+          </CardDescription>
         </CardHeader>
         <form onSubmit={webhookForm.handleSubmit((values) => saveWebhook.mutate(values))}>
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="callbackUrl">Test callback URL</Label>
-              <Input id="callbackUrl" placeholder="https://example.com/callback" {...webhookForm.register("callbackUrl")} />
+              <Input
+                id="callbackUrl"
+                placeholder="https://example.com/callback"
+                disabled={!activeKey}
+                {...webhookForm.register("callbackUrl")}
+              />
               {webhookForm.formState.errors.callbackUrl && (
                 <p className="mt-1 text-xs text-danger">{webhookForm.formState.errors.callbackUrl.message}</p>
               )}
             </div>
             <div>
               <Label htmlFor="webhookUrl">Test webhook URL</Label>
-              <Input id="webhookUrl" placeholder="https://example.com/webhooks/nawill" {...webhookForm.register("webhookUrl")} />
+              <Input
+                id="webhookUrl"
+                placeholder="https://example.com/webhooks/nawill"
+                disabled={!activeKey}
+                {...webhookForm.register("webhookUrl")}
+              />
               {webhookForm.formState.errors.webhookUrl && (
                 <p className="mt-1 text-xs text-danger">{webhookForm.formState.errors.webhookUrl.message}</p>
               )}
             </div>
           </CardContent>
           <CardFooter className="justify-between">
-            <Button type="submit" variant="outline" loading={saveWebhook.isPending}>
+            <Button type="submit" variant="outline" disabled={!activeKey} loading={saveWebhook.isPending}>
               Save
             </Button>
             {showContinue && (
@@ -175,7 +188,7 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
           <DialogHeader>
             <DialogTitle>Your API key pair</DialogTitle>
             <DialogDescription>
-              Copy your secret key now — it will not be shown again (FR-ApiKey-1).
+              Copy your secret key now — it will not be shown again.
             </DialogDescription>
           </DialogHeader>
           {revealedSecret && (
@@ -202,8 +215,8 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
           <DialogHeader>
             <DialogTitle>Regenerate API key pair?</DialogTitle>
             <DialogDescription>
-              Your current key stops working immediately (no dual-active-pair window, per FR-ApiKey-1).
-              Any live integration using it will break until updated.
+              Your current key stops working immediately. Any live integration using it will
+              break until updated.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

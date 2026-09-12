@@ -19,7 +19,9 @@ export async function computeOnboardingStatus() {
     safeCall(client.business.getKycDetails()),
     safeCall(client.kyc.listDocuments()),
     safeCall(client.team.listInvites()),
-    safeCall(client.apiKeys.getWebhookConfig()),
+    // 404s with "No active API key for this business" until one's been
+    // generated - true for every brand-new business on its first visit here.
+    safeCall(client.apiKeys.getWebhookConfig(), [404]),
     safeCall(client.apiKeys.list({ size: 1 })),
   ]);
 
@@ -33,6 +35,10 @@ export async function computeOnboardingStatus() {
     // "submit button actually clicked."
     kycSubmitted: documents === undefined ? true : documents.length >= 4,
     teamInvited: invites === undefined ? true : invites.length > 0,
+    // undefined here covers both "no permission to see it" (don't nag) and
+    // "no API key yet" (genuinely not configured) - defaulting to true is
+    // still correct for the latter case too, since the stepper combines this
+    // with apiKeysDone (false until a key exists), which is the real gate.
     webhookConfigured:
       webhookConfig === undefined ? true : Boolean(webhookConfig.callbackUrl || webhookConfig.webhookUrl),
     apiKeysDone: apiKeys === undefined ? true : apiKeys.totalElements > 0,

@@ -35,6 +35,7 @@ export interface SignupRequest {
   email: string;
   phoneNo: string;
   password: string;
+  confirmPassword: string;
   /** Presence of businessName triggers a business signup instead of an individual one. */
   businessName?: string;
   cacNumber?: string;
@@ -45,12 +46,23 @@ export interface LoginRequest {
   password: string;
 }
 
+/**
+ * Returned by signup, signupViaInvite, login, AND refresh - refreshToken is
+ * rotated (a new one issued) on every refresh call, single-use (NFR-7): the
+ * caller must persist the new refreshToken and discard the old one every
+ * time, never reuse a previously-seen one.
+ */
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
   tokenType: "Bearer";
   expiresInSeconds: number;
   userId: string;
   businessId: string;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }
 
 export interface ForgotPasswordRequest {
