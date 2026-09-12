@@ -13,7 +13,7 @@ import { useForgotPassword } from "@/hooks/use-auth";
 
 export function ForgotPasswordForm() {
   const forgot = useForgotPassword();
-  const [resetToken, setResetToken] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const {
     register,
     handleSubmit,
@@ -23,12 +23,10 @@ export function ForgotPasswordForm() {
   return (
     <div>
       <h1 className="text-xl font-semibold text-navy-900">Forgot your password?</h1>
-      <p className="mt-1 text-sm text-navy-500">We&apos;ll send a 6-digit reset code to your email.</p>
+      <p className="mt-1 text-sm text-navy-500">We&apos;ll email you a link to reset it.</p>
 
       <form
-        onSubmit={handleSubmit((values) =>
-          forgot.mutate(values, { onSuccess: (data) => setResetToken(data.resetToken) }),
-        )}
+        onSubmit={handleSubmit((values) => forgot.mutate(values, { onSuccess: () => setSubmitted(true) }))}
         className="mt-6 space-y-4"
       >
         <div>
@@ -37,14 +35,13 @@ export function ForgotPasswordForm() {
           {errors.email && <p className="mt-1 text-xs text-danger">{errors.email.message}</p>}
         </div>
         <Button type="submit" className="w-full" loading={forgot.isPending}>
-          Send reset code
+          Send reset link
         </Button>
       </form>
 
-      {resetToken && (
+      {submitted && (
         <Alert variant="info" className="mt-4">
-          Email delivery isn&apos;t set up yet, so here&apos;s your reset code:{" "}
-          <span className="font-mono font-semibold">{resetToken}</span>
+          If an account exists for that email, a reset link is on its way. Check your inbox.
         </Alert>
       )}
 
