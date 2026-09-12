@@ -65,8 +65,22 @@ async function refreshSession(refreshToken: string): Promise<SessionCookie | nul
   }
 }
 
+const REQUEST_ID_HEADER = "x-request-id";
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // One id per incoming request, correlating this app's own logs, the
+  // browser (visible on every response, for support/debugging), and the
+  // Java backend's own logs - RequestIdFilter there adopts whatever
+  // X-Request-Id it's handed rather than always minting its own (see
+  // backend-client.ts, which forwards this same header on every backend
+  // call). Respects one already set upstream (e.g. a CDN/LB) instead of
+  // always minting a fresh one.
+  const requestId = request.headers.get(REQUEST_ID_HEADER) ?? crypto.randomUUID();
+  const forwardedHeaders = new Headers(request.headers);
+  forwardedHeaders.set(REQUEST_ID_HEADER, requestId);
+
   let session = readSession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
   let rotatedCookieValue: string | null = null;
   let sessionInvalidated = false;
@@ -93,6 +107,7 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
     const redirectResponse = NextResponse.redirect(url);
+    redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
     if (sessionInvalidated) redirectResponse.cookies.delete(SESSION_COOKIE_NAME);
     return redirectResponse;
   }
@@ -101,10 +116,13 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    redirectResponse.headers.set(REQUEST_ID_HEADER, requestId);
+    return redirectResponse;
   }
 
-  const response = NextResponse.next({ request });
+  const response = NextResponse.next({ request: { headers: forwardedHeaders } });
+  response.headers.set(REQUEST_ID_HEADER, requestId);
   if (rotatedCookieValue) {
     response.cookies.set(SESSION_COOKIE_NAME, rotatedCookieValue, {
       httpOnly: true,

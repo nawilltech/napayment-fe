@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       throw new ValidationError(parsed.error.issues.map((issue) => issue.message));
     }
 
-    const auth = await publicBackendClient().auth.signup(parsed.data);
+    const auth = await (await publicBackendClient()).auth.signup(parsed.data);
 
     await setSession({
       accessToken: auth.accessToken,
