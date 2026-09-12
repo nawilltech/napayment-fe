@@ -10,6 +10,7 @@ export async function POST(request: Request) {
     const result = await client.auth.changePassword({
       currentPassword: body.currentPassword,
       newPassword: body.newPassword,
+      confirmNewPassword: body.confirmPassword,
     });
     return NextResponse.json(result);
   } catch (error) {

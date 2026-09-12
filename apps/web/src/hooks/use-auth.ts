@@ -66,10 +66,7 @@ export function useLogout() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (input: ForgotPasswordInput) =>
-      api.post<{ message: string; resetToken: string | null }>(
-        "/api/auth/forgot-password",
-        input,
-      ),
+      api.post<{ message: string }>("/api/auth/forgot-password", input),
     onError: (error: Error) => toast.error(error.message),
   });
 }

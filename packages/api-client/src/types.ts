@@ -71,20 +71,20 @@ export interface ForgotPasswordRequest {
 
 export interface ForgotPasswordResponse {
   message: string;
-  /** TODO(FE-Gap, doc F9): returned directly today rather than emailed/SMS'd. */
-  resetToken: string | null;
 }
 
 export interface ResetPasswordRequest {
   email: string;
-  /** 6-digit code */
+  /** 6-digit code, delivered via the link emailed to the account's inbox. */
   token: string;
   newPassword: string;
+  confirmNewPassword: string;
 }
 
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+  confirmNewPassword: string;
 }
 
 export interface MessageResponse {

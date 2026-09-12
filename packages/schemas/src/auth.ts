@@ -66,11 +66,17 @@ export const forgotPasswordSchema = z.object({
 });
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
-export const resetPasswordSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  token: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
-  newPassword: strongPasswordSchema,
-});
+export const resetPasswordSchema = z
+  .object({
+    email: z.string().email("Enter a valid email"),
+    token: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
+    newPassword: strongPasswordSchema,
+    confirmNewPassword: z.string().min(1, "Required"),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Passwords don't match",
+    path: ["confirmNewPassword"],
+  });
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const changePasswordSchema = z
