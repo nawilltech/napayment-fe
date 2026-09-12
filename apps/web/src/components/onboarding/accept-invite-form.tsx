@@ -1,24 +1,25 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { acceptInviteSchema, type AcceptInviteInput } from "@napayment/schemas";
+import { acceptInviteSchema, DEFAULT_CALLING_CODE, type AcceptInviteInput } from "@napayment/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { Label } from "@/components/ui/label";
-import { DevGapNotice } from "@/components/ui/alert";
 import { useAcceptInvite } from "@/hooks/use-auth";
 
 export function AcceptInviteForm({ token }: { token: string }) {
   const acceptInvite = useAcceptInvite();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<AcceptInviteInput>({
     resolver: zodResolver(acceptInviteSchema),
-    defaultValues: { token },
+    defaultValues: { token, phoneNo: DEFAULT_CALLING_CODE.dialCode },
   });
 
   return (
@@ -27,12 +28,6 @@ export function AcceptInviteForm({ token }: { token: string }) {
       <p className="mt-1 text-sm text-navy-500">
         Complete your details to join your team&apos;s business account.
       </p>
-
-      <DevGapNotice>
-        there&apos;s no public endpoint yet to resolve an invite by token (doc F9), so this can&apos;t
-        show who invited you or which role you&apos;re accepting before you submit — that&apos;s
-        confirmed server-side once you create your account.
-      </DevGapNotice>
 
       <form onSubmit={handleSubmit((values) => acceptInvite.mutate(values))} className="mt-6 space-y-4">
         <input type="hidden" {...register("token")} />
@@ -54,7 +49,13 @@ export function AcceptInviteForm({ token }: { token: string }) {
         </div>
         <div>
           <Label htmlFor="phoneNo">Phone number</Label>
-          <Input id="phoneNo" placeholder="0801 234 5678" {...register("phoneNo")} />
+          <Controller
+            name="phoneNo"
+            control={control}
+            render={({ field }) => (
+              <PhoneInput id="phoneNo" value={field.value} onChange={field.onChange} onBlur={field.onBlur} />
+            )}
+          />
           {errors.phoneNo && <p className="mt-1 text-xs text-danger">{errors.phoneNo.message}</p>}
         </div>
         <div>

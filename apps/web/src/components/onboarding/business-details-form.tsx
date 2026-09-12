@@ -56,7 +56,7 @@ export function BusinessDetailsForm() {
       <CardHeader>
         <CardTitle>Business details</CardTitle>
         <CardDescription>
-          This confirms the registered identity behind your virtual account (FR-1, FR-8 KYB).
+          Tell us about your business to activate your virtual account.
         </CardDescription>
       </CardHeader>
       <form

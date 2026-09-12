@@ -18,9 +18,10 @@ export async function POST(request: Request) {
 
     await setSession({
       accessToken: auth.accessToken,
+      refreshToken: auth.refreshToken,
       userId: auth.userId,
       businessId: auth.businessId,
-      expiresAt: Date.now() + auth.expiresInSeconds * 1000,
+      accessTokenExpiresAt: Date.now() + auth.expiresInSeconds * 1000,
     });
 
     return NextResponse.json({ userId: auth.userId, businessId: auth.businessId, isBusiness });

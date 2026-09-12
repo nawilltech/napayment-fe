@@ -44,7 +44,7 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
       <Card>
         <CardHeader>
           <CardTitle>Invite a team member</CardTitle>
-          <CardDescription>FR-5a: scoped staff roles, limited to your business only.</CardDescription>
+          <CardDescription>Give a colleague access to your business account.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit((values) => createInvite.mutate(values, { onSuccess: () => reset() }))}>
           <CardContent className="space-y-4">

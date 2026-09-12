@@ -42,10 +42,9 @@ export function ForgotPasswordForm() {
       </form>
 
       {resetToken && (
-        <Alert variant="dev" className="mt-4">
-          Backend gap (doc F9): the reset code is returned directly in the API response today
-          instead of being emailed (FR-Notif-1 isn&apos;t wired up yet). For this build, your code
-          is: <span className="font-mono font-semibold">{resetToken}</span>
+        <Alert variant="info" className="mt-4">
+          Email delivery isn&apos;t set up yet, so here&apos;s your reset code:{" "}
+          <span className="font-mono font-semibold">{resetToken}</span>
         </Alert>
       )}
 

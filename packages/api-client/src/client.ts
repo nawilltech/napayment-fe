@@ -37,6 +37,17 @@ export function createBackendClient(config: ApiClientConfig) {
           method: "POST",
           body,
         }),
+      /**
+       * NFR-7: rotates the presented refresh token - the response's
+       * refreshToken is a NEW one, the presented one is now dead
+       * (single-use). Public endpoint, no Bearer token needed - the refresh
+       * token itself is the credential.
+       */
+      refresh: (body: T.RefreshTokenRequest) =>
+        apiRequest<T.AuthResponse>(config, "/api/v1/auth/refresh", { method: "POST", body }),
+      /** Revokes the refresh token server-side. Public endpoint, same as refresh. */
+      logout: (body: T.RefreshTokenRequest) =>
+        apiRequest<T.MessageResponse>(config, "/api/v1/auth/logout", { method: "POST", body }),
     },
 
     users: {

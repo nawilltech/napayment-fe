@@ -55,8 +55,7 @@ export function KycForm() {
           <div>
             <CardTitle>Owner identity</CardTitle>
             <CardDescription>
-              FR-8: BVN or NIN verification for the business owner, checked against a sandbox
-              identity provider.
+              Verify the business owner&apos;s identity with a BVN or NIN.
             </CardDescription>
           </div>
           {ownerIdentity && <StatusBadge status={ownerIdentity.verified ? "VERIFIED" : "PENDING_REVIEW"} />}

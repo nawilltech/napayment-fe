@@ -160,10 +160,11 @@ export function useRevokeInvite() {
 
 // ---- Webhook / callback URL ------------------------------------------------------
 
-export function useWebhookConfig() {
+export function useWebhookConfig(enabled = true) {
   return useQuery({
     queryKey: ["webhook-config"],
     queryFn: () => api.get<WebhookConfigResponse>("/api/onboarding/webhook-config"),
+    enabled,
   });
 }
 

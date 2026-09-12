@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { phoneNoSchema } from "./phone";
 
 /**
  * Mirrors the backend's @StrongPassword bean-validation constraint
@@ -16,22 +17,40 @@ export const strongPasswordSchema = z
   .regex(/\d/, "Must include a digit")
   .regex(/[^A-Za-z0-9]/, "Must include a special character");
 
-export const individualSignupSchema = z.object({
+/**
+ * Base object fields, kept separate from the exported schemas below: Zod's
+ * `.refine()` (needed for the password/confirmPassword match check, which
+ * mirrors the backend's own `SignupRequest` check) returns a `ZodEffects`,
+ * not a `ZodObject` - and `ZodEffects` has no `.extend()`. So the business
+ * variant must `.extend()` this base *before* either variant applies its
+ * own `.refine()`, not the other way around.
+ */
+const baseSignupFields = z.object({
   firstName: z.string().min(1, "Required"),
   middleName: z.string().optional(),
   lastName: z.string().min(1, "Required"),
   email: z.string().email("Enter a valid email"),
-  phoneNo: z.string().min(10, "Enter a valid phone number"),
+  phoneNo: phoneNoSchema,
   password: strongPasswordSchema,
+  confirmPassword: z.string().min(1, "Required"),
 });
 
-export const businessSignupSchema = individualSignupSchema.extend({
-  businessName: z.string().min(2, "Required"),
-  cacNumber: z
-    .string()
-    .min(1, "Required")
-    .regex(/^(RC|BN|IT)\d{4,10}$/i, "Format like RC1234567"),
-});
+function passwordsMatch(data: { password: string; confirmPassword: string }) {
+  return data.password === data.confirmPassword;
+}
+const PASSWORDS_MATCH_ISSUE = { message: "Passwords don't match", path: ["confirmPassword"] };
+
+export const individualSignupSchema = baseSignupFields.refine(passwordsMatch, PASSWORDS_MATCH_ISSUE);
+
+export const businessSignupSchema = baseSignupFields
+  .extend({
+    businessName: z.string().min(2, "Required"),
+    cacNumber: z
+      .string()
+      .min(1, "Required")
+      .regex(/^(RC|BN|IT)\d{4,10}$/i, "Format like RC1234567"),
+  })
+  .refine(passwordsMatch, PASSWORDS_MATCH_ISSUE);
 
 export type IndividualSignupInput = z.infer<typeof individualSignupSchema>;
 export type BusinessSignupInput = z.infer<typeof businessSignupSchema>;
@@ -76,7 +95,7 @@ export const acceptInviteSchema = z.object({
   firstName: z.string().min(1, "Required"),
   middleName: z.string().optional(),
   lastName: z.string().min(1, "Required"),
-  phoneNo: z.string().min(10, "Enter a valid phone number"),
+  phoneNo: phoneNoSchema,
   password: strongPasswordSchema,
 });
 export type AcceptInviteInput = z.infer<typeof acceptInviteSchema>;
