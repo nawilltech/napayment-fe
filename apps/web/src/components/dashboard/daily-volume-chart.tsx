@@ -16,7 +16,7 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
 
   if (data.length === 0) {
     return (
-      <div className="flex h-48 items-center justify-center text-sm text-navy-400">
+      <div className="flex h-48 items-center justify-center text-sm text-subtle">
         No transactions in this range yet.
       </div>
     );
@@ -36,10 +36,10 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
         <div className="pointer-events-none absolute inset-0 flex flex-col justify-between pb-6">
           {[1, 0.5, 0].map((fraction) => (
             <div key={fraction} className="flex items-center gap-2">
-              <span className="w-14 shrink-0 text-right text-[10px] text-navy-400">
+              <span className="w-14 shrink-0 text-right font-mono text-[10px] text-subtle">
                 {fraction === 0 ? "₦0" : formatNaira(String(Math.round(maxVolume * fraction)))}
               </span>
-              <div className="h-px flex-1 bg-navy-100" />
+              <div className="h-px flex-1 bg-line-soft" />
             </div>
           ))}
         </div>
@@ -52,15 +52,15 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
             return (
               <div key={day.date} className="relative flex w-7 shrink-0 flex-col items-center">
                 {isHighest && (
-                  <span className="mb-1 whitespace-nowrap text-[10px] font-medium text-navy-600">
+                  <span className="mb-1 whitespace-nowrap font-mono text-[10px] font-medium text-muted">
                     {formatNaira(day.volume)}
                   </span>
                 )}
                 <button
                   type="button"
                   className={cn(
-                    "w-6 rounded-t-[4px] bg-navy-700 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500",
-                    activeIndex === index ? "opacity-100" : "opacity-80 hover:opacity-100",
+                    "w-6 rounded-t-[4px] bg-brand transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
+                    activeIndex === null || activeIndex === index ? "opacity-100" : "opacity-45",
                   )}
                   style={{ height: `${heightPct}%`, minHeight: Number(day.volume) > 0 ? 2 : 0 }}
                   onPointerEnter={() => setActiveIndex(index)}
@@ -69,7 +69,7 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
                   onBlur={() => setActiveIndex(null)}
                   aria-label={`${day.date}: ${day.count} transaction${day.count === 1 ? "" : "s"}, ${formatNaira(day.volume)}`}
                 />
-                <span className="absolute -bottom-5 text-[9px] text-navy-400">
+                <span className="absolute -bottom-5 font-mono text-[9px] text-subtle">
                   {new Date(day.date).toLocaleDateString("en-NG", { day: "2-digit", month: "short" }).slice(0, 6)}
                 </span>
               </div>
@@ -79,18 +79,18 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
       </div>
 
       {/* Tooltip - reflects the currently hovered/focused bar */}
-      <div className="mt-2 h-10 rounded-md border border-border bg-navy-50 px-3 py-2 text-xs">
+      <div className="mt-2 h-10 rounded-lg border border-line bg-paper px-3 py-2 text-xs">
         {active ? (
           <div className="flex items-center justify-between">
-            <span className="text-navy-500">
+            <span className="text-muted">
               {new Date(active.date).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}
             </span>
-            <span className="font-semibold text-navy-900">
+            <span className="font-mono font-semibold text-ink">
               {formatNaira(active.volume)} · {active.count} txn{active.count === 1 ? "" : "s"}
             </span>
           </div>
         ) : (
-          <span className="text-navy-400">Hover or focus a bar for details</span>
+          <span className="text-subtle">Hover or focus a bar for details</span>
         )}
       </div>
 

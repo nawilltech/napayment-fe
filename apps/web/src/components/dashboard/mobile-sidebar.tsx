@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Menu, X } from "lucide-react";
-import { SidebarNav } from "./sidebar-nav";
+import { SidebarContent } from "./sidebar-content";
+import type { ActivationProgress } from "./sidebar-nav";
 
-export function MobileSidebar() {
+export function MobileSidebar({ activation }: { activation?: ActivationProgress }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -19,29 +20,21 @@ export function MobileSidebar() {
       <DialogPrimitive.Trigger asChild>
         <button
           type="button"
-          className="flex size-9 items-center justify-center rounded-md text-navy-700 hover:bg-navy-50 md:hidden"
+          className="-ml-1.5 flex size-9 items-center justify-center rounded-lg text-ink hover:bg-line-soft md:hidden"
           aria-label="Open menu"
         >
           <Menu className="size-5" />
         </button>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-navy-900/50 md:hidden" />
-        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-64 max-w-[80vw] flex-col bg-navy-900 px-3 py-5 shadow-xl md:hidden">
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/40 md:hidden" />
+        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-[260px] max-w-[85vw] flex-col overflow-y-auto bg-ink px-3.5 py-[22px] shadow-xl md:hidden">
           <DialogPrimitive.Title className="sr-only">Navigation menu</DialogPrimitive.Title>
-          <div className="mb-6 flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-cream-200 text-sm font-bold text-navy-900">
-                N
-              </span>
-              <span className="font-semibold text-cream-50">Nawill Pay</span>
-            </div>
-            <DialogPrimitive.Close className="flex size-8 items-center justify-center rounded-md text-navy-300 hover:bg-navy-800 hover:text-cream-50">
-              <X className="size-4" />
-              <span className="sr-only">Close</span>
-            </DialogPrimitive.Close>
-          </div>
-          <SidebarNav onNavigate={() => setOpen(false)} />
+          <DialogPrimitive.Close className="absolute right-3 top-5 flex size-8 items-center justify-center rounded-lg text-ink-fg hover:bg-ink-raised hover:text-cream">
+            <X className="size-4" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+          <SidebarContent activation={activation} onNavigate={() => setOpen(false)} />
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

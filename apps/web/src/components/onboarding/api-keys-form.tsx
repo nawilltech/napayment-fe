@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2 } from "lucide-react";
+import { X } from "lucide-react";
 import {
   ipWhitelistEntrySchema,
   webhookConfigSchema,
@@ -58,7 +58,7 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
         <CardHeader>
           <CardTitle>API keys</CardTitle>
           <CardDescription>
-            Use these keys to securely connect your own systems to Nawill Pay.
+            Use these keys to securely connect your own systems to Napayment.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -78,7 +78,7 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
               <div>
                 <Label>Secret key</Label>
                 <CopyField value="sk_live_•••••••••••••••••••••••••••••••" mono />
-                <p className="mt-1 text-xs text-navy-500">
+                <p className="mt-1 text-xs text-muted">
                   Shown once, at generation. Lost it? Regenerate below — the old key stops working
                   immediately.
                 </p>
@@ -117,17 +117,25 @@ export function ApiKeysForm({ showContinue = false }: { showContinue?: boolean }
                 Add
               </Button>
             </form>
-            <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
               {whitelist?.content.map((cidr) => (
-                <div key={cidr} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-                  <code className="text-sm text-navy-800">{cidr}</code>
-                  <button onClick={() => removeIp.mutate(cidr)} className="text-navy-400 hover:text-danger">
-                    <Trash2 className="size-4" />
+                <span
+                  key={cidr}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-line-soft py-1.5 pl-2.5 pr-1.5 font-mono text-[12.5px] text-ink"
+                >
+                  {cidr}
+                  <button
+                    type="button"
+                    onClick={() => removeIp.mutate(cidr)}
+                    className="rounded p-0.5 text-subtle hover:bg-sand hover:text-danger"
+                    aria-label={`Remove ${cidr}`}
+                  >
+                    <X className="size-3.5" />
                   </button>
-                </div>
+                </span>
               ))}
               {whitelist?.content.length === 0 && (
-                <p className="text-xs text-navy-500">No restrictions — any source IP may use this key.</p>
+                <p className="text-xs text-muted">No restrictions — any source IP may use this key.</p>
               )}
             </div>
           </CardContent>

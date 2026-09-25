@@ -65,7 +65,7 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
                 </Select>
               </div>
             </div>
-            <p className="text-xs text-navy-500">{ROLE_TEMPLATE_META[roleTemplate ?? "ADMIN"].description}</p>
+            <p className="text-xs text-muted">{ROLE_TEMPLATE_META[roleTemplate ?? "ADMIN"].description}</p>
             <div>
               <Label htmlFor="message">Personal message (optional)</Label>
               <Textarea id="message" rows={2} {...register("message")} />
@@ -84,13 +84,13 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
           <CardTitle>Pending & sent invites</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {invites?.length === 0 && <p className="text-sm text-navy-500">No invites sent yet.</p>}
+          {invites?.length === 0 && <p className="text-sm text-muted">No invites sent yet.</p>}
           {invites?.map((invite) => (
             <div key={invite.id} className="rounded-md border border-border p-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-navy-900">{invite.email}</p>
-                  <p className="text-xs text-navy-500">
+                  <p className="text-sm font-medium text-ink">{invite.email}</p>
+                  <p className="text-xs text-muted">
                     {invite.roleName} · invited {formatDate(invite.invitedAt)}
                   </p>
                 </div>
@@ -100,7 +100,7 @@ export function TeamInviteForm({ showContinue = false }: { showContinue?: boolea
                     <button
                       type="button"
                       onClick={() => revokeInvite.mutate(invite.id)}
-                      className="text-navy-400 hover:text-danger"
+                      className="text-subtle hover:text-danger"
                       title="Revoke invite"
                     >
                       <Trash2 className="size-4" />

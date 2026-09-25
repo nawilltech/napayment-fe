@@ -1,65 +1,88 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand tokens - see packages/ui-tokens and docs/nawill-pay-frontend.md doc F8.
-     navy-700 / cream-200 are sampled from the logo; the rest of each scale is
-     generated around those two anchors and should be reviewed by design. */
-  --color-navy-50: #eef0f5;
-  --color-navy-100: #d7dbe6;
-  --color-navy-200: #afb7cc;
-  --color-navy-300: #8790b3;
-  --color-navy-400: #5f6b99;
-  --color-navy-500: #454e77;
-  --color-navy-600: #333a5c;
-  --color-navy-700: #262b49;
-  --color-navy-800: #1b1f36;
-  --color-navy-900: #121425;
+  /* Brand tokens - Napayment identity (docs/Nawill Technology branding,
+     "Napayment Brand" + "Napayment Web"). Mirrors packages/ui-tokens. */
 
-  --color-cream-50: #fbfaf6;
-  --color-cream-100: #f7f4ec;
-  --color-cream-200: #ece6d9;
-  --color-cream-300: #ded5bf;
-  --color-cream-400: #c9bc9c;
-  --color-cream-500: #b3a37d;
+  /* Ink: text, amounts, console sidebar */
+  --color-ink: #20264a;
+  --color-ink-raised: #2c3360;
+  --color-ink-line: #3a4270;
+  --color-ink-fg: #c9cee8;
+  --color-ink-muted: #8e9bd8;
+  --color-ink-subtle: #b7bedb;
 
+  /* Nawill Blue: primary actions, active states, links */
+  --color-brand: #4757b8;
+  --color-brand-hover: #3b4aa3;
+  --color-brand-soft: #d6daf2;
+  --color-brand-line: #9fa8de;
+  --color-brand-surface: #eef0fa;
+
+  /* Cream family: surfaces, receipts, hairlines */
+  --color-cream: #f4eedd;
+  --color-paper: #fbf9f2;
+  --color-sand: #e4dcc8;
+  --color-line: #d8cfb4;
+  --color-line-soft: #efe8d6;
+  --color-tan: #b3a37d;
+
+  /* Warm secondary text */
+  --color-muted: #4e4a33;
+  --color-subtle: #6e6648;
+  --color-faint: #8c8468;
+
+  /* Payment status - never used for decoration */
   --color-success: #1a7f4e;
   --color-success-surface: #e7f6ee;
+  --color-success-line: #bfe3cf;
   --color-warning: #b4740e;
   --color-warning-surface: #fbf0dd;
+  --color-warning-line: #e8cf9e;
+  --color-warning-ink: #5a3d0c;
   --color-danger: #c22a2a;
   --color-danger-surface: #fbe8e8;
   --color-pending: #3e5aa8;
   --color-pending-surface: #e9edfa;
 
-  --background: #f6f7fb;
-  --foreground: var(--color-navy-900);
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
   --surface: #ffffff;
-  --border: #e3e6ef;
+  --border: var(--color-line);
 }
 
 @theme inline {
-  --color-navy-50: var(--color-navy-50);
-  --color-navy-100: var(--color-navy-100);
-  --color-navy-200: var(--color-navy-200);
-  --color-navy-300: var(--color-navy-300);
-  --color-navy-400: var(--color-navy-400);
-  --color-navy-500: var(--color-navy-500);
-  --color-navy-600: var(--color-navy-600);
-  --color-navy-700: var(--color-navy-700);
-  --color-navy-800: var(--color-navy-800);
-  --color-navy-900: var(--color-navy-900);
+  --color-ink: var(--color-ink);
+  --color-ink-raised: var(--color-ink-raised);
+  --color-ink-line: var(--color-ink-line);
+  --color-ink-fg: var(--color-ink-fg);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-ink-subtle: var(--color-ink-subtle);
 
-  --color-cream-50: var(--color-cream-50);
-  --color-cream-100: var(--color-cream-100);
-  --color-cream-200: var(--color-cream-200);
-  --color-cream-300: var(--color-cream-300);
-  --color-cream-400: var(--color-cream-400);
-  --color-cream-500: var(--color-cream-500);
+  --color-brand: var(--color-brand);
+  --color-brand-hover: var(--color-brand-hover);
+  --color-brand-soft: var(--color-brand-soft);
+  --color-brand-line: var(--color-brand-line);
+  --color-brand-surface: var(--color-brand-surface);
+
+  --color-cream: var(--color-cream);
+  --color-paper: var(--color-paper);
+  --color-sand: var(--color-sand);
+  --color-line: var(--color-line);
+  --color-line-soft: var(--color-line-soft);
+  --color-tan: var(--color-tan);
+
+  --color-muted: var(--color-muted);
+  --color-subtle: var(--color-subtle);
+  --color-faint: var(--color-faint);
 
   --color-success: var(--color-success);
   --color-success-surface: var(--color-success-surface);
+  --color-success-line: var(--color-success-line);
   --color-warning: var(--color-warning);
   --color-warning-surface: var(--color-warning-surface);
+  --color-warning-line: var(--color-warning-line);
+  --color-warning-ink: var(--color-warning-ink);
   --color-danger: var(--color-danger);
   --color-danger-surface: var(--color-danger-surface);
   --color-pending: var(--color-pending);
@@ -70,11 +93,21 @@
   --color-surface: var(--surface);
   --color-border: var(--border);
 
-  --font-sans: var(--font-inter);
+  /* IBM Plex Sans: all interface text. IBM Plex Mono: amounts, references,
+     dates (digits line up in lists). Special Elite: wordmark and campaign
+     lines only - never buttons or form fields. */
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+  --font-display: var(--font-special-elite);
 }
 
 body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Amounts and references read as a ledger: tabular, slashed-free digits. */
+.font-mono {
+  font-variant-numeric: tabular-nums;
 }

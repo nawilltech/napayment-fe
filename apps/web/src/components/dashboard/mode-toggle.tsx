@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FlaskConical, Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "napayment_mode";
@@ -43,14 +42,14 @@ export function ModeToggle() {
       onClick={toggle}
       title={isLive ? "Switch to test mode" : "Switch to live mode"}
       className={cn(
-        "flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors",
+        "flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-[5px] font-mono text-[11px] uppercase transition-colors",
         isLive
-          ? "border-success/30 bg-success-surface text-success hover:border-success/60"
-          : "border-danger/30 bg-danger-surface text-danger hover:border-danger/60",
+          ? "border-transparent bg-success-surface text-[#12573A] hover:border-success-line"
+          : "border-transparent bg-warning-surface text-warning-ink hover:border-warning-line",
       )}
     >
-      {isLive ? <Radio className="size-3" /> : <FlaskConical className="size-3" />}
-      {isLive ? "Live Mode" : "Test Mode"}
+      <span className={cn("size-1.5 rounded-full", isLive ? "bg-success" : "bg-warning")} aria-hidden />
+      {isLive ? "Live mode" : "Test mode"}
     </button>
   );
 }

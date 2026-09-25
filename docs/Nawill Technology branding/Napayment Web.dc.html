@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+<template id="__bundler_thumbnail" data-bg-color="#20264A">
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#20264A"/><text x="50" y="66" font-family="Georgia, serif" font-size="46" fill="#F4EEDD" text-anchor="middle">n</text></svg>
+</template>
+<style>
+  body { margin: 0; background: #E4DCC8; }
+  a { color: #4757B8; }
+  a:hover { color: #20264A; }
+</style>
+</helmet>
+
+<div style="padding:64px 48px 120px; font-family:'IBM Plex Sans',sans-serif; color:#20264A; background:#E4DCC8; min-height:100vh; box-sizing:border-box;">
+
+  <div style="max-width:1280px; margin:0 auto 44px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:24px;">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.2em; text-transform:uppercase; color:#6E6648; margin-bottom:10px;">Napayment · Business Console · Web</div>
+      <div style="font-family:'Special Elite',monospace; font-size:46px;">Web screens</div>
+    </div>
+    <div style="font-size:14px; color:#4E4A33; max-width:540px; line-height:1.6; text-wrap:pretty;">Built from apps/web in napayment-fe. Sign in, Home, Transactions, Activation and Settings exist in code today. Payment links, one-time accounts and Settlements are designed ahead of the v0.1.x screens scheduled in doc F10.</div>
+  </div>
+
+  <div style="max-width:1280px; margin:0 auto; display:flex; flex-direction:column; gap:64px;">
+
+    <!-- 01 SIGN IN -->
+    <div data-screen-label="01 Sign in" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">01 — Sign in</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:grid; grid-template-columns:1fr 1fr; background:#F4EEDD;">
+        <div style="background:#4757B8; color:#F4EEDD; padding:56px; display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="position:relative; width:40px; height:40px;">
+              <svg viewBox="0 0 100 100" width="40" height="40" style="position:absolute; inset:0;"><path d="M18 0 H82 Q100 0 100 18 V88 L91.7 96 L83.3 88 L75 96 L66.7 88 L58.3 96 L50 88 L41.7 96 L33.3 88 L25 96 L16.7 88 L8.3 96 L0 88 V18 Q0 0 18 0 Z" fill="#F4EEDD"></path></svg>
+              <div style="position:absolute; inset:0 0 4px 0; display:flex; align-items:center; justify-content:center; font-family:'Special Elite',monospace; font-size:26px; color:#4757B8;">n</div>
+            </div>
+            <div style="font-family:'Special Elite',monospace; font-size:26px;">napayment</div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:20px;">
+            <div style="font-family:'Special Elite',monospace; font-size:52px; line-height:1.1;">Every payment,<br/>on record.</div>
+            <div style="font-size:17px; line-height:1.6; color:#D6DAF2; max-width:420px;">Collect school fees, agency bills and business income by transfer, link or cash. Receipts go out by SMS.</div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em; color:#D6DAF2;">A NAWILL TECHNOLOGY LTD PRODUCT · RC 1765112</div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; padding:56px;">
+          <div style="width:380px; display:flex; flex-direction:column; gap:18px;">
+            <div>
+              <div style="font-size:28px; font-weight:700;">Sign in</div>
+              <div style="font-size:14.5px; color:#4E4A33; margin-top:6px;">Welcome back to your Business Console.</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:13px; font-weight:600;">Email</div>
+              <div style="background:#fff; border:2px solid #4757B8; border-radius:10px; height:48px; padding:0 14px; box-sizing:border-box; display:flex; align-items:center; font-size:15px;">bursar@greenfield.edu.ng</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; font-size:13px;"><span style="font-weight:600;">Password</span><span style="color:#4757B8; font-weight:600;">Forgot password?</span></div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:10px; height:48px; padding:0 14px; display:flex; align-items:center; justify-content:space-between; font-size:15px;"><span style="letter-spacing:0.2em;">••••••••••</span><span style="font-size:13px; color:#4757B8; font-weight:600;">Show</span></div>
+            </div>
+            <div style="background:#4757B8; color:#F4EEDD; border-radius:10px; height:50px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:15px;">Sign in</div>
+            <div style="font-size:14px; color:#4E4A33; text-align:center;">New to Napayment? <span style="color:#4757B8; font-weight:600;">Create an account</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 HOME -->
+    <div data-screen-label="02 Home" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">02 — Home</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD;">
+        <dc-import name="Console Sidebar" active="Home" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="height:64px; border-bottom:1px solid #D8CFB4; background:#FBF9F2; display:flex; align-items:center; justify-content:space-between; padding:0 32px;">
+            <div style="font-size:18px; font-weight:700;">Home</div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; background:#E7F6EE; color:#12573A; border-radius:6px; padding:5px 10px;">LIVE MODE</div>
+              <div style="width:36px; height:36px; border-radius:18px; background:#E4DCC8; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600;">AO</div>
+            </div>
+          </div>
+          <div style="flex:1; padding:28px 32px; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:20px; overflow:hidden;">
+            <div style="display:flex; flex-direction:column; gap:20px; min-width:0;">
+              <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:16px;">
+                <div style="background:#4757B8; color:#F4EEDD; border-radius:14px; padding:22px;">
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#D6DAF2;">AVAILABLE BALANCE</div>
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:34px; font-weight:600; margin-top:8px;">₦1,284,500.00</div>
+                  <div style="display:flex; gap:10px; margin-top:18px;">
+                    <div style="background:#F4EEDD; color:#20264A; border-radius:8px; padding:9px 14px; font-size:13.5px; font-weight:600;">Settle now</div>
+                    <div style="border:1px solid #9FA8DE; border-radius:8px; padding:9px 14px; font-size:13.5px; font-weight:600;">Send money</div>
+                  </div>
+                </div>
+                <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+                  <div>
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#6E6648;">VIRTUAL ACCOUNT</div>
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; margin-top:8px; letter-spacing:0.04em;">9012 548 331</div>
+                    <div style="font-size:13px; color:#4E4A33; margin-top:4px;">Nawill MFB · Greenfield Sec. School</div>
+                  </div>
+                  <div style="font-size:13px; color:#4757B8; font-weight:600;">Copy account details</div>
+                </div>
+              </div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <div style="font-size:15px; font-weight:700;">Collected, last 14 days</div>
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600;">₦4,860,000</div>
+                </div>
+                <div style="display:flex; align-items:flex-end; gap:8px; height:150px; margin-top:18px; border-bottom:1px solid #D8CFB4;">
+                  <sc-for list="{{ bars }}" as="b" hint-placeholder-count="14">
+                    <div style="flex:1; background:#4757B8; border-radius:4px 4px 0 0; height:{{ b.h }};"></div>
+                  </sc-for>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6E6648; margin-top:8px;"><span>12 Sep</span><span>18 Sep</span><span>25 Sep</span></div>
+              </div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #EFE8D6;">
+                  <div style="font-size:15px; font-weight:700;">Recent activity</div>
+                  <div style="font-size:13px; color:#4757B8; font-weight:600;">View all</div>
+                </div>
+                <sc-for list="{{ recent }}" as="t" hint-placeholder-count="4">
+                  <div style="display:grid; grid-template-columns:1.4fr 1fr 110px 110px; align-items:center; padding:11px 20px; border-bottom:1px solid #EFE8D6; font-size:13.5px;">
+                    <div style="font-weight:600;">{{ t.name }}</div>
+                    <div style="color:#6E6648; font-size:12.5px;">{{ t.method }}</div>
+                    <div><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:2px 7px; border-radius:4px; color:{{ t.color }}; background:{{ t.surface }};">{{ t.status }}</span></div>
+                    <div style="font-family:'IBM Plex Mono',monospace; text-align:right;">{{ t.amount }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; min-width:0;">
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px;">
+                <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                  <div style="font-size:15px; font-weight:700;">Finish activation</div>
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">3 of 5</div>
+                </div>
+                <div style="height:6px; background:#EFE8D6; border-radius:3px; margin:12px 0 14px; overflow:hidden;"><div style="width:60%; height:100%; background:#4757B8;"></div></div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="5">
+                    <div style="display:flex; align-items:center; gap:10px; font-size:13.5px;">
+                      <div style="width:18px; height:18px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; background:{{ c.dot }}; border:{{ c.border }};">{{ c.mark }}</div>
+                      <span style="color:{{ c.color }};">{{ c.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="margin-top:16px; background:#20264A; color:#F4EEDD; border-radius:8px; padding:10px; text-align:center; font-size:13.5px; font-weight:600;">Continue: upload documents</div>
+              </div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px;">
+                <div style="font-size:15px; font-weight:700; margin-bottom:14px;">Active collections</div>
+                <sc-for list="{{ campaigns }}" as="p" hint-placeholder-count="3">
+                  <div style="padding:10px 0; border-bottom:1px solid #EFE8D6;">
+                    <div style="display:flex; justify-content:space-between; font-size:13.5px;"><span style="font-weight:600;">{{ p.name }}</span><span style="font-family:'IBM Plex Mono',monospace;">{{ p.pct }}</span></div>
+                    <div style="height:5px; background:#EFE8D6; border-radius:3px; margin-top:8px; overflow:hidden;"><div style="height:100%; background:#1A7F4E; width:{{ p.pct }};"></div></div>
+                    <div style="font-size:12px; color:#6E6648; margin-top:6px;">{{ p.meta }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 TRANSACTIONS -->
+    <div data-screen-label="03 Transactions" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">03 — Transactions</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD;">
+        <dc-import name="Console Sidebar" active="Transactions" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="height:64px; border-bottom:1px solid #D8CFB4; background:#FBF9F2; display:flex; align-items:center; justify-content:space-between; padding:0 32px;">
+            <div style="font-size:18px; font-weight:700;">Transactions</div>
+            <div style="border:1px solid #D8CFB4; background:#fff; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600;">Export CSV</div>
+          </div>
+          <div style="padding:24px 32px; display:flex; flex-direction:column; gap:18px; flex:1; min-height:0;">
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px;">
+              <sc-for list="{{ tiles }}" as="s" hint-placeholder-count="4">
+                <div style="background:#fff; border:1px solid #D8CFB4; border-radius:12px; padding:16px 18px;">
+                  <div style="font-size:12.5px; color:#6E6648;">{{ s.label }}</div>
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; margin-top:6px;">{{ s.value }}</div>
+                  <div style="font-size:12px; color:#6E6648; margin-top:4px;">{{ s.sub }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <div style="flex:1; min-width:240px; background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:40px; padding:0 14px; display:flex; align-items:center; font-size:13.5px; color:#8C8468;">Search by session ID or payer</div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:40px; padding:0 14px; display:flex; align-items:center; font-size:13.5px;">Status: All</div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:40px; padding:0 14px; display:flex; align-items:center; font-size:13.5px;">Type: Credit</div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:40px; padding:0 14px; display:flex; align-items:center; font-size:13.5px;">12 Sep – 25 Sep</div>
+            </div>
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:12px; overflow:hidden; flex:1; min-height:0;">
+              <div style="display:grid; grid-template-columns:1.3fr 1.6fr 1fr 110px 120px 130px; padding:12px 20px; background:#FBF9F2; border-bottom:1px solid #D8CFB4; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#6E6648;">
+                <span>PAYER</span><span>SESSION ID</span><span>METHOD</span><span>STATUS</span><span style="text-align:right;">AMOUNT</span><span style="text-align:right;">DATE</span>
+              </div>
+              <sc-for list="{{ table }}" as="t" hint-placeholder-count="9">
+                <div style="display:grid; grid-template-columns:1.3fr 1.6fr 1fr 110px 120px 130px; align-items:center; padding:11px 20px; border-bottom:1px solid #EFE8D6; font-size:13.5px;">
+                  <span style="font-weight:600;">{{ t.name }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#4E4A33;">{{ t.session }}</span>
+                  <span style="color:#4E4A33; font-size:13px;">{{ t.method }}</span>
+                  <span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:2px 7px; border-radius:4px; color:{{ t.color }}; background:{{ t.surface }};">{{ t.status }}</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace; text-align:right;">{{ t.amount }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648; text-align:right;">{{ t.date }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 PAYMENT LINKS -->
+    <div data-screen-label="04 Payment links" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">04 — Payment links, create</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD; position:relative;">
+        <dc-import name="Console Sidebar" active="Payment links" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="height:64px; border-bottom:1px solid #D8CFB4; background:#FBF9F2; display:flex; align-items:center; justify-content:space-between; padding:0 32px;">
+            <div style="font-size:18px; font-weight:700;">Payment links</div>
+            <div style="background:#4757B8; color:#F4EEDD; border-radius:8px; padding:9px 16px; font-size:13.5px; font-weight:600;">+ New link</div>
+          </div>
+          <div style="padding:24px 32px;">
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:12px; overflow:hidden;">
+              <div style="display:grid; grid-template-columns:1.4fr 1.3fr 110px 110px 100px; padding:12px 20px; background:#FBF9F2; border-bottom:1px solid #D8CFB4; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#6E6648;">
+                <span>NAME</span><span>LINK</span><span>TYPE</span><span style="text-align:right;">AMOUNT</span><span style="text-align:right;">STATUS</span>
+              </div>
+              <sc-for list="{{ links }}" as="l" hint-placeholder-count="6">
+                <div style="display:grid; grid-template-columns:1.4fr 1.3fr 110px 110px 100px; align-items:center; padding:13px 20px; border-bottom:1px solid #EFE8D6; font-size:13.5px;">
+                  <span style="font-weight:600;">{{ l.name }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#4757B8;">{{ l.url }}</span>
+                  <span style="font-size:12.5px; color:#4E4A33;">{{ l.type }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace; text-align:right;">{{ l.amount }}</span>
+                  <span style="text-align:right;"><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:2px 7px; border-radius:4px; color:{{ l.color }}; background:{{ l.surface }};">{{ l.status }}</span></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute; inset:0; background:rgba(32,38,74,0.35);"></div>
+        <div style="position:absolute; top:0; right:0; bottom:0; width:440px; background:#FBF9F2; box-shadow:-20px 0 40px rgba(32,38,74,0.2); display:flex; flex-direction:column;">
+          <div style="padding:24px 28px; border-bottom:1px solid #D8CFB4; display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:18px; font-weight:700;">New payment link</div>
+            <div style="font-size:20px; color:#6E6648;">×</div>
+          </div>
+          <div style="padding:24px 28px; display:flex; flex-direction:column; gap:18px; flex:1;">
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:13px; font-weight:600;">Name</div>
+              <div style="background:#fff; border:2px solid #4757B8; border-radius:8px; height:44px; padding:0 12px; box-sizing:border-box; display:flex; align-items:center; font-size:14.5px;">Sports levy, Term 1</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:13px; font-weight:600;">Link type</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; background:#EFE8D6; border-radius:8px; padding:4px;">
+                <div style="background:#fff; border-radius:6px; padding:9px; text-align:center; font-size:13.5px; font-weight:600; box-shadow:0 1px 2px rgba(32,38,74,0.1);">Permanent</div>
+                <div style="padding:9px; text-align:center; font-size:13.5px; color:#4E4A33;">Temporary</div>
+              </div>
+              <div style="font-size:12px; color:#6E6648;">Permanent links stay open until you revoke them. Temporary links expire after 24 hours by default.</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:13px; font-weight:600;">Amount</div>
+              <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:15px;"><span style="color:#6E6648;">₦</span>3,000.00</div>
+              <div style="font-size:12px; color:#6E6648;">Leave empty to let the payer enter any amount.</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #D8CFB4; border-radius:8px; padding:12px 14px;">
+              <div>
+                <div style="font-size:13.5px; font-weight:600;">Single use</div>
+                <div style="font-size:12px; color:#6E6648; margin-top:2px;">Close after the first payment</div>
+              </div>
+              <div style="width:40px; height:22px; border-radius:11px; background:#D8CFB4; position:relative;"><div style="position:absolute; left:3px; top:3px; width:16px; height:16px; border-radius:8px; background:#fff;"></div></div>
+            </div>
+          </div>
+          <div style="padding:18px 28px; border-top:1px solid #D8CFB4; display:flex; gap:10px; justify-content:flex-end;">
+            <div style="border:1px solid #D8CFB4; background:#fff; border-radius:8px; padding:10px 16px; font-size:13.5px; font-weight:600;">Cancel</div>
+            <div style="background:#4757B8; color:#F4EEDD; border-radius:8px; padding:10px 18px; font-size:13.5px; font-weight:600;">Create link</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 SETTLEMENTS -->
+    <div data-screen-label="05 Settlements" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">05 — Settlements &amp; splits</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD;">
+        <dc-import name="Console Sidebar" active="Settlements" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="height:64px; border-bottom:1px solid #D8CFB4; background:#FBF9F2; display:flex; align-items:center; justify-content:space-between; padding:0 32px;">
+            <div style="font-size:18px; font-weight:700;">Settlements</div>
+            <div style="background:#4757B8; color:#F4EEDD; border-radius:8px; padding:9px 16px; font-size:13.5px; font-weight:600;">Settle ₦1,284,500 now</div>
+          </div>
+          <div style="padding:24px 32px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:20px;">
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:15px; font-weight:700;">Payout split</div>
+                <div style="font-size:13px; color:#4757B8; font-weight:600;">+ Add account</div>
+              </div>
+              <div style="display:flex; height:14px; border-radius:7px; overflow:hidden;">
+                <div style="width:70%; background:#4757B8;"></div><div style="width:20%; background:#20264A;"></div><div style="width:10%; background:#B3A37D;"></div>
+              </div>
+              <sc-for list="{{ splits }}" as="s" hint-placeholder-count="3">
+                <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #EFE8D6;">
+                  <div style="width:10px; height:10px; border-radius:3px; background:{{ s.color }}; flex-shrink:0;"></div>
+                  <div style="flex:1;">
+                    <div style="font-size:13.5px; font-weight:600;">{{ s.name }}</div>
+                    <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#6E6648; margin-top:2px;">{{ s.bank }}</div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600;">{{ s.pct }}</div>
+                </div>
+              </sc-for>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#FBF9F2; border:1px solid #D8CFB4; border-radius:10px; padding:12px 14px;">
+                <div>
+                  <div style="font-size:13.5px; font-weight:600;">Auto-settle daily</div>
+                  <div style="font-size:12px; color:#6E6648; margin-top:2px;">Pays out the full balance at 6:00 PM</div>
+                </div>
+                <div style="width:40px; height:22px; border-radius:11px; background:#4757B8; position:relative;"><div style="position:absolute; right:3px; top:3px; width:16px; height:16px; border-radius:8px; background:#fff;"></div></div>
+              </div>
+              <div style="font-size:12px; color:#6E6648; line-height:1.5;">Changing splits or settling manually requires your transaction PIN.</div>
+            </div>
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; overflow:hidden;">
+              <div style="padding:16px 20px; border-bottom:1px solid #EFE8D6; font-size:15px; font-weight:700;">History</div>
+              <div style="display:grid; grid-template-columns:1.2fr 1fr 110px 120px; padding:10px 20px; background:#FBF9F2; border-bottom:1px solid #D8CFB4; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; color:#6E6648;">
+                <span>REFERENCE</span><span>ACCOUNT</span><span>STATUS</span><span style="text-align:right;">AMOUNT</span>
+              </div>
+              <sc-for list="{{ settlements }}" as="s" hint-placeholder-count="8">
+                <div style="display:grid; grid-template-columns:1.2fr 1fr 110px 120px; align-items:center; padding:11px 20px; border-bottom:1px solid #EFE8D6; font-size:13px;">
+                  <span style="font-family:'IBM Plex Mono',monospace; font-size:12px;">{{ s.ref }}</span>
+                  <span style="color:#4E4A33;">{{ s.acct }}</span>
+                  <span><span style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; padding:2px 7px; border-radius:4px; color:{{ s.color }}; background:{{ s.surface }};">{{ s.status }}</span></span>
+                  <span style="font-family:'IBM Plex Mono',monospace; text-align:right;">{{ s.amount }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 ACTIVATION -->
+    <div data-screen-label="06 Activation" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">06 — Activation: KYC documents</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD;">
+        <dc-import name="Console Sidebar" active="Activation" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="height:64px; border-bottom:1px solid #D8CFB4; background:#FBF9F2; display:flex; align-items:center; padding:0 32px;">
+            <div style="font-size:18px; font-weight:700;">Activate your business</div>
+          </div>
+          <div style="padding:28px 32px; display:grid; grid-template-columns:240px minmax(0,1fr); gap:28px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; background:{{ s.bg }};">
+                  <div style="width:26px; height:26px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; background:{{ s.dot }}; color:{{ s.dotText }}; flex-shrink:0;">{{ s.n }}</div>
+                  <div>
+                    <div style="font-size:13.5px; font-weight:600;">{{ s.label }}</div>
+                    <div style="font-size:11.5px; color:#6E6648;">{{ s.state }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:28px; display:flex; flex-direction:column; gap:18px;">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.12em; color:#6E6648;">STEP 2 OF 5</div>
+                <div style="font-size:22px; font-weight:700; margin-top:6px;">Owner identity &amp; documents</div>
+                <div style="font-size:14px; color:#4E4A33; margin-top:6px;">We verify every business before live payouts. Files up to 10 MB, PDF or image.</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="font-size:13px; font-weight:600;">BVN</div>
+                  <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:14.5px;"><span>222 ••• ••• 18</span><span style="font-family:'IBM Plex Sans',sans-serif; font-size:11.5px; font-weight:600; color:#12573A; background:#E7F6EE; padding:3px 8px; border-radius:4px;">Verified</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="font-size:13px; font-weight:600;">NIN <span style="color:#6E6648; font-weight:400;">(optional if BVN given)</span></div>
+                  <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; font-size:14px; color:#8C8468;">11 digits</div>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <sc-for list="{{ docs }}" as="d" hint-placeholder-count="4">
+                  <div style="border:{{ d.border }}; background:{{ d.bg }}; border-radius:10px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div style="min-width:0;">
+                      <div style="font-size:13.5px; font-weight:600;">{{ d.label }}</div>
+                      <div style="font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#6E6648; margin-top:3px;">{{ d.file }}</div>
+                    </div>
+                    <div style="font-size:12.5px; font-weight:600; color:#4757B8; flex-shrink:0;">{{ d.action }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="flex:1;"></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #EFE8D6; padding-top:18px;">
+                <div style="font-size:13.5px; color:#4757B8; font-weight:600;">Back</div>
+                <div style="background:#4757B8; color:#F4EEDD; border-radius:8px; padding:11px 20px; font-size:14px; font-weight:600;">Save and continue</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 SETTINGS API KEYS -->
+    <div data-screen-label="07 Settings API keys" style="display:flex; flex-direction:column; gap:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:#6E6648;">07 — Settings: API keys &amp; webhooks</div>
+      <div style="width:1280px; height:800px; border-radius:12px; overflow:hidden; box-shadow:0 20px 50px rgba(32,38,74,0.2); display:flex; background:#F4EEDD;">
+        <dc-import name="Console Sidebar" active="Settings" hint-size="236px,800px"></dc-import>
+        <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div style="border-bottom:1px solid #D8CFB4; background:#FBF9F2; padding:20px 32px 0;">
+            <div style="font-size:18px; font-weight:700;">Settings</div>
+            <div style="display:flex; gap:26px; margin-top:16px; font-size:13.5px;">
+              <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+                <div style="padding-bottom:12px; color:{{ t.color }}; font-weight:{{ t.weight }}; border-bottom:{{ t.border }};">{{ t.label }}</div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="padding:24px 32px; display:flex; flex-direction:column; gap:18px; max-width:860px;">
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:15px; font-weight:700;">API keys</div>
+                  <div style="font-size:13px; color:#4E4A33; margin-top:3px;">For your own server to call collect and withdraw.</div>
+                </div>
+                <div style="border:1px solid #D8CFB4; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600;">Regenerate</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:13px; font-weight:600;">Public key</div>
+                <div style="background:#FBF9F2; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:13.5px;"><span>pk_live_7f2c91e04ab83d56</span><span style="font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; color:#4757B8; font-weight:600;">Copy</span></div>
+              </div>
+              <div style="background:#FBF0DD; border:1px solid #E8CF9E; border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:13.5px; font-weight:600; color:#5A3D0C;">Copy your secret key now. You won't see it again.</div>
+                <div style="background:#fff; border:1px solid #E8CF9E; border-radius:8px; height:42px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:13px;"><span>sk_live_e41b••••••••••••••••c07a</span><span style="font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; color:#4757B8; font-weight:600;">Copy</span></div>
+              </div>
+            </div>
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div style="grid-column:1 / -1; font-size:15px; font-weight:700;">Webhooks</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:13px; font-weight:600;">Webhook URL</div>
+                <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; font-family:'IBM Plex Mono',monospace; font-size:13px;">https://greenfield.edu.ng/hooks/napay</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:13px; font-weight:600;">Callback URL</div>
+                <div style="background:#fff; border:1px solid #D8CFB4; border-radius:8px; height:44px; padding:0 12px; display:flex; align-items:center; font-size:14px; color:#8C8468;">Optional</div>
+              </div>
+            </div>
+            <div style="background:#fff; border:1px solid #D8CFB4; border-radius:14px; padding:22px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:15px; font-weight:700;">IP whitelist</div>
+                <div style="font-size:13px; color:#4757B8; font-weight:600;">+ Add CIDR</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:#EFE8D6; border-radius:6px; padding:6px 10px;">102.89.34.0/24 ×</div>
+                <div style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:#EFE8D6; border-radius:6px; padding:6px 10px;">197.210.52.18/32 ×</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const S = {
+      PAID: ['#1A7F4E', '#E7F6EE'], PENDING: ['#3E5AA8', '#E9EDFA'], PROCESSING: ['#3E5AA8', '#E9EDFA'],
+      FAILED: ['#C22A2A', '#FBE8E8'], ON_HOLD: ['#B4740E', '#FBF0DD'], COMPLETED: ['#1A7F4E', '#E7F6EE'],
+      ACTIVE: ['#1A7F4E', '#E7F6EE'], REDEEMED: ['#3E5AA8', '#E9EDFA'], EXPIRED: ['#6E6648', '#EFE8D6'], REVOKED: ['#C22A2A', '#FBE8E8'],
+    };
+    const st = (status) => ({ status, color: S[status][0], surface: S[status][1] });
+    const vols = [22, 35, 18, 40, 62, 48, 30, 12, 55, 70, 88, 64, 95, 78];
+    const table = [
+      ['Chidera Okafor', '000015260925095112004812', 'Transfer', 'PAID', '₦30,000.00', '25 Sep 09:51'],
+      ['Musa Abdullahi', '000015260925094012003377', 'Cash (agent)', 'PAID', '₦30,000.00', '25 Sep 09:40'],
+      ['Blessing Eze', '000015260925092211002951', 'Pay link', 'PENDING', '₦15,000.00', '25 Sep 09:22'],
+      ['Tunde Bakare', '000015260925083008001220', 'Transfer', 'PAID', '₦30,000.00', '25 Sep 08:30'],
+      ['Amaka Nwosu', '000015260925081204000871', 'Pay link', 'FAILED', '₦30,000.00', '25 Sep 08:12'],
+      ['Ifeoma Obi', '000015260924172245009910', 'One-time acct', 'PAID', '₦30,000.00', '24 Sep 17:22'],
+      ['Yusuf Bello', '000015260924151030008714', 'Transfer', 'ON_HOLD', '₦120,000.00', '24 Sep 15:10'],
+      ['Grace Adeyemi', '000015260924140118007702', 'Pay link', 'PAID', '₦5,000.00', '24 Sep 14:01'],
+      ['Emeka Uche', '000015260924112937006158', 'Transfer', 'PROCESSING', '₦30,000.00', '24 Sep 11:29'],
+    ].map(([name, session, method, s, amount, date]) => ({ name, session, method, amount, date, ...st(s) }));
+    const done = { dot: '#1A7F4E', border: 'none', mark: '✓', color: '#20264A' };
+    const todo = { dot: 'transparent', border: '2px solid #D8CFB4', mark: '', color: '#4E4A33' };
+    const stepOn = (n, label, state, kind) => ({
+      n, label, state,
+      bg: kind === 'current' ? '#fff' : 'transparent',
+      dot: kind === 'done' ? '#1A7F4E' : kind === 'current' ? '#4757B8' : '#EFE8D6',
+      dotText: kind === 'todo' ? '#6E6648' : '#fff',
+    });
+    const tab = (label, on) => ({ label, color: on ? '#20264A' : '#6E6648', weight: on ? 600 : 400, border: on ? '2px solid #4757B8' : '2px solid transparent' });
+    return {
+      bars: vols.map(v => ({ h: v + '%' })),
+      recent: table.slice(0, 4),
+      table,
+      checklist: [
+        { label: 'Business details', ...done },
+        { label: 'Owner identity (BVN)', ...done },
+        { label: 'Invite your team', ...done },
+        { label: 'Upload KYC documents', ...todo },
+        { label: 'Submit for review', ...todo },
+      ],
+      campaigns: [
+        { name: 'Term 1 School Fees', pct: '68%', meta: '162 of 240 students · ₦4.86M' },
+        { name: 'PTA Levy', pct: '37%', meta: '88 of 240 · ₦440,000' },
+        { name: 'JSS 2 Excursion', pct: '91%', meta: '51 of 56 · ₦637,500' },
+      ],
+      tiles: [
+        { label: 'Total collected', value: '₦4,860,000', sub: '184 transactions' },
+        { label: 'Average payment', value: '₦26,413', sub: 'Across all methods' },
+        { label: 'Pending', value: '₦45,000', sub: '2 transactions' },
+        { label: 'Failed', value: '₦30,000', sub: '1 transaction' },
+      ],
+      links: [
+        ['Term 1 School Fees', 'napay.ng/p/GRN-T1', 'Permanent', '₦30,000', 'ACTIVE'],
+        ['PTA Levy', 'napay.ng/p/GRN-PTA', 'Permanent', '₦5,000', 'ACTIVE'],
+        ['JSS 2 Excursion', 'napay.ng/p/GRN-X2', 'Temporary', '₦12,500', 'ACTIVE'],
+        ['Chioma, fee balance', 'napay.ng/p/7QK2M', 'Single use', '₦8,000', 'REDEEMED'],
+        ['Uniform balance', 'napay.ng/p/GRN-UNI', 'Temporary', 'Any', 'EXPIRED'],
+        ['Old bus levy', 'napay.ng/p/GRN-BUS', 'Permanent', '₦2,000', 'REVOKED'],
+      ].map(([name, url, type, amount, s]) => ({ name, url, type, amount, ...st(s) })),
+      splits: [
+        { name: 'School operations', bank: 'Access Bank ···0921', pct: '70%', color: '#4757B8' },
+        { name: 'Staff salary account', bank: 'GTBank ···4410', pct: '20%', color: '#20264A' },
+        { name: 'Development fund', bank: 'Zenith ···7736', pct: '10%', color: '#B3A37D' },
+      ],
+      settlements: [
+        ['STL-260924-0031', 'Access ···0921', 'COMPLETED', '₦612,500.00'],
+        ['STL-260924-0032', 'GTBank ···4410', 'COMPLETED', '₦175,000.00'],
+        ['STL-260924-0033', 'Zenith ···7736', 'PROCESSING', '₦87,500.00'],
+        ['STL-260923-0028', 'Access ···0921', 'COMPLETED', '₦441,000.00'],
+        ['STL-260923-0029', 'GTBank ···4410', 'COMPLETED', '₦126,000.00'],
+        ['STL-260923-0030', 'Zenith ···7736', 'FAILED', '₦63,000.00'],
+        ['STL-260922-0025', 'Access ···0921', 'COMPLETED', '₦380,100.00'],
+        ['STL-260922-0026', 'GTBank ···4410', 'COMPLETED', '₦108,600.00'],
+      ].map(([ref, acct, s, amount]) => ({ ref, acct, amount, ...st(s) })),
+      steps: [
+        stepOn('1', 'Business details', 'Done', 'done'),
+        stepOn('2', 'Identity & documents', 'In progress', 'current'),
+        stepOn('3', 'Team', 'Done', 'done'),
+        stepOn('4', 'API keys', 'Optional', 'todo'),
+        stepOn('5', 'Review & submit', 'Not started', 'todo'),
+      ],
+      docs: [
+        { label: 'CAC certificate', file: 'cac-greenfield.pdf · 1.2 MB', action: 'Download', border: '1px solid #BFE3CF', bg: '#F3FBF6' },
+        { label: 'Memorandum & articles', file: 'memart.pdf · 3.8 MB', action: 'Download', border: '1px solid #BFE3CF', bg: '#F3FBF6' },
+        { label: 'Proof of address', file: 'Drop file or browse', action: 'Upload', border: '1.5px dashed #B3A37D', bg: '#FBF9F2' },
+        { label: "Director's valid ID", file: 'Drop file or browse', action: 'Upload', border: '1.5px dashed #B3A37D', bg: '#FBF9F2' },
+      ],
+      tabs: [tab('Profile'), tab('Contact'), tab('Team'), tab('Security'), tab('API keys & webhooks', true)],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

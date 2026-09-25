@@ -1,3 +1,4 @@
+import { Logo } from "@/components/brand/logo";
 import { AcceptInviteForm } from "@/components/onboarding/accept-invite-form";
 
 /**
@@ -16,7 +17,8 @@ export default async function InviteAcceptPage({
   const { token } = await params;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-900 px-4 py-8">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8">
+      <Logo size={36} wordmarkClassName="text-ink" />
       <AcceptInviteForm token={token} />
     </div>
   );

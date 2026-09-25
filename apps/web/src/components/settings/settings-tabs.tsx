@@ -8,30 +8,32 @@ const TABS = [
   { href: "/dashboard/settings/profile", label: "Profile" },
   { href: "/dashboard/settings/contact", label: "Contact" },
   { href: "/dashboard/settings/team", label: "Team" },
-  { href: "/dashboard/settings/api-keys", label: "API Keys & Webhooks" },
+  { href: "/dashboard/settings/api-keys", label: "API keys & webhooks" },
+  { href: "/dashboard/settings/security", label: "Security" },
 ];
 
 export function SettingsTabs() {
   const pathname = usePathname();
   return (
-    <div className="overflow-x-auto border-b border-border">
-      <div className="flex w-max min-w-full gap-6">
+    <div className="overflow-x-auto">
+      <nav className="flex w-max min-w-full gap-5 sm:gap-[26px]" aria-label="Settings">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
           return (
             <Link
               key={tab.href}
               href={tab.href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "-mb-px whitespace-nowrap border-b-2 border-transparent px-1 py-3 text-sm font-medium text-navy-400 transition-colors hover:text-navy-700",
-                active && "border-navy-700 text-navy-900",
+                "-mb-px whitespace-nowrap border-b-2 border-transparent pb-3 pt-3.5 text-[13.5px] text-subtle transition-colors hover:text-ink",
+                active && "border-brand font-semibold text-ink",
               )}
             >
               {tab.label}
             </Link>
           );
         })}
-      </div>
+      </nav>
     </div>
   );
 }

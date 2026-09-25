@@ -38,16 +38,16 @@ export function ReviewSummary() {
             <Link
               key={item.key}
               href={item.href}
-              className="flex items-center justify-between rounded-md border border-border px-4 py-3 hover:bg-navy-50"
+              className="flex items-center justify-between rounded-md border border-border px-4 py-3 hover:bg-paper"
             >
-              <span className="flex items-center gap-3 text-sm font-medium text-navy-800">
-                {done ? <Check className="size-4 text-success" /> : <Circle className="size-4 text-navy-300" />}
+              <span className="flex items-center gap-3 text-sm font-medium text-ink">
+                {done ? <Check className="size-4 text-success" /> : <Circle className="size-4 text-faint" />}
                 {item.label}
                 {"optional" in item && item.optional && (
-                  <span className="text-xs font-normal text-navy-400">(optional)</span>
+                  <span className="text-xs font-normal text-subtle">(optional)</span>
                 )}
               </span>
-              <span className="text-xs text-navy-400">{done ? "Done" : "Set up"}</span>
+              <span className="text-xs text-subtle">{done ? "Done" : "Set up"}</span>
             </Link>
           );
         })}

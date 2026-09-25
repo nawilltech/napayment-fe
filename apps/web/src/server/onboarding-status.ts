@@ -1,6 +1,8 @@
 import "server-only";
+import { cache } from "react";
 import { authedBackendClient } from "./backend-client";
 import { safeCall } from "./safe-call";
+import type { OnboardingStep } from "@/components/onboarding/stepper";
 
 /**
  * These checks are all gated behind business-owner-only permissions
@@ -13,7 +15,9 @@ import { safeCall } from "./safe-call";
  * teammate with an activation checklist they have no permission to act on"
  * rather than crashing the page (the bug this replaced).
  */
-export async function computeOnboardingStatus() {
+// cache(): the console layout and the Home checklist both need this in one
+// request - dedupe so it's one round of backend calls, not two.
+export const computeOnboardingStatus = cache(async () => {
   const client = await authedBackendClient();
   const [businessDetails, documents, invites, webhookConfig, apiKeys] = await Promise.all([
     safeCall(client.business.getKycDetails()),
@@ -43,4 +47,27 @@ export async function computeOnboardingStatus() {
       webhookConfig === undefined ? true : Boolean(webhookConfig.callbackUrl || webhookConfig.webhookUrl),
     apiKeysDone: apiKeys === undefined ? true : apiKeys.totalElements > 0,
   };
+});
+
+export type OnboardingStatus = Awaited<ReturnType<typeof computeOnboardingStatus>>;
+
+/** One list drives the onboarding stepper, the sidebar "3/5" tag and the Home checklist. */
+export function activationSteps(status: OnboardingStatus): OnboardingStep[] {
+  return [
+    { key: "business", label: "Business details", href: "/onboarding/business", done: status.businessDetailsDone },
+    { key: "kyc", label: "KYC documents", href: "/onboarding/kyc", done: status.kycSubmitted },
+    { key: "team", label: "Invite your team", href: "/onboarding/team", done: status.teamInvited },
+    {
+      key: "api-keys",
+      label: "API keys & webhooks",
+      href: "/onboarding/api-keys",
+      done: status.apiKeysDone && status.webhookConfigured,
+    },
+    { key: "review", label: "Review & finish", href: "/onboarding/review", done: false },
+  ];
+}
+
+/** Same gate the dashboard banner has always used - review isn't a stored state. */
+export function isActivationDone(status: OnboardingStatus): boolean {
+  return status.businessDetailsDone && status.kycSubmitted && status.apiKeysDone;
 }

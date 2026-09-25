@@ -22,13 +22,13 @@ export function PasswordRequirements({ password }: { password: string }) {
             key={req.label}
             className={cn(
               "flex items-center gap-1.5 text-xs transition-colors",
-              met ? "text-success" : "text-navy-400",
+              met ? "text-success" : "text-subtle",
             )}
           >
             <span
               className={cn(
                 "flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-colors",
-                met ? "border-success bg-success text-white" : "border-navy-300 bg-transparent",
+                met ? "border-success bg-success text-white" : "border-tan bg-transparent",
               )}
             >
               {met && <Check className="size-2.5" strokeWidth={3} />}
