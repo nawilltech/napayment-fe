@@ -87,6 +87,46 @@ export interface ChangePasswordRequest {
   confirmNewPassword: string;
 }
 
+/**
+ * FR-Auth-2. `currentPin` is required only when the caller already has one
+ * set (changing it) - omit/leave blank on a first-time set, the backend
+ * validates against the caller's actual state, not the request shape.
+ */
+export interface SetTransactionPinRequest {
+  currentPassword: string;
+  currentPin?: string;
+  pin: string;
+  confirmPin: string;
+}
+
+/**
+ * FR-Auth-1: peer-to-peer transfer between two Nawill virtual accounts.
+ * `recipientIdentifier` is format-sniffed backend-side - a 10-digit numeric
+ * string resolves as a Nawill account number, anything else as a phone
+ * number.
+ */
+export interface TransferRequest {
+  recipientIdentifier: string;
+  amount: string;
+  narration?: string;
+  transactionPin: string;
+}
+
+export interface TransferResponse {
+  id: string;
+  transferGroupId: string;
+  amount: string;
+  recipientDisplayName: string;
+  senderNewBalance: string;
+  createdAt: string;
+}
+
+/** Confirm-before-send preview (GET /transfers/resolve?identifier=...). */
+export interface TransferResolveResponse {
+  displayName: string;
+  accountNumberMasked: string;
+}
+
 export interface MessageResponse {
   message: string;
 }
@@ -199,7 +239,12 @@ export interface TransactionResponse {
   transactionType: TransactionType;
   sessionId: string;
   virtualAccountId: string;
-  paymentProcessorId: string;
+  /** Null for a peer-to-peer transfer leg (FR-Auth-1) - no external processor is involved. */
+  paymentProcessorId: string | null;
+  /** Set only on transfer-sourced rows: a transfer produces one DEBIT + one CREDIT sharing this id. */
+  transferGroupId: string | null;
+  /** The other side's virtual account id, set only on transfer-sourced rows. */
+  counterpartyAccountId: string | null;
   createdAt: string;
 }
 

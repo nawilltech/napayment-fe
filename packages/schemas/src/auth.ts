@@ -92,6 +92,31 @@ export const changePasswordSchema = z
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 /**
+ * FR-Auth-2. `currentPin` is deliberately always shown/collected in the UI
+ * (never conditionally hidden based on "do I already have one" state) - the
+ * backend has no GET endpoint to check that ahead of time, so a single form
+ * works for both first-time set and change: leave `currentPin` blank the
+ * first time, the backend's own validation (not this schema) is what
+ * actually enforces whether one was required.
+ */
+export const setTransactionPinSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Required"),
+    currentPin: z
+      .string()
+      .regex(/^\d{4}$/, "Enter your current 4-digit PIN")
+      .optional()
+      .or(z.literal("")),
+    pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
+    confirmPin: z.string().min(1, "Required"),
+  })
+  .refine((data) => data.pin === data.confirmPin, {
+    message: "PINs don't match",
+    path: ["confirmPin"],
+  });
+export type SetTransactionPinInput = z.infer<typeof setTransactionPinSchema>;
+
+/**
  * FR-5a's "join an existing business" signup variant - no email field: the
  * backend derives it from the invite token (AcceptInviteRequest has no email
  * param either), so asking for it here would just be an unused input.
