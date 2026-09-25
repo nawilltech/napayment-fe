@@ -23,9 +23,9 @@ export function AcceptInviteForm({ token }: { token: string }) {
   });
 
   return (
-    <div className="w-full max-w-md rounded-xl border border-navy-700 bg-surface p-6 sm:p-8">
-      <h1 className="text-lg font-semibold text-navy-900">You&apos;ve been invited to Nawill Pay</h1>
-      <p className="mt-1 text-sm text-navy-500">
+    <div className="w-full max-w-md rounded-[14px] border border-line bg-surface p-6 sm:p-8">
+      <h1 className="text-[22px] font-bold leading-tight text-ink">You&apos;ve been invited to Napayment</h1>
+      <p className="mt-1 text-sm text-muted">
         Complete your details to join your team&apos;s business account.
       </p>
 

@@ -1,0 +1,47 @@
+{
+  "status": "IMPLEMENTED — landed in backend commit 7a5f3f9 (feat(payments,auth): peer-to-peer transfer + transaction PIN, FR-Auth-1/2) and consumed by the frontend (Settings → Security, Send Money). Kept here, like the rest of this directory, as a record of the real shape rather than the original sketch below it.",
+  "context": "docs/treasury-settlements-ui-design.md §4.6 and §7 sketched this ahead of the backend. The actual first PIN-gated feature the backend shipped was peer-to-peer wallet transfer (FR-Auth-1), not settlement/payout gating as originally scoped in that doc — the PIN mechanism itself is unchanged and will gate the Payouts phase's sensitive actions the same way once those land.",
+  "shapeActuallyBuilt": "alternativeShape (inline PIN per sensitive endpoint) — not the verification-token shape this file originally recommended. PIN-checking (including lockout) lives once in TransactionPinService, exposed to payments via a small TransactionPinGateway interface (ADR-12 cross-module ownership pattern, same shape as RecipientDirectory) — so the duplication concern the original recommendation was trying to avoid didn't materialize; only one caller (TransferService) verifies a PIN today.",
+  "endpoints": [
+    {
+      "endpoint": "POST /api/v1/auth/transaction-pin",
+      "purpose": "Set (first time) or change the 4-digit transaction PIN. One endpoint for both — there is no separate PUT.",
+      "auth": "JWT",
+      "request": {
+        "body": {
+          "currentPassword": "the account's current login password, required every time as proof of ownership",
+          "currentPin": "required only if the caller already has a PIN set; omit/blank on first-time set — the backend checks the caller's actual state, not the request shape",
+          "pin": "1234",
+          "confirmPin": "1234"
+        }
+      },
+      "response": { "status": 200, "body": { "message": "Transaction PIN set successfully." } },
+      "errors": [
+        "400 PIN_MISMATCH — pin/confirmPin don't match",
+        "401 INVALID_CREDENTIALS — wrong currentPassword",
+        "401 INVALID_PIN — wrong currentPin when one is already set"
+      ],
+      "knownGap": "No GET endpoint exists to check whether a PIN is already set. The frontend's Settings → Security form always shows the 'Current PIN' field, labeled 'leave blank if you don't have one yet', rather than conditionally rendering based on server state — see docs/treasury-settlements-ui-design.md §7."
+    },
+    {
+      "endpoint": "GET /api/v1/transfers/resolve?identifier=...",
+      "purpose": "Confirm-before-send: resolves a recipient's masked display name before the sender commits. identifier is format-sniffed — a 10-digit numeric string resolves as a Nawill account number, anything else as a phone number.",
+      "auth": "JWT",
+      "response": { "status": 200, "body": { "displayName": "Bo*** R.", "accountNumberMasked": "******5226" } }
+    },
+    {
+      "endpoint": "POST /api/v1/transfers",
+      "purpose": "Peer-to-peer transfer between two Nawill virtual accounts, PIN-gated. Idempotent (Idempotency-Key header).",
+      "auth": "JWT",
+      "request": { "body": { "recipientIdentifier": "9724705226", "amount": "10000 (kobo)", "narration": "optional, max 128 chars", "transactionPin": "1234" } },
+      "response": { "status": 200, "body": { "id": "uuid", "transferGroupId": "uuid", "amount": "10000", "recipientDisplayName": "Bo*** R.", "senderNewBalance": "40000", "createdAt": "2026-09-13T01:49:00Z" } },
+      "errors": [
+        "400 INSUFFICIENT_BALANCE",
+        "401 INVALID_PIN, message includes the attempt count e.g. 'Incorrect transaction PIN (attempt 2/3)'",
+        "423 ACCOUNT_LOCKED after 3 wrong PIN attempts — 'Too many incorrect PIN attempts. Try again in 30 minute(s).' (own Redis-backed lockout, separate from login's — a wrong PIN never locks login, and vice versa)",
+        "400 PIN_NOT_SET if the caller has never set one"
+      ],
+      "verifiedLiveAgainstBackend": "2026-09-13: signup x2, recipient resolution by account number AND by phone, first-time PIN set with blank currentPin, insufficient-balance rejection, wrong-PIN rejection with attempt counter, and lockout after 3 attempts — all confirmed via direct HTTP calls through the Next.js BFF routes."
+    }
+  ]
+}

@@ -24,3 +24,9 @@ Kept here as a historical reference — each file below notes where it landed.
 The one gap this integration *surfaced* rather than closed: there's still no
 public "resolve invite by token" endpoint, so the accept-invite page can't
 show who invited you before you submit — see doc F9.
+
+## Payouts/Treasury phase
+
+| File | What it sketched | Where it landed |
+|---|---|---|
+| `transaction-pin.json` | A proposed PIN set/change/verify contract, sketched ahead of the backend (see `docs/treasury-settlements-ui-design.md`) | **Implemented**, with one shape change: the backend chose the simpler inline-PIN-per-endpoint approach over this sketch's recommended verification-token shape, and the first real PIN-gated feature was peer-to-peer transfer (FR-Auth-1), not settlement/payout gating. One endpoint (`POST /api/v1/auth/transaction-pin`) handles both first-time set and change — no separate PUT, and no GET status endpoint exists yet. See the file for the real shape and the Settings → Security / Send Money screens for where it's consumed. |

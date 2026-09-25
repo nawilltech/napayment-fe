@@ -4,48 +4,70 @@
  * tailwind.config (mobile, once it's built out - see docs/nawill-pay-frontend.md
  * doc F8 "Design tokens").
  *
- * `navy` and `cream` are sampled directly from the provided logo mark; the
- * rest of each scale is generated around those two anchors and should be
- * reviewed by design before ship - see the doc F8 note.
+ * Values come from the Napayment identity in docs/Nawill Technology branding
+ * ("Napayment Brand" palette + "Napayment Web" screens). Nawill core colours
+ * (blue, ink, cream) carry over unchanged; status colours are for payment
+ * states only.
  */
 
 export const colors = {
-  navy: {
-    50: "#EEF0F5",
-    100: "#D7DBE6",
-    200: "#AFB7CC",
-    300: "#8790B3",
-    400: "#5F6B99",
-    500: "#454E77",
-    600: "#333A5C",
-    700: "#262B49", // brand anchor - sampled from logo background
-    800: "#1B1F36",
-    900: "#121425",
+  ink: {
+    DEFAULT: "#20264A", // text, amounts, console sidebar
+    raised: "#2C3360",
+    line: "#3A4270",
+    fg: "#C9CEE8",
+    muted: "#8E9BD8",
+    subtle: "#B7BEDB",
+  },
+  brand: {
+    DEFAULT: "#4757B8", // Nawill Blue - primary, actions
+    hover: "#3B4AA3",
+    soft: "#D6DAF2",
+    line: "#9FA8DE",
+    surface: "#EEF0FA",
   },
   cream: {
-    50: "#FBFAF6",
-    100: "#F7F4EC",
-    200: "#ECE6D9", // brand anchor - sampled from logo letterform
-    300: "#DED5BF",
-    400: "#C9BC9C",
-    500: "#B3A37D",
+    DEFAULT: "#F4EEDD", // surfaces, receipts
+    paper: "#FBF9F2",
+    sand: "#E4DCC8",
+    line: "#D8CFB4",
+    lineSoft: "#EFE8D6",
+    tan: "#B3A37D",
+  },
+  text: {
+    muted: "#4E4A33",
+    subtle: "#6E6648",
+    faint: "#8C8468",
   },
   status: {
     success: "#1A7F4E",
     successSurface: "#E7F6EE",
+    successLine: "#BFE3CF",
     warning: "#B4740E",
     warningSurface: "#FBF0DD",
+    warningLine: "#E8CF9E",
+    warningInk: "#5A3D0C",
     danger: "#C22A2A",
     dangerSurface: "#FBE8E8",
     pending: "#3E5AA8",
     pendingSurface: "#E9EDFA",
+    // Mobile-only offline states (brand palette "Received" / "Queued")
+    received: "#2E7D5B",
+    queued: "#B7791F",
   },
+} as const;
+
+export const fonts = {
+  sans: "IBM Plex Sans",
+  mono: "IBM Plex Mono",
+  display: "Special Elite",
 } as const;
 
 export const radius = {
   sm: "6px",
-  md: "10px",
-  lg: "14px",
+  md: "8px",
+  lg: "10px",
+  xl: "14px",
   full: "9999px",
 } as const;
 

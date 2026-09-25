@@ -58,18 +58,18 @@ export function SignupForm() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-navy-900">Create your account</h1>
-      <p className="mt-1 text-sm text-navy-500">Fill in your details to get onboarded.</p>
+      <h1 className="text-[28px] font-bold leading-tight text-ink">Create your account</h1>
+      <p className="mt-1.5 text-[14.5px] text-muted">Fill in your details to get onboarded.</p>
 
-      <div className="mt-6 grid grid-cols-2 gap-2 rounded-md bg-navy-50 p-1">
+      <div className="mt-6 grid grid-cols-2 rounded-lg bg-line-soft p-1">
         {(["individual", "business"] as const).map((type) => (
           <button
             key={type}
             type="button"
             onClick={() => setAccountType(type)}
             className={cn(
-              "rounded px-3 py-2 text-sm font-medium capitalize transition-colors",
-              accountType === type ? "bg-surface text-navy-900 shadow-sm" : "text-navy-500",
+              "rounded-md px-3 py-[9px] text-[13.5px] capitalize transition-colors",
+              accountType === type ? "bg-surface font-semibold text-ink shadow-[0_1px_2px_rgba(32,38,74,0.1)]" : "text-muted hover:text-ink",
             )}
           >
             {type}
@@ -92,7 +92,7 @@ export function SignupForm() {
         </div>
 
         {accountType === "business" && (
-          <div className="grid grid-cols-1 gap-4 rounded-md border border-border bg-navy-50 p-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 rounded-md border border-border bg-paper p-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="businessName">Business name</Label>
               <Input id="businessName" {...register("businessName")} />
@@ -151,14 +151,14 @@ export function SignupForm() {
           )}
         </div>
 
-        <Button type="submit" className="w-full" loading={signup.isPending}>
+        <Button type="submit" size="lg" className="w-full" loading={signup.isPending}>
           Create account
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-navy-500">
+      <p className="mt-6 text-center text-sm text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-navy-700 hover:underline">
+        <Link href="/login" className="font-semibold text-brand hover:underline">
           Log in
         </Link>
       </p>

@@ -3,21 +3,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy-500 disabled:pointer-events-none disabled:opacity-50",
+export const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        primary: "bg-navy-700 text-cream-50 hover:bg-navy-800",
-        secondary: "bg-cream-200 text-navy-900 hover:bg-cream-300",
-        outline: "border border-border bg-surface text-navy-900 hover:bg-navy-50",
-        ghost: "text-navy-700 hover:bg-navy-50",
+        primary: "bg-brand text-cream hover:bg-brand-hover",
+        dark: "bg-ink text-cream hover:bg-ink-raised",
+        secondary: "bg-line-soft text-ink hover:bg-sand",
+        outline: "border border-line bg-surface text-ink hover:bg-paper",
+        ghost: "text-brand hover:bg-brand-surface",
         destructive: "bg-danger text-white hover:opacity-90",
       },
       size: {
-        sm: "h-8 px-3 text-xs",
-        md: "h-10 px-4",
-        lg: "h-12 px-6 text-base",
+        sm: "h-8 px-3 text-[13px]",
+        md: "h-10 px-4 text-[13.5px]",
+        lg: "h-12 px-6 text-[15px]",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },
