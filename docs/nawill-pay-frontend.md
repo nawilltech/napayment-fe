@@ -11,6 +11,8 @@ Date: September 2026
 
 **Implementation status (added post-v0.1 of this document):** the Business Console's full onboarding flow — business/individual signup, KYC document upload, team invites, API key + IP whitelist + webhook config, and the corresponding Settings tabs — is built in `apps/web` per this handbook's own architecture (Chapters F2/F4/F8), along with a **Transactions** screen (filterable/paginated list + analytics dashboard: stat tiles, a daily-volume bar chart, status/type breakdowns). The Consumer Wallet App (`apps/mobile`) is scaffolded only, per doc F10. Every screen calls a real backend endpoint through the BFF proxy (doc F2 ADR-FE-2) — **`apps/web/src/server/dev-store.ts` (the JSON-file dev stand-in every onboarding screen was originally built against) has been deleted**: the backend closed essentially every doc F9 gap it was covering for (`GET /users/me`, business KYC/KYB, owner BVN/NIN identity, KYC document upload+download, KYC submit, team invitations + a real invite-acceptance signup path, API-key webhook config, business contact settings) in one pass, and every Route Handler that used to read/write it now calls the real endpoint instead. See the revised doc F9 table for what's still actually open (a small remainder, not the original eight gaps) and doc F6 for the endpoints themselves. `docs/api-contracts/` is kept as a historical record of the contracts this integration was built against — each file now links to where it landed.
 
+**Next phase — Payouts & Treasury:** full UI design in `docs/treasury-settlements-ui-design.md`. **Partially built:** the transaction PIN (Settings → Security) and peer-to-peer wallet transfer (Send Money, `/dashboard/send`) shipped first — ahead of the settlement/payout-split screens that doc originally scoped the PIN around — since that's what the backend implemented first (FR-Auth-1/2). The PIN mechanism (`POST /api/v1/auth/transaction-pin`, verified via `TransactionPinGateway`) is the same one that will gate settlements/payout-split changes once those land; see `docs/api-contracts/transaction-pin.json` for the real (not proposed) contract. **Still not built:** settlement accounts/payout splits, settlements history, bank accounts, payment links, temporary accounts — backend for those, plus the real-money-movement parts (live NIP disbursement, the collection account's real-bank link), is in progress on a separate track.
+
 ---
 
 This document is the frontend counterpart to the backend's `docs/nawill-pay.md` master specification. Citation scheme: **doc F-N** refers to a chapter here; a bare **doc N** (no `F`) refers to the corresponding chapter in the backend spec (e.g. `doc 3 §2.5` is the backend's HMAC auth flow). Requirement IDs (`FR-x`, `NFR-x`) are the backend's own and are reused verbatim rather than renumbered, since the frontend exists to serve them, not redefine them.
@@ -96,6 +98,8 @@ Rationale for Expo specifically (over bare React Native): EAS Update ships JS-on
 ### ADR-FE-6 — NativeWind, for design-token parity with the web app
 
 Tailwind syntax on React Native. The same `tailwind.config` color/spacing/radius tokens (doc F8) back both the Console and the Wallet App, so "the navy used for a primary button" is defined once and consumed twice, not redefined per platform.
+
+**Addendum (Wallet App v1):** not adopted for the first build. NativeWind's Metro/Babel setup was unverified against Expo SDK 57, so the app uses React Native `StyleSheet` over a typed theme (`apps/mobile/src/theme`) whose values mirror `packages/ui-tokens` one-to-one. Token parity holds; class-name parity doesn't. Revisit once NativeWind is confirmed on the SDK in use.
 
 ### ADR-FE-7 — Token storage & app-lock
 
@@ -334,14 +338,15 @@ Each screen cites the backend process flow it drives (doc 4 Part C) so a screen'
 
 | Screen | Backend flow | Key endpoints |
 |---|---|---|
-| Onboarding (signup, KYC tier 1) | doc 4 §C.1 | `POST /auth/signup` + the full KYC endpoint set (doc F6) now exist backend-side; not built on mobile yet, scaffold only (doc F10) |
-| Home (balance, virtual account number) | — | `GET /virtual-accounts` |
-| Transaction history | doc 4 §C.2 | `GET /transactions` now exists (doc F6) — unblocked backend-side; not built on mobile yet, scaffold only (doc F10) |
-| Collect (share payment link / dynamic account) | doc 4 §C.8 | `/payment-links`, `/temporary-accounts` |
-| Send to another Nawill user | doc 4 §C.2 (partial) | **no endpoint yet** — doc F9, highest-priority remaining gap |
+| Onboarding (signup, KYC tier 1) | doc 4 §C.1 | **Built** — sign in / sign up (individual + business) / forgot + reset password (`/auth/*`). KYC document upload stays on the Console for now |
+| Home (balance, virtual account number) | — | **Built** — `GET /virtual-accounts`, `GET /transactions` |
+| Transaction history | doc 4 §C.2 | **Built** — Activity tab (`GET /transactions`, `/transactions/analytics`) + receipt (`GET /transactions/{id}`) |
+| Collect (share payment link / dynamic account) | doc 4 §C.8 | **Built** — `/payment-links` (outbox-queued offline), `/temporary-accounts` (online-only; polled for PAID) |
+| Send to another Nawill user | doc 4 §C.2 (partial) | **Built** — `/transfers/resolve` + `/transfers` behind the transaction-PIN sheet; online-only |
+| Withdraw to bank | — | **Built** — `POST /settlements` to the configured settlement account(s); outbox-queued offline. Backend takes no PIN here (doc F9) |
 | Notifications | doc 1 FR-Notif-1 | invite emails now send for real (`EmailGateway`); no general in-app/push notification system yet — doc F9 |
-| Security (2FA, change password, biometric app-lock) | doc 1 FR-8 | `/auth/change-password` is real; 2FA endpoints don't exist yet — doc F9 |
-| Profile / Settings | — | `GET /users/me`, `/business/contact` now exist backend-side (doc F6); not built on mobile yet, scaffold only (doc F10) |
+| Security (2FA, change password, biometric app-lock) | doc 1 FR-8 | **Built:** change password, set/change transaction PIN. Not yet: 2FA (no endpoints, doc F9), biometric app-lock (`expo-local-authentication` not installed) |
+| Profile / Settings | — | **Built** — `GET /users/me`, settlement-account count, offline queue, sign out |
 
 ---
 
@@ -434,6 +439,10 @@ What's left, resolved-or-not:
 | ~~**Refresh-token rotation**~~ **Resolved** | — | `POST /auth/refresh` + `POST /auth/logout` now exist (doc F6) — rotating, Redis-backed, reuse-detecting. Frontend half: `apps/web/src/middleware.ts` proactively refreshes the access token (within a 2-minute buffer of its 15-min expiry) before it ever reaches a Server Component, since only middleware/Route Handlers/Server Actions can write the rotated cookie — a Server Component render can't. Sessions now survive up to 30 days instead of forcing a re-login every 15 minutes. See `docs/subjects/authentication-and-sessions.md` for the full flow and why a reactive retry-on-401 design was rejected in favor of this proactive one. |
 | **Peer-to-peer send** | The Wallet App's core "transfer money" flow (FR-Auth-1) | Still open. Today's transaction/collect endpoints only credit/debit the *caller's own* virtual account. |
 | **2FA endpoints** | Security settings screen, FR-8 | Still open. Settings → Profile only exposes change-password, which is real. |
+| **Transaction PIN on settlements** | A PIN-gated Withdraw in the Wallet App (mobile design 08) | `POST /settlements` takes no PIN, unlike `/transfers`. The app confirms explicitly instead of showing a PIN pad the backend wouldn't check. |
+| **Phone-number login** | Mobile sign-in as designed (phone + password) | `LoginRequest` is email-only; the Wallet App signs in by email until this exists. |
+| **Payer / counterparty name on transactions** | Naming rows and receipts by who paid (mobile designs 02, 06, 07) | `TransactionResponse` has no display name, so rows are titled by kind ("Payment received", "Transfer sent"). |
+| **`GET /temporary-accounts/{id}`** | Cheap status polling on the one-time account screen | No read-by-id; the app polls the list every 5s while the account is ACTIVE and picks its row out. |
 | ~~**Password-reset email delivery**~~ **Resolved** | — | `ForgotPasswordResponse` no longer carries a token; `AuthService#forgotPassword` emails a `/reset-password?email=...&token=...` link via `EmailGateway` instead. `ResetPasswordRequest`/`ChangePasswordRequest` both gained a `confirmNewPassword` field, checked server-side. |
 | **Notification delivery beyond email** | In-app/push notification screen, FR-Notif-1 | Invite emails and password-reset emails now send for real via `EmailGateway`/`SmtpEmailGateway` (best-effort, logged on failure). No general in-app/push notification system yet. |
 | **Reporting/statement export (FR-Report-1)** | Reports screen | No reporting module/endpoints exist yet. |
