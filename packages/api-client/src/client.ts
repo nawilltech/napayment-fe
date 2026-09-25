@@ -48,6 +48,9 @@ export function createBackendClient(config: ApiClientConfig) {
       /** Revokes the refresh token server-side. Public endpoint, same as refresh. */
       logout: (body: T.RefreshTokenRequest) =>
         apiRequest<T.MessageResponse>(config, "/api/v1/auth/logout", { method: "POST", body }),
+      /** FR-Auth-2: set (first time) or change the 4-digit transaction PIN required to send a transfer. */
+      setTransactionPin: (body: T.SetTransactionPinRequest) =>
+        apiRequest<T.MessageResponse>(config, "/api/v1/auth/transaction-pin", { method: "POST", body }),
     },
 
     users: {
@@ -277,6 +280,21 @@ export function createBackendClient(config: ApiClientConfig) {
         ),
       get: (id: string) =>
         apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/payment-processors/${id}`),
+    },
+
+    /** FR-Auth-1: peer-to-peer transfer between two Nawill virtual accounts, gated by the transaction PIN above. */
+    transfers: {
+      /** Confirm-before-send: resolves the masked recipient name before the caller commits. */
+      resolve: (identifier: string) =>
+        apiRequest<T.TransferResolveResponse>(config, "/api/v1/transfers/resolve", {
+          query: { identifier },
+        }),
+      create: (body: T.TransferRequest, idempotencyKey: string) =>
+        apiRequest<T.TransferResponse>(config, "/api/v1/transfers", {
+          method: "POST",
+          body,
+          idempotencyKey,
+        }),
     },
 
     referenceData: {

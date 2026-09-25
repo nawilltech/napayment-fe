@@ -38,22 +38,22 @@ export function FileDropzone({
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={cn(
-          "flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center transition-colors",
-          dragging ? "border-navy-500 bg-navy-50" : "border-border hover:border-navy-300",
-          uploaded && "border-success/40 bg-success-surface",
+          "flex cursor-pointer flex-col items-center gap-2 rounded-[10px] border-[1.5px] border-dashed p-6 text-center transition-colors",
+          dragging ? "border-brand bg-brand-surface" : "border-tan bg-paper hover:border-brand",
+          uploaded && "border-solid border-success-line bg-[#F3FBF6]",
         )}
       >
         {uploaded ? (
           <>
             <CheckCircle2 className="size-6 text-success" />
-            <p className="text-sm font-medium text-navy-800">{uploaded.fileName}</p>
-            <p className="text-xs text-navy-500">{(uploaded.sizeBytes / 1024).toFixed(0)} KB · click to replace</p>
+            <p className="font-mono text-[12.5px] text-ink">{uploaded.fileName}</p>
+            <p className="text-xs text-subtle">{(uploaded.sizeBytes / 1024).toFixed(0)} KB · <span className="font-semibold text-brand">Replace</span></p>
           </>
         ) : (
           <>
-            <UploadCloud className="size-6 text-navy-400" />
-            <p className="text-sm font-medium text-navy-800">{label}</p>
-            {hint && <p className="text-xs text-navy-500">{hint}</p>}
+            <UploadCloud className="size-6 text-subtle" />
+            <p className="text-[13.5px] font-semibold text-ink">{label}</p>
+            {hint && <p className="text-xs text-subtle">{hint}</p>}
           </>
         )}
         <input

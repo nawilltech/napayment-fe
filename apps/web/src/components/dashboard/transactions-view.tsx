@@ -5,8 +5,11 @@ import type { TransactionFilter } from "@napayment/api-client";
 import { TransactionFilters } from "./transaction-filters";
 import { TransactionAnalytics } from "./transaction-analytics";
 import { TransactionTable } from "./transaction-table";
+import { DailyVolumeChart } from "./daily-volume-chart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTransactionAnalytics, useTransactions } from "@/hooks/use-transactions";
 
+// Filters scope both the tiles and the table - the numbers always agree.
 export function TransactionsView() {
   const [filter, setFilter] = useState<TransactionFilter>({});
   const [page, setPage] = useState(0);
@@ -15,13 +18,8 @@ export function TransactionsView() {
   const analytics = useTransactionAnalytics(filter);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-navy-900">Transactions</h1>
-        <p className="text-sm text-navy-500">
-          Filters below scope both the analytics and the table — the numbers always agree.
-        </p>
-      </div>
+    <div className="space-y-[18px]">
+      <TransactionAnalytics analytics={analytics.data} loading={analytics.isLoading} />
 
       <TransactionFilters
         value={filter}
@@ -31,14 +29,24 @@ export function TransactionsView() {
         }}
       />
 
-      <TransactionAnalytics analytics={analytics.data} loading={analytics.isLoading} />
-
       <TransactionTable
         data={transactions.data}
         loading={transactions.isLoading}
         page={page}
         onPageChange={setPage}
       />
+
+      {analytics.data && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Daily volume</CardTitle>
+            <CardDescription>Sum of transaction amounts per day, for the filtered range.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DailyVolumeChart data={analytics.data.dailyVolume} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

@@ -98,7 +98,7 @@ export function KycForm() {
                 {uploaded && (
                   <a
                     href={`/api/onboarding/kyc/documents/${uploaded.id}/download`}
-                    className="flex items-center gap-1 text-xs font-medium text-navy-600 hover:underline"
+                    className="flex items-center gap-1 text-xs font-medium text-muted hover:underline"
                   >
                     <Download className="size-3" />
                     Download
@@ -109,7 +109,7 @@ export function KycForm() {
           })}
         </CardContent>
         <CardFooter className="justify-between">
-          <p className="mr-auto text-xs text-navy-500">
+          <p className="mr-auto text-xs text-muted">
             {documents?.length ?? 0} of {KYC_DOCUMENT_TYPES.length} documents uploaded
           </p>
           <Button

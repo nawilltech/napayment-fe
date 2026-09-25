@@ -1,32 +1,34 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { getSession } from "@/server/session";
-import { computeOnboardingStatus } from "@/server/onboarding-status";
-import { Sidebar } from "@/components/dashboard/sidebar";
-import { DashboardHeader } from "@/components/dashboard/header";
+import { activationSteps, computeOnboardingStatus, isActivationDone } from "@/server/onboarding-status";
+import { ConsoleShell } from "@/components/dashboard/console-shell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session) redirect("/login");
 
   const status = await computeOnboardingStatus();
-  const activationDone = status.businessDetailsDone && status.kycSubmitted && status.apiKeysDone;
+  const steps = activationSteps(status);
+  const complete = isActivationDone(status);
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="min-w-0 flex-1">
-        <DashboardHeader />
-        {!activationDone && (
-          <div className="flex flex-col items-start gap-1 bg-warning-surface px-4 py-2.5 text-sm text-warning sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <span>Finish activating your business to unlock full access.</span>
-            <Link href="/onboarding" className="font-semibold underline">
+    <ConsoleShell
+      activation={{ done: steps.filter((s) => s.done).length, total: steps.length, complete }}
+      banner={
+        !complete && (
+          <div className="flex flex-col items-start gap-1 border-b border-warning-line bg-warning-surface px-4 py-2.5 text-[13.5px] text-warning-ink sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <span>Finish activating your business to unlock live payouts.</span>
+            <Link href="/onboarding" className="inline-flex items-center gap-1 font-semibold hover:underline">
               Continue activation
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
-        )}
-        <main className="p-4 sm:p-6">{children}</main>
-      </div>
-    </div>
+        )
+      }
+    >
+      {children}
+    </ConsoleShell>
   );
 }
