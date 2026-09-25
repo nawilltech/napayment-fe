@@ -12,17 +12,23 @@ export interface OnboardingStep {
   done: boolean;
 }
 
-function StepBadge({ done, active, index }: { done: boolean; active: boolean; index: number }) {
+function StepBadge({ done, active, index, size }: { done: boolean; active: boolean; index: number; size: "sm" | "md" }) {
   return (
     <span
       className={cn(
-        "flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
-        done ? "bg-success text-white" : active ? "bg-cream-200 text-navy-800" : "bg-navy-100 text-navy-500",
+        "flex shrink-0 items-center justify-center rounded-full font-mono font-semibold",
+        size === "md" ? "size-[26px] text-xs" : "size-5 text-[10.5px]",
+        done ? "bg-success text-white" : active ? "bg-brand text-white" : "bg-line-soft text-subtle",
       )}
     >
-      {done ? <Check className="size-3" /> : index + 1}
+      {done ? <Check className={size === "md" ? "size-3.5" : "size-3"} strokeWidth={3} /> : index + 1}
     </span>
   );
+}
+
+function stateLabel(done: boolean, active: boolean) {
+  if (done) return "Done";
+  return active ? "In progress" : "Not started";
 }
 
 export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
@@ -30,8 +36,8 @@ export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
 
   return (
     <>
-      {/* Desktop: vertical sidebar */}
-      <nav className="hidden w-56 shrink-0 md:block">
+      {/* Desktop: vertical step list */}
+      <nav className="hidden w-60 shrink-0 md:block" aria-label="Activation steps">
         <ol className="space-y-1">
           {steps.map((step, index) => {
             const active = pathname === step.href;
@@ -39,13 +45,17 @@ export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
               <li key={step.key}>
                 <Link
                   href={step.href}
+                  aria-current={active ? "step" : undefined}
                   className={cn(
-                    "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
-                    active ? "bg-navy-700 text-cream-50" : "text-navy-600 hover:bg-navy-50",
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors",
+                    active ? "bg-surface shadow-[0_1px_2px_rgba(32,38,74,0.08)]" : "hover:bg-paper",
                   )}
                 >
-                  <StepBadge done={step.done} active={active} index={index} />
-                  {step.label}
+                  <StepBadge done={step.done} active={active} index={index} size="md" />
+                  <span className="min-w-0">
+                    <span className="block text-[13.5px] font-semibold text-ink">{step.label}</span>
+                    <span className="block text-[11.5px] text-subtle">{stateLabel(step.done, active)}</span>
+                  </span>
                 </Link>
               </li>
             );
@@ -54,7 +64,7 @@ export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
       </nav>
 
       {/* Mobile: compact horizontal scroller */}
-      <nav className="-mx-4 overflow-x-auto px-4 pb-1 md:hidden">
+      <nav className="-mx-4 overflow-x-auto px-4 pb-1 md:hidden" aria-label="Activation steps">
         <ol className="flex min-w-max gap-2">
           {steps.map((step, index) => {
             const active = pathname === step.href;
@@ -62,14 +72,13 @@ export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
               <li key={step.key}>
                 <Link
                   href={step.href}
+                  aria-current={active ? "step" : undefined}
                   className={cn(
-                    "flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    active
-                      ? "border-navy-700 bg-navy-700 text-cream-50"
-                      : "border-border bg-surface text-navy-600",
+                    "flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
+                    active ? "border-brand bg-surface text-ink" : "border-line bg-paper text-muted",
                   )}
                 >
-                  <StepBadge done={step.done} active={active} index={index} />
+                  <StepBadge done={step.done} active={active} index={index} size="sm" />
                   {step.label}
                 </Link>
               </li>

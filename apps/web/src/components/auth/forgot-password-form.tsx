@@ -22,8 +22,8 @@ export function ForgotPasswordForm() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-navy-900">Forgot your password?</h1>
-      <p className="mt-1 text-sm text-navy-500">We&apos;ll email you a link to reset it.</p>
+      <h1 className="text-[28px] font-bold leading-tight text-ink">Forgot your password?</h1>
+      <p className="mt-1.5 text-[14.5px] text-muted">We&apos;ll email you a link to reset it.</p>
 
       <form
         onSubmit={handleSubmit((values) => forgot.mutate(values, { onSuccess: () => setSubmitted(true) }))}
@@ -34,7 +34,7 @@ export function ForgotPasswordForm() {
           <Input id="email" type="email" {...register("email")} />
           {errors.email && <p className="mt-1 text-xs text-danger">{errors.email.message}</p>}
         </div>
-        <Button type="submit" className="w-full" loading={forgot.isPending}>
+        <Button type="submit" size="lg" className="w-full" loading={forgot.isPending}>
           Send reset link
         </Button>
       </form>
@@ -45,8 +45,8 @@ export function ForgotPasswordForm() {
         </Alert>
       )}
 
-      <p className="mt-6 text-center text-sm text-navy-500">
-        <Link href="/login" className="font-medium text-navy-700 hover:underline">
+      <p className="mt-6 text-center text-sm text-muted">
+        <Link href="/login" className="font-semibold text-brand hover:underline">
           Back to log in
         </Link>
       </p>

@@ -33,7 +33,7 @@ export function ResetPasswordForm() {
   if (!email || !token) {
     return (
       <div>
-        <h1 className="text-xl font-semibold text-navy-900">Reset your password</h1>
+        <h1 className="text-[28px] font-bold leading-tight text-ink">Reset your password</h1>
         <Alert variant="warning" className="mt-4">
           This reset link is missing or invalid. Request a new one from the{" "}
           <Link href="/forgot-password" className="font-medium underline">
@@ -47,8 +47,8 @@ export function ResetPasswordForm() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-navy-900">Reset your password</h1>
-      <p className="mt-1 text-sm text-navy-500">Choose a new password for {email}.</p>
+      <h1 className="text-[28px] font-bold leading-tight text-ink">Reset your password</h1>
+      <p className="mt-1.5 text-[14.5px] text-muted">Choose a new password for {email}.</p>
 
       <form onSubmit={handleSubmit((values) => reset.mutate(values))} className="mt-6 space-y-4">
         <input type="hidden" {...register("email")} />
@@ -65,7 +65,7 @@ export function ResetPasswordForm() {
             <p className="mt-1 text-xs text-danger">{errors.confirmNewPassword.message}</p>
           )}
         </div>
-        <Button type="submit" className="w-full" loading={reset.isPending}>
+        <Button type="submit" size="lg" className="w-full" loading={reset.isPending}>
           Reset password
         </Button>
       </form>

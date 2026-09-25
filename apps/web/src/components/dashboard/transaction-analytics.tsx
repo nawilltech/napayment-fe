@@ -1,44 +1,29 @@
 "use client";
 
-import { ArrowDownLeft, ArrowUpRight, TrendingUp } from "lucide-react";
-import type { TransactionAnalyticsResponse } from "@napayment/api-client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/badge";
-import { DailyVolumeChart } from "./daily-volume-chart";
+import type { TransactionAnalyticsResponse, TransactionStatus } from "@napayment/api-client";
 import { formatNaira } from "@/lib/utils";
 
-function StatTile({
-  label,
-  value,
-  icon: Icon,
-  tone,
-}: {
-  label: string;
-  value: string;
-  icon?: typeof ArrowDownLeft;
-  tone?: "success" | "danger";
-}) {
+function StatTile({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardDescription className="flex items-center gap-1.5">
-          {Icon && (
-            <Icon
-              className={cnTone(tone)}
-            />
-          )}
-          {label}
-        </CardDescription>
-        <CardTitle className="text-xl">{value}</CardTitle>
-      </CardHeader>
-    </Card>
+    <div className="min-w-0 rounded-xl border border-line bg-surface px-[18px] py-4">
+      <p className="text-[12.5px] text-subtle">{label}</p>
+      <p className="mt-1.5 truncate font-mono text-[22px] font-semibold text-ink">{value}</p>
+      <p className="mt-1 text-xs text-subtle">{sub}</p>
+    </div>
   );
 }
 
-function cnTone(tone?: "success" | "danger") {
-  return tone === "success" ? "size-3.5 text-success" : tone === "danger" ? "size-3.5 text-danger" : "size-3.5";
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+function sumStatuses(analytics: TransactionAnalyticsResponse, statuses: TransactionStatus[]) {
+  const rows = analytics.byStatus.filter((row) => statuses.includes(row.status));
+  return {
+    count: rows.reduce((n, row) => n + row.count, 0),
+    volume: String(rows.reduce((n, row) => n + Number(row.volume), 0)),
+  };
 }
 
+/** Headline tiles (Web 03 Transactions) - scoped by the same filter as the table. */
 export function TransactionAnalytics({
   analytics,
   loading,
@@ -47,82 +32,29 @@ export function TransactionAnalytics({
   loading: boolean;
 }) {
   if (loading && !analytics) {
-    return <div className="h-40 animate-pulse rounded-lg bg-navy-50" />;
+    return (
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="h-[98px] animate-pulse rounded-xl bg-line-soft" />
+        ))}
+      </div>
+    );
   }
   if (!analytics) return null;
 
+  const pending = sumStatuses(analytics, ["PENDING", "PROCESSING", "ON_HOLD"]);
+  const failed = sumStatuses(analytics, ["FAILED"]);
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatTile label="Transactions" value={String(analytics.totalCount)} icon={TrendingUp} />
-        <StatTile label="Total volume" value={formatNaira(analytics.totalVolume)} />
-        <StatTile
-          label="Credit volume"
-          value={formatNaira(analytics.creditVolume)}
-          icon={ArrowDownLeft}
-          tone="success"
-        />
-        <StatTile
-          label="Debit volume"
-          value={formatNaira(analytics.debitVolume)}
-          icon={ArrowUpRight}
-          tone="danger"
-        />
-        <StatTile label="Net volume" value={formatNaira(analytics.netVolume)} />
-        <StatTile label="Average amount" value={formatNaira(analytics.averageAmount)} />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Daily volume</CardTitle>
-          <CardDescription>Sum of transaction amounts per day, for the filtered range.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DailyVolumeChart data={analytics.dailyVolume} />
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>By status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {analytics.byStatus.length === 0 && <p className="text-sm text-navy-400">No data</p>}
-            {analytics.byStatus.map((row) => (
-              <div key={row.status} className="flex items-center justify-between text-sm">
-                <StatusBadge status={row.status} />
-                <span className="text-navy-600">
-                  {row.count} · {formatNaira(row.volume)}
-                </span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>By type</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {analytics.byType.length === 0 && <p className="text-sm text-navy-400">No data</p>}
-            {analytics.byType.map((row) => (
-              <div key={row.type} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 font-medium text-navy-800">
-                  {row.type === "CREDIT" ? (
-                    <ArrowDownLeft className="size-3.5 text-success" />
-                  ) : (
-                    <ArrowUpRight className="size-3.5 text-danger" />
-                  )}
-                  {row.type}
-                </span>
-                <span className="text-navy-600">
-                  {row.count} · {formatNaira(row.volume)}
-                </span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+    <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+      <StatTile
+        label="Total volume"
+        value={formatNaira(analytics.totalVolume)}
+        sub={plural(analytics.totalCount, "transaction")}
+      />
+      <StatTile label="Average payment" value={formatNaira(analytics.averageAmount)} sub="Across these filters" />
+      <StatTile label="Pending" value={formatNaira(pending.volume)} sub={plural(pending.count, "transaction")} />
+      <StatTile label="Failed" value={formatNaira(failed.volume)} sub={plural(failed.count, "transaction")} />
     </div>
   );
 }

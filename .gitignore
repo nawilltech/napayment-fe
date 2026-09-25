@@ -39,3 +39,6 @@ assets/reference-screenshots/
 npm-debug.log*
 .turbo/
 coverage/
+
+# macOS
+.DS_Store

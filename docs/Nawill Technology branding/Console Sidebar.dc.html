@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="width:236px; height:100%; background:#20264A; color:#F4EEDD; display:flex; flex-direction:column; padding:22px 14px; box-sizing:border-box; font-family:'IBM Plex Sans',sans-serif;">
+  <div style="display:flex; align-items:center; gap:10px; padding:0 8px 22px;">
+    <div style="position:relative; width:32px; height:32px; flex-shrink:0;">
+      <svg viewBox="0 0 100 100" width="32" height="32" style="position:absolute; inset:0;"><path d="M18 0 H82 Q100 0 100 18 V88 L91.7 96 L83.3 88 L75 96 L66.7 88 L58.3 96 L50 88 L41.7 96 L33.3 88 L25 96 L16.7 88 L8.3 96 L0 88 V18 Q0 0 18 0 Z" fill="#F4EEDD"></path></svg>
+      <div style="position:absolute; inset:0 0 3px 0; display:flex; align-items:center; justify-content:center; font-family:'Special Elite',monospace; font-size:21px; color:#20264A;">n</div>
+    </div>
+    <div style="font-family:'Special Elite',monospace; font-size:20px;">napayment</div>
+  </div>
+  <div style="background:#2C3360; border-radius:10px; padding:10px 12px; margin-bottom:18px;">
+    <div style="font-size:13px; font-weight:600;">Greenfield Sec. School</div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#B7BEDB; margin-top:2px;">BUSINESS · LIVE</div>
+  </div>
+  <sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+    <div style="margin-bottom:14px;">
+      <div style="font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em; color:#8E9BD8; padding:0 10px 6px;">{{ g.title }}</div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+          <div style="display:flex; align-items:center; justify-content:space-between; border-radius:8px; padding:9px 10px; font-size:13.5px; font-weight:{{ it.weight }}; background:{{ it.bg }}; color:{{ it.color }};">
+            <span>{{ it.label }}</span>
+            <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:#B7BEDB;">{{ it.tag }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+  <div style="flex:1;"></div>
+  <div style="border-top:1px solid #3A4270; padding:14px 10px 0; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.12em; color:#8E9BD8;">A NAWILL PRODUCT</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 236, &quot;height&quot;: 800}, &quot;active&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;Home&quot;, &quot;Transactions&quot;, &quot;Payment links&quot;, &quot;One-time accounts&quot;, &quot;Settlements&quot;, &quot;Send money&quot;, &quot;Activation&quot;, &quot;Settings&quot;], &quot;default&quot;: &quot;Home&quot;, &quot;tsType&quot;: &quot;string&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const active = this.props.active ?? 'Home';
+    const item = (label, tag) => {
+      const on = label === active;
+      return { label, tag: tag || '', bg: on ? '#4757B8' : 'transparent', color: on ? '#F4EEDD' : '#C9CEE8', weight: on ? 600 : 400 };
+    };
+    return {
+      groups: [
+        { title: 'OVERVIEW', items: [item('Home'), item('Transactions')] },
+        { title: 'COLLECT', items: [item('Payment links'), item('One-time accounts')] },
+        { title: 'MONEY OUT', items: [item('Settlements'), item('Send money')] },
+        { title: 'ACCOUNT', items: [item('Activation', '3/5'), item('Settings')] },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>
