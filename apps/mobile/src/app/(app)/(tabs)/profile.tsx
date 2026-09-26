@@ -8,7 +8,7 @@ import { AppText } from '@/components/text';
 import { useMe, useSettlementAccounts } from '@/hooks/queries';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { useSession } from '@/hooks/use-session';
-import { initials } from '@/lib/format';
+import { displayName, initials } from '@napayment/format';
 import { colors } from '@/theme';
 
 type Item = { label: string; value?: string; href?: Href; onPress?: () => void; danger?: boolean };
@@ -44,7 +44,7 @@ export default function ProfileScreen() {
   const { signOut } = useSession();
 
   const user = me.data;
-  const name = user ? (user.businessName ?? `${user.firstName} ${user.lastName}`) : '';
+  const name = user ? displayName(user) : '';
   const verified = user?.isVerified;
   const banks = settlement.data?.totalElements;
 

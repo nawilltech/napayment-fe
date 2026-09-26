@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import type { TransactionDailyVolume } from "@napayment/api-client";
-import { cn, formatNaira } from "@/lib/utils";
+import { formatDate, formatDayMonth, formatNaira, plural } from "@napayment/format";
+import { cn } from "@/lib/utils";
+import { ChartDataTable } from "./chart-data-table";
 
 /**
  * Single-series bar chart (volume by day) per the dataviz skill's mark specs:
@@ -28,6 +30,8 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
     0,
   );
   const active = activeIndex !== null ? data[activeIndex] : null;
+  // At most ~8 date labels, so they never collide on a phone.
+  const labelEvery = Math.ceil(data.length / 8);
 
   return (
     <div>
@@ -50,7 +54,7 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
             const heightPct = Math.max((Number(day.volume) / maxVolume) * 100, Number(day.volume) > 0 ? 2 : 0);
             const isHighest = index === highestIndex;
             return (
-              <div key={day.date} className="relative flex w-7 shrink-0 flex-col items-center">
+              <div key={day.date} className="relative flex h-full w-7 shrink-0 flex-col items-center justify-end">
                 {isHighest && (
                   <span className="mb-1 whitespace-nowrap font-mono text-[10px] font-medium text-muted">
                     {formatNaira(day.volume)}
@@ -67,10 +71,15 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
                   onPointerLeave={() => setActiveIndex(null)}
                   onFocus={() => setActiveIndex(index)}
                   onBlur={() => setActiveIndex(null)}
-                  aria-label={`${day.date}: ${day.count} transaction${day.count === 1 ? "" : "s"}, ${formatNaira(day.volume)}`}
+                  aria-label={`${formatDate(day.date)}: ${plural(day.count, "transaction")}, ${formatNaira(day.volume)}`}
                 />
-                <span className="absolute -bottom-5 font-mono text-[9px] text-subtle">
-                  {new Date(day.date).toLocaleDateString("en-NG", { day: "2-digit", month: "short" }).slice(0, 6)}
+                <span
+                  className={cn(
+                    "absolute -bottom-5 whitespace-nowrap font-mono text-[9px] text-subtle",
+                    index % labelEvery !== 0 && index !== data.length - 1 && "invisible",
+                  )}
+                >
+                  {formatDayMonth(day.date)}
                 </span>
               </div>
             );
@@ -83,37 +92,17 @@ export function DailyVolumeChart({ data }: { data: TransactionDailyVolume[] }) {
         {active ? (
           <div className="flex items-center justify-between">
             <span className="text-muted">
-              {new Date(active.date).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}
+              {formatDate(active.date)}
             </span>
             <span className="font-mono font-semibold text-ink">
-              {formatNaira(active.volume)} · {active.count} txn{active.count === 1 ? "" : "s"}
+              {formatNaira(active.volume)} · {plural(active.count, "transaction")}
             </span>
           </div>
         ) : (
           <span className="text-subtle">Hover or focus a bar for details</span>
         )}
       </div>
-
-      {/* sr-only table view - same data, no hover required */}
-      <table className="sr-only">
-        <caption>Daily transaction volume</caption>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Transaction count</th>
-            <th>Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((day) => (
-            <tr key={day.date}>
-              <td>{day.date}</td>
-              <td>{day.count}</td>
-              <td>{formatNaira(day.volume)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ChartDataTable caption="Daily transaction volume" data={data} />
     </div>
   );
 }

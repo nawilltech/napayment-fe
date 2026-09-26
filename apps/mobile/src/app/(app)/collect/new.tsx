@@ -14,7 +14,7 @@ import { AppText } from '@/components/text';
 import { useCreateDynamicAccount } from '@/hooks/queries';
 import { useOnline } from '@/hooks/use-online';
 import { errorMessage } from '@/lib/api';
-import { formatNaira, nairaToKobo } from '@/lib/format';
+import { formatNaira, nairaToKobo } from '@napayment/format';
 import { newIdempotencyKey, outboxKeys, type CreateLinkVars } from '@/lib/outbox';
 import { colors, radius } from '@/theme';
 

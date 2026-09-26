@@ -42,14 +42,15 @@ export function ModeToggle() {
       onClick={toggle}
       title={isLive ? "Switch to test mode" : "Switch to live mode"}
       className={cn(
-        "flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-[5px] font-mono text-[11px] uppercase transition-colors",
+        "flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-[5px] font-mono text-[11px] uppercase transition-colors sm:px-2.5",
         isLive
           ? "border-transparent bg-success-surface text-[#12573A] hover:border-success-line"
           : "border-transparent bg-warning-surface text-warning-ink hover:border-warning-line",
       )}
     >
       <span className={cn("size-1.5 rounded-full", isLive ? "bg-success" : "bg-warning")} aria-hidden />
-      {isLive ? "Live mode" : "Test mode"}
+      {isLive ? "Live" : "Test"}
+      <span className="hidden sm:inline">mode</span>
     </button>
   );
 }

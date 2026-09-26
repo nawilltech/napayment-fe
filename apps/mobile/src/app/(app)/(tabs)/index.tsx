@@ -10,7 +10,7 @@ import { AppText } from '@/components/text';
 import { TransactionRow } from '@/components/transaction-row';
 import { useMe, useRecentTransactions, useWallet } from '@/hooks/queries';
 import { isForbidden } from '@/lib/api';
-import { formatNaira, greeting, groupAccountNumber, initials } from '@/lib/format';
+import { displayName, formatNaira, greeting, groupAccountNumber, initials } from '@napayment/format';
 import { colors, radius } from '@/theme';
 
 const ACTIONS: { label: string; glyph: string; href: Href; primary?: boolean }[] = [
@@ -25,7 +25,7 @@ export default function HomeScreen() {
   const recent = useRecentTransactions(4);
   const { copied, copy } = useCopy();
 
-  const name = me.data ? (me.data.businessName ?? `${me.data.firstName} ${me.data.lastName}`) : '';
+  const name = me.data ? displayName(me.data) : '';
   const account = wallet.data;
   const refreshing = wallet.isRefetching || recent.isRefetching;
 

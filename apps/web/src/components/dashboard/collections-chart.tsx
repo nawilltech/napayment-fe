@@ -1,16 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { cn, formatNaira } from "@/lib/utils";
-
-export interface CollectionsDay {
-  date: string; // YYYY-MM-DD
-  count: number;
-  volume: string; // kobo
-}
-
-const shortDate = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString("en-NG", { day: "numeric", month: "short" });
+import type { TransactionDailyVolume } from "@napayment/api-client";
+import { formatDayMonth, formatNaira, plural } from "@napayment/format";
+import { cn } from "@/lib/utils";
+import { ChartDataTable } from "./chart-data-table";
 
 /**
  * Compact single-series bar chart for Home ("Collected, last N days"). One
@@ -18,7 +12,7 @@ const shortDate = (iso: string) =>
  * 2px gap, 4px rounded tops on a square baseline; hover/focus drives a
  * readout line, and an sr-only table carries the same data.
  */
-export function CollectionsChart({ days }: { days: CollectionsDay[] }) {
+export function CollectionsChart({ days }: { days: TransactionDailyVolume[] }) {
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(...days.map((d) => Number(d.volume)), 1);
   const current = active !== null ? days[active] : null;
@@ -37,7 +31,7 @@ export function CollectionsChart({ days }: { days: CollectionsDay[] }) {
               onPointerEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              aria-label={`${shortDate(day.date)}: ${formatNaira(day.volume)} from ${day.count} payment${day.count === 1 ? "" : "s"}`}
+              aria-label={`${formatDayMonth(day.date)}: ${formatNaira(day.volume)} from ${plural(day.count, "payment")}`}
             >
               <span
                 className={cn(
@@ -53,39 +47,20 @@ export function CollectionsChart({ days }: { days: CollectionsDay[] }) {
       <div className="mt-2 flex h-4 justify-between font-mono text-[10.5px] text-subtle">
         {current ? (
           <>
-            <span>{shortDate(current.date)}</span>
+            <span>{formatDayMonth(current.date)}</span>
             <span className="text-ink">
-              {formatNaira(current.volume)} · {current.count} payment{current.count === 1 ? "" : "s"}
+              {formatNaira(current.volume)} · {plural(current.count, "payment")}
             </span>
           </>
         ) : (
           <>
-            <span>{shortDate(days[0].date)}</span>
-            <span>{shortDate(days[mid].date)}</span>
-            <span>{shortDate(days[days.length - 1].date)}</span>
+            <span>{formatDayMonth(days[0].date)}</span>
+            <span>{formatDayMonth(days[mid].date)}</span>
+            <span>{formatDayMonth(days[days.length - 1].date)}</span>
           </>
         )}
       </div>
-
-      <table className="sr-only">
-        <caption>Collected per day</caption>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Payments</th>
-            <th>Collected</th>
-          </tr>
-        </thead>
-        <tbody>
-          {days.map((day) => (
-            <tr key={day.date}>
-              <td>{day.date}</td>
-              <td>{day.count}</td>
-              <td>{formatNaira(day.volume)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ChartDataTable caption="Collected per day" data={days} />
     </div>
   );
 }

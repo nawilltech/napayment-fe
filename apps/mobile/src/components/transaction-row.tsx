@@ -1,8 +1,7 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import type { TransactionResponse } from '@napayment/api-client';
-import { formatTime } from '@/lib/format';
-import { describeTransaction } from '@/lib/transactions';
+import { describeTransaction, formatTime } from '@napayment/format';
 import { colors } from '@/theme';
 import { Row } from './card';
 import { StatusTag } from './status-tag';
