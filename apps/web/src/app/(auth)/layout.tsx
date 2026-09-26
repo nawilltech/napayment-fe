@@ -9,13 +9,31 @@ const SECTORS = [
   { name: "Businesses & associations", collects: "Invoices, dues, subscriptions" },
 ];
 
+/**
+ * Task first: the form sits on the left (where the eye lands and where the
+ * logo conventionally lives) and comes first in the DOM, so keyboard and
+ * screen-reader order match what's on screen. The brand panel is supporting
+ * context on the right, and is dropped on smaller screens, where logo,
+ * tagline and form stay together as one centred group.
+ */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen bg-cream lg:grid-cols-2">
+      <main className="flex flex-col justify-center px-4 py-8 sm:px-14 lg:justify-start lg:py-14">
+        <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
+          <Logo size={36} wordmarkClassName="text-ink" />
+          <p className="max-w-[320px] text-[13.5px] text-muted lg:hidden">
+            Collections for schools, hospitals, government agencies and businesses.
+          </p>
+        </div>
+        <div className="flex justify-center pt-8 lg:flex-1 lg:items-center lg:py-10">
+          <div className="w-full max-w-[380px]">{children}</div>
+        </div>
+      </main>
+
       {/* Brand panel - Nawill Blue, typewriter headline (Web 01 Sign in) */}
       <aside className="hidden flex-col bg-brand p-14 text-cream lg:flex">
-        <Logo size={40} tone="cream" letterClassName="text-brand" wordmarkClassName="text-cream" />
-        <div className="flex flex-1 flex-col justify-center gap-5 py-10">
+        <div className="flex flex-1 flex-col justify-center gap-5">
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-soft">
             Collections for organisations
           </p>
@@ -42,16 +60,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           A Nawill Technology Ltd product · RC 1765112
         </p>
       </aside>
-
-      <main className="flex flex-col items-center justify-center px-4 py-10 sm:px-14">
-        <div className="mb-8 flex flex-col items-center gap-3 text-center lg:hidden">
-          <Logo size={36} wordmarkClassName="text-ink" />
-          <p className="max-w-[320px] text-[13.5px] text-muted">
-            Collections for schools, hospitals, government agencies and businesses.
-          </p>
-        </div>
-        <div className="w-full max-w-[380px]">{children}</div>
-      </main>
     </div>
   );
 }
