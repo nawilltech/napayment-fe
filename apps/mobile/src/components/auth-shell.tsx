@@ -18,7 +18,7 @@ export function AuthShell({ children, compact }: { children: ReactNode; compact?
             <Wordmark size={compact ? 24 : 34} color={colors.cream} />
             {!compact && (
               <AppText size={14} color={colors.brandSoft} align="center">
-                Collect school fees, bills and income.{'\n'}Works when network is weak.
+                Collect fees and bills for schools, hospitals,{'\n'}agencies and businesses. Works on weak network.
               </AppText>
             )}
           </View>
