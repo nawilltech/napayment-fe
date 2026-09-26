@@ -1,5 +1,6 @@
 "use client";
 
+import { displayName } from "@napayment/format";
 import { Logo } from "@/components/brand/logo";
 import { useMe } from "@/hooks/use-auth";
 import { SidebarNav, type ActivationProgress } from "./sidebar-nav";
@@ -13,7 +14,7 @@ export function SidebarContent({
   onNavigate?: () => void;
 }) {
   const { data: me } = useMe();
-  const accountName = me?.businessName ?? (me ? `${me.firstName} ${me.lastName}` : " ");
+  const accountName = me ? displayName(me) : " ";
   const accountKind = me?.businessName ? "Business" : "Individual";
 
   return (

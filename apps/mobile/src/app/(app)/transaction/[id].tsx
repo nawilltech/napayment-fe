@@ -3,16 +3,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import type { TransactionResponse } from '@napayment/api-client';
 import { BackHeader } from '@/components/back-header';
 import { Button } from '@/components/button';
-import { ReceiptEdge } from '@/components/receipt-edge';
+import { Receipt, ReceiptLine, ReceiptRule } from '@/components/receipt';
 import { Screen } from '@/components/screen';
 import { StatusBadge } from '@/components/status-badge';
 import { AppText } from '@/components/text';
 import { useMe, useTransaction } from '@/hooks/queries';
 import { errorMessage } from '@/lib/api';
-import { formatDateTime, formatNaira } from '@/lib/format';
+import { describeTransaction, displayName, formatDateTime, formatNaira } from '@napayment/format';
 import { shareText } from '@/lib/share';
-import { describeTransaction } from '@/lib/transactions';
-import { colors, radius } from '@/theme';
+import { colors } from '@/theme';
 
 function headline(txn: TransactionResponse) {
   const { credit } = describeTransaction(txn);
@@ -33,7 +32,7 @@ export default function ReceiptScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const txn = useTransaction(id);
   const me = useMe();
-  const holder = (me.data?.businessName ?? (me.data ? `${me.data.firstName} ${me.data.lastName}` : 'Napayment')).toUpperCase();
+  const holder = (me.data ? displayName(me.data) : 'Napayment').toUpperCase();
 
   if (!txn.data) {
     return (
@@ -89,57 +88,27 @@ export default function ReceiptScreen() {
         </AppText>
       </View>
 
-      <View style={styles.receiptWrap}>
-        <View style={styles.receipt}>
-          <AppText display size={15} align="center">
-            {holder}
-          </AppText>
-          <AppText display size={12} color={colors.subtle} align="center" style={{ marginTop: 4 }}>
-            {kind}
-          </AppText>
-          <View style={styles.rule} />
-          <View style={{ gap: 8 }}>
-            {rows.map(([label, value]) => (
-              <View key={label} style={styles.line}>
-                <AppText display size={13}>
-                  {label}
-                </AppText>
-                <AppText display size={13} style={{ flexShrink: 1, textAlign: 'right' }}>
-                  {value}
-                </AppText>
-              </View>
-            ))}
-          </View>
-          <View style={styles.rule} />
-          <View style={[styles.line, { alignItems: 'baseline' }]}>
-            <AppText display size={14}>
-              AMOUNT
-            </AppText>
-            <AppText display size={24}>
-              {formatNaira(t.amount)}
-            </AppText>
-          </View>
-          <AppText display size={10.5} color={colors.subtle} align="center" style={{ marginTop: 14, letterSpacing: 0.6 }} selectable>
-            SESSION {t.sessionId}
-          </AppText>
-        </View>
-        <ReceiptEdge />
-      </View>
+      <Receipt gap={8}>
+        <AppText display size={15} align="center">
+          {holder}
+        </AppText>
+        <AppText display size={12} color={colors.subtle} align="center">
+          {kind}
+        </AppText>
+        <ReceiptRule />
+        {rows.map(([label, value]) => (
+          <ReceiptLine key={label} label={label} value={value} typewriter />
+        ))}
+        <ReceiptRule />
+        <ReceiptLine label="Amount" value={formatNaira(t.amount)} typewriter total />
+        <AppText display size={10.5} color={colors.subtle} align="center" style={{ marginTop: 8, letterSpacing: 0.6 }} selectable>
+          SESSION {t.sessionId}
+        </AppText>
+      </Receipt>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   head: { alignItems: 'center', paddingHorizontal: 20, paddingTop: 8 },
-  receiptWrap: { marginHorizontal: 18, marginTop: 22 },
-  receipt: {
-    backgroundColor: colors.cream,
-    borderTopLeftRadius: radius.card,
-    borderTopRightRadius: radius.card,
-    paddingHorizontal: 20,
-    paddingTop: 22,
-    paddingBottom: 24,
-  },
-  rule: { borderTopWidth: 1, borderStyle: 'dashed', borderColor: colors.receiptRule, marginVertical: 16 },
-  line: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
 });

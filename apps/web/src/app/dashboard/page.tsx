@@ -8,9 +8,11 @@ import { activationSteps, computeOnboardingStatus, isActivationDone } from "@/se
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/badge";
-import { CollectionsChart, type CollectionsDay } from "@/components/dashboard/collections-chart";
+import { CollectionsChart } from "@/components/dashboard/collections-chart";
 import { CopyButton } from "@/components/dashboard/copy-button";
-import { cn, formatDate, formatNaira } from "@/lib/utils";
+import type { TransactionDailyVolume } from "@napayment/api-client";
+import { describeTransaction, displayName, formatDateTime, formatNaira, groupAccountNumber } from "@napayment/format";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Home — Napayment" };
 
@@ -20,17 +22,12 @@ const CHART_DAYS = 14;
 const lagosDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" });
 
 /** Every day in the window, zero-filled - the analytics endpoint omits empty days. */
-function lastNDays(n: number, data: CollectionsDay[]): CollectionsDay[] {
+function lastNDays(n: number, data: TransactionDailyVolume[]): TransactionDailyVolume[] {
   const byDate = new Map(data.map((d) => [d.date, d]));
   return Array.from({ length: n }, (_, i) => {
     const date = lagosDay.format(new Date(Date.now() - (n - 1 - i) * 86_400_000));
     return byDate.get(date) ?? { date, count: 0, volume: "0" };
   });
-}
-
-/** NUBAN reads in 4-3-3 groups, the way it's said aloud. */
-function groupAccountNumber(value: string) {
-  return value.length === 10 ? `${value.slice(0, 4)} ${value.slice(4, 7)} ${value.slice(7)}` : value;
 }
 
 export default async function DashboardPage() {
@@ -53,6 +50,7 @@ export default async function DashboardPage() {
     computeOnboardingStatus(),
   ]);
   const account = virtualAccounts?.content[0];
+  const name = displayName(me);
   const steps = activationSteps(status);
   const doneCount = steps.filter((s) => s.done).length;
   const nextStep = steps.find((s) => !s.done);
@@ -91,13 +89,13 @@ export default async function DashboardPage() {
                 {account ? groupAccountNumber(account.accountNumber) : "—"}
               </p>
               <p className="mt-1 truncate text-[13px] text-muted">
-                {me.businessName ?? `${me.firstName} ${me.lastName}`} · {account?.currency ?? "NGN"}
+                {name} · {account?.currency ?? "NGN"}
               </p>
             </div>
             {account && (
               <CopyButton
                 label="Copy account details"
-                value={`${account.accountNumber} · ${me.businessName ?? `${me.firstName} ${me.lastName}`}`}
+                value={`${account.accountNumber} · ${name}`}
               />
             )}
           </Card>
@@ -143,10 +141,10 @@ export default async function DashboardPage() {
             >
               <div className="min-w-0">
                 <p className="truncate font-mono text-xs text-ink">{txn.sessionId}</p>
-                <p className="font-mono text-[11px] text-subtle">{formatDate(txn.createdAt)}</p>
+                <p className="font-mono text-[11px] text-subtle">{formatDateTime(txn.createdAt)}</p>
               </div>
               <p className="hidden text-[12.5px] text-subtle sm:block">
-                {txn.transferGroupId ? "Transfer" : txn.transactionType === "CREDIT" ? "Credit" : "Debit"}
+                {describeTransaction(txn).kind}
               </p>
               <div className="order-last sm:order-none">
                 <StatusBadge status={txn.transactionStatus} />
