@@ -3,12 +3,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { BackHeader } from '@/components/back-header';
 import { Button } from '@/components/button';
 import { useCopy } from '@/components/copy';
-import { ReceiptEdge } from '@/components/receipt-edge';
+import { Receipt, ReceiptLine } from '@/components/receipt';
 import { Screen } from '@/components/screen';
 import { AppText } from '@/components/text';
 import { useDynamicAccount, useMe } from '@/hooks/queries';
 import { useNow } from '@/hooks/use-now';
-import { countdown, formatNaira, groupAccountNumber } from '@/lib/format';
+import { countdown, displayName, formatNaira, groupAccountNumber } from '@napayment/format';
 import { shareSms } from '@/lib/share';
 import { colors, radius } from '@/theme';
 
@@ -23,7 +23,7 @@ export default function OneTimeAccountScreen() {
   const now = useNow(active);
   const expired = data?.status === 'EXPIRED' || (active && new Date(data.expiresAt).getTime() <= now);
   const paid = data?.status === 'PAID';
-  const holder = me.data?.businessName ?? (me.data ? `${me.data.firstName} ${me.data.lastName}` : '');
+  const holder = me.data ? displayName(me.data) : '';
 
   const shareMessage = data
     ? `Pay ${data.expectedAmount ? formatNaira(data.expectedAmount) : ''} to ${data.accountNumber}${holder ? ` (Napayment / ${holder})` : ''}. Valid for 30 minutes.`
@@ -54,8 +54,7 @@ export default function OneTimeAccountScreen() {
       </View>
 
       {data && (
-        <View style={styles.receiptWrap}>
-          <View style={styles.receipt}>
+        <Receipt>
             <View>
               <AppText eyebrow size={10.5}>
                 Account number
@@ -70,8 +69,8 @@ export default function OneTimeAccountScreen() {
                 {groupAccountNumber(data.accountNumber)}
               </AppText>
             </View>
-            <Line label="Account name" value={holder ? `Napayment / ${holder}` : 'Napayment'} />
-            {data.reference && <Line label="Reference" value={data.reference} />}
+            <ReceiptLine label="Account name" value={holder ? `Napayment / ${holder}` : 'Napayment'} />
+            {data.reference && <ReceiptLine label="Reference" value={data.reference} />}
             {paid ? (
               <View style={[styles.state, { backgroundColor: colors.successSurface }]}>
                 <AppText size={12.5} color={colors.successInk}>
@@ -97,9 +96,7 @@ export default function OneTimeAccountScreen() {
                 </AppText>
               </View>
             )}
-          </View>
-          <ReceiptEdge />
-        </View>
+        </Receipt>
       )}
 
       {!data && account.isLoading && (
@@ -120,31 +117,9 @@ export default function OneTimeAccountScreen() {
   );
 }
 
-function Line({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-      <AppText size={13.5} color={colors.subtle} numberOfLines={1} style={{ flexShrink: 0 }}>
-        {label}
-      </AppText>
-      <AppText size={13.5} weight="semibold" numberOfLines={1} style={{ flexShrink: 1 }}>
-        {value}
-      </AppText>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   head: { paddingHorizontal: 22, paddingTop: 8 },
-  receiptWrap: { marginHorizontal: 18, marginTop: 22 },
-  receipt: {
-    backgroundColor: colors.cream,
-    borderTopLeftRadius: radius.card,
-    borderTopRightRadius: radius.card,
-    paddingHorizontal: 20,
-    paddingTop: 22,
-    paddingBottom: 20,
-    gap: 14,
-  },
   state: { borderRadius: radius.lg, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, paddingTop: 16 },
   pulse: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.cream, opacity: 0.9 },

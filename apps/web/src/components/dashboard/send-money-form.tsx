@@ -12,13 +12,7 @@ import { PinInput } from "@/components/ui/pin-input";
 import { Alert } from "@/components/ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useResolveRecipient, useTransfer } from "@/hooks/use-transfer";
-import { formatNaira } from "@/lib/utils";
-
-function nairaToKobo(naira: string): string | undefined {
-  if (!naira.trim()) return undefined;
-  const value = Math.round(Number(naira) * 100);
-  return Number.isFinite(value) && value > 0 ? String(value) : undefined;
-}
+import { formatNaira, nairaToKobo } from "@napayment/format";
 
 type Step = "details" | "confirm" | "success";
 

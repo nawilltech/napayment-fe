@@ -10,7 +10,7 @@ import { AppText } from '@/components/text';
 import { TransactionRow } from '@/components/transaction-row';
 import { useAnalytics, useTransactionFeed } from '@/hooks/queries';
 import { isForbidden } from '@/lib/api';
-import { dayLabel, formatNaira } from '@/lib/format';
+import { dayLabel, formatNaira } from '@napayment/format';
 import { colors, radius } from '@/theme';
 
 /** Monday 00:00 local - "this week" for both the chip and the tiles. */

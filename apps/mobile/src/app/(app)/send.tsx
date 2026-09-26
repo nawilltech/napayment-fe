@@ -10,15 +10,15 @@ import { Card, Row } from '@/components/card';
 import { Field } from '@/components/field';
 import { FormError } from '@/components/form-error';
 import { PinSheet } from '@/components/pin-sheet';
-import { ReceiptEdge } from '@/components/receipt-edge';
+import { Receipt, ReceiptLine, ReceiptRule } from '@/components/receipt';
 import { Screen } from '@/components/screen';
 import { StatusBadge } from '@/components/status-badge';
 import { AppText } from '@/components/text';
 import { newIdempotencyKey, useResolveRecipient, useTransfer, useWallet } from '@/hooks/queries';
 import { useOnline } from '@/hooks/use-online';
 import { errorMessage } from '@/lib/api';
-import { formatDateTime, formatNaira, nairaToKobo } from '@/lib/format';
-import { colors, radius } from '@/theme';
+import { formatDateTime, formatNaira, nairaToKobo } from '@napayment/format';
+import { colors } from '@/theme';
 
 /**
  * Send to another Napayment account (FR-Auth-1). Online-only: the PIN is
@@ -101,16 +101,13 @@ export default function SendScreen() {
             to {done.recipientDisplayName}
           </AppText>
         </View>
-        <View style={{ marginHorizontal: 18, marginTop: 22 }}>
-          <View style={styles.receipt}>
-            <Line label="Amount" value={formatNaira(done.amount)} big />
-            <View style={styles.rule} />
-            <Line label="Recipient" value={done.recipientDisplayName} />
-            <Line label="Date" value={formatDateTime(done.createdAt)} />
-            <Line label="New balance" value={formatNaira(done.senderNewBalance)} />
-          </View>
-          <ReceiptEdge />
-        </View>
+        <Receipt gap={8}>
+          <ReceiptLine label="Amount" value={formatNaira(done.amount)} typewriter total />
+          <ReceiptRule />
+          <ReceiptLine label="Recipient" value={done.recipientDisplayName} typewriter />
+          <ReceiptLine label="Date" value={formatDateTime(done.createdAt)} typewriter />
+          <ReceiptLine label="New balance" value={formatNaira(done.senderNewBalance)} typewriter />
+        </Receipt>
       </Screen>
     );
   }
@@ -188,22 +185,8 @@ export default function SendScreen() {
   );
 }
 
-function Line({ label, value, big }: { label: string; value: string; big?: boolean }) {
-  return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-      <AppText display size={big ? 14 : 13}>
-        {big ? label.toUpperCase() : label}
-      </AppText>
-      <AppText display size={big ? 24 : 13} style={{ flexShrink: 1, textAlign: 'right' }}>
-        {value}
-      </AppText>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   body: { paddingHorizontal: 16, paddingTop: 16, gap: 16 },
   doneHead: { alignItems: 'center', paddingTop: 40 },
-  receipt: { backgroundColor: colors.cream, borderTopLeftRadius: radius.card, borderTopRightRadius: radius.card, padding: 20, gap: 8 },
-  rule: { borderTopWidth: 1, borderStyle: 'dashed', borderColor: colors.receiptRule, marginVertical: 8 },
 });

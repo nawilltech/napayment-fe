@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useScrollActiveIntoView } from "@/hooks/use-scroll-active-into-view";
 
 export interface OnboardingStep {
   key: string;
@@ -33,6 +34,7 @@ function stateLabel(done: boolean, active: boolean) {
 
 export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
   const pathname = usePathname();
+  const chipsRef = useScrollActiveIntoView<HTMLElement>(pathname);
 
   return (
     <>
@@ -64,8 +66,8 @@ export function OnboardingStepper({ steps }: { steps: OnboardingStep[] }) {
       </nav>
 
       {/* Mobile: compact horizontal scroller */}
-      <nav className="-mx-4 overflow-x-auto px-4 pb-1 md:hidden" aria-label="Activation steps">
-        <ol className="flex min-w-max gap-2">
+      <nav ref={chipsRef} className="scroll-fade-x -mx-4 overflow-x-auto px-4 pb-1 md:hidden" aria-label="Activation steps">
+        <ol className="flex min-w-max gap-2 pr-8">
           {steps.map((step, index) => {
             const active = pathname === step.href;
             return (
