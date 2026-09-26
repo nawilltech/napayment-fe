@@ -17,9 +17,9 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Typecheck
-        run: npm run typecheck
+        run: npx turbo run typecheck --filter=web
       - name: Lint
-        run: npm run lint
+        run: npx turbo run lint --filter=web
       - name: Build
         env:
           NAWILL_API_BASE_URL: http://localhost:8080
