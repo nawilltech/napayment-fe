@@ -1,6 +1,6 @@
 import { Linking, Platform, Share } from 'react-native';
 import type { PaymentLinkResponse } from '@napayment/api-client';
-import { formatNaira } from './format';
+import { formatNaira } from '@napayment/format';
 
 /**
  * Public pay-page base, e.g. https://pay.napayment.ng/p - no hosted pay page

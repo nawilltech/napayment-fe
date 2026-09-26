@@ -12,7 +12,7 @@ import { AppText } from '@/components/text';
 import { usePaymentLinks, useRevokePaymentLink } from '@/hooks/queries';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { errorMessage, isForbidden } from '@/lib/api';
-import { formatDate, formatNaira } from '@/lib/format';
+import { formatDate, formatNaira } from '@napayment/format';
 import { linkLabel, linkMessage, linkUrl, shareSms, shareText, shareWhatsApp } from '@/lib/share';
 import { colors, radius } from '@/theme';
 

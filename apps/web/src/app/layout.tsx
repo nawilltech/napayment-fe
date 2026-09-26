@@ -23,7 +23,8 @@ const specialElite = Special_Elite({
 
 export const metadata: Metadata = {
   title: "Napayment — Business Console",
-  description: "Collect, settle and track every payment on Napayment, a Nawill Technology product.",
+  description:
+    "Collect fees, bills and levies for schools, hospitals, government agencies and businesses - by transfer, payment link or cash, with SMS receipts. A Nawill Technology product.",
 };
 
 export default function RootLayout({

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useScrollActiveIntoView } from "@/hooks/use-scroll-active-into-view";
 
 const TABS = [
   { href: "/dashboard/settings/profile", label: "Profile" },
@@ -14,9 +15,10 @@ const TABS = [
 
 export function SettingsTabs() {
   const pathname = usePathname();
+  const rowRef = useScrollActiveIntoView<HTMLDivElement>(pathname);
   return (
-    <div className="overflow-x-auto">
-      <nav className="flex w-max min-w-full gap-5 sm:gap-[26px]" aria-label="Settings">
+    <div ref={rowRef} className="scroll-fade-x overflow-x-auto sm:[mask-image:none]">
+      <nav className="flex w-max min-w-full gap-5 pr-8 sm:gap-[26px] sm:pr-0" aria-label="Settings">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
           return (

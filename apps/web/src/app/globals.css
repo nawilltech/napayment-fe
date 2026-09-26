@@ -111,3 +111,12 @@ body {
 .font-mono {
   font-variant-numeric: tabular-nums;
 }
+
+/* Horizontal scroll rows: fade the right edge so it reads as "more this way". */
+@utility scroll-fade-x {
+  mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

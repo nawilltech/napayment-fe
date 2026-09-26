@@ -9,7 +9,7 @@ import { StatusTag } from '@/components/status-tag';
 import { AppText } from '@/components/text';
 import { useOnline } from '@/hooks/use-online';
 import { useQueuedActions } from '@/hooks/use-outbox';
-import { formatNaira, formatTime } from '@/lib/format';
+import { formatNaira, formatTime } from '@napayment/format';
 import { queryClient } from '@/lib/query';
 import { colors, radius } from '@/theme';
 

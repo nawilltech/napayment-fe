@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { CopyField } from "@/components/ui/copy-field";
-import { formatDate } from "@/lib/utils";
+import { formatDateTime as formatDate } from "@napayment/format";
 import { useCreateInvite, useInvites, useRevokeInvite } from "@/hooks/use-onboarding";
 
 export function TeamInviteForm({ showContinue = false }: { showContinue?: boolean }) {

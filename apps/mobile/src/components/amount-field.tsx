@@ -1,6 +1,6 @@
 import { Field, type FieldProps } from './field';
 import { AppText } from './text';
-import { formatAmountInput } from '@/lib/format';
+import { formatAmountInput } from '@napayment/format';
 import { colors } from '@/theme';
 
 /** Large mono naira entry (design 03): "₦" prefix, thousands grouped as you type. */

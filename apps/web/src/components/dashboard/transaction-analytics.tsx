@@ -1,19 +1,19 @@
 "use client";
 
 import type { TransactionAnalyticsResponse, TransactionStatus } from "@napayment/api-client";
-import { formatNaira } from "@/lib/utils";
+import { formatNaira, plural } from "@napayment/format";
 
 function StatTile({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="min-w-0 rounded-xl border border-line bg-surface px-[18px] py-4">
+    <div className="min-w-0 rounded-xl border border-line bg-surface px-3.5 py-3.5 sm:px-[18px] sm:py-4">
       <p className="text-[12.5px] text-subtle">{label}</p>
-      <p className="mt-1.5 truncate font-mono text-[22px] font-semibold text-ink">{value}</p>
+      <p className="mt-1.5 truncate font-mono text-[17px] font-semibold text-ink sm:text-[22px]" title={value}>
+        {value}
+      </p>
       <p className="mt-1 text-xs text-subtle">{sub}</p>
     </div>
   );
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 function sumStatuses(analytics: TransactionAnalyticsResponse, statuses: TransactionStatus[]) {
   const rows = analytics.byStatus.filter((row) => statuses.includes(row.status));
@@ -33,7 +33,7 @@ export function TransactionAnalytics({
 }) {
   if (loading && !analytics) {
     return (
-      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, i) => (
           <div key={i} className="h-[98px] animate-pulse rounded-xl bg-line-soft" />
         ))}
@@ -46,7 +46,7 @@ export function TransactionAnalytics({
   const failed = sumStatuses(analytics, ["FAILED"]);
 
   return (
-    <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 lg:grid-cols-4">
       <StatTile
         label="Total volume"
         value={formatNaira(analytics.totalVolume)}

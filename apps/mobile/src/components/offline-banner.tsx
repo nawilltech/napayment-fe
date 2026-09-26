@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { useOnline } from '@/hooks/use-online';
 import { useQueuedActions } from '@/hooks/use-outbox';
-import { formatTime } from '@/lib/format';
+import { formatTime } from '@napayment/format';
 import { colors, radius } from '@/theme';
 import { AppText } from './text';
 
