@@ -482,7 +482,12 @@ export interface PageParams {
 
 // ---- Users -------------------------------------------------------------------------
 
-export type UserType = "USER" | "ADMIN" | "SUPERADMIN" | "PSSP" | "BUSINESS";
+/**
+ * Mirrors the backend enum (onboarding-auth-rbac UserType). There is no
+ * BUSINESS type: business owners and teammates are USER with a businessId -
+ * see apps/web/src/lib/account.ts for how the console tells them apart.
+ */
+export type UserType = "USER" | "ADMIN" | "SUPERADMIN" | "PSSP";
 
 /** GET /api/v1/users/me - added specifically to close the doc F9 "no profile-read endpoint" gap. */
 export interface UserResponse {
