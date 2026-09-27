@@ -11,12 +11,12 @@ import {
   type KycDocumentType,
   type OwnerIdentityInput,
 } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/badge";
-import { FileDropzone } from "@/components/ui/file-dropzone";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { Label } from "@napayment/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
+import { StatusBadge } from "@napayment/ui/badge";
+import { FileDropzone } from "@napayment/ui/file-dropzone";
 import {
   useKycDocuments,
   useOwnerIdentity,

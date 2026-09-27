@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { TransactionFilter, TransactionStatus, TransactionType } from "@napayment/api-client";
 import { authedBackendClient } from "@/server/backend-client";
-import { handleRouteError } from "@/server/route-helpers";
+import { handleRouteError } from "@napayment/bff/route-helpers";
 
 export async function GET(request: Request) {
   try {

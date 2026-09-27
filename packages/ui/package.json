@@ -1,0 +1,27 @@
+{
+  "name": "@napayment/ui",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./theme.css": "./src/theme.css",
+    "./lib/*": "./src/lib/*.ts",
+    "./*": "./src/components/*.tsx"
+  },
+  "dependencies": {
+    "@napayment/api-client": "*",
+    "@napayment/format": "*",
+    "@napayment/schemas": "*",
+    "@radix-ui/react-dialog": "1.1.23",
+    "@radix-ui/react-dropdown-menu": "2.1.24",
+    "@radix-ui/react-tabs": "1.1.21",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.44.0",
+    "tailwind-merge": "3.6.0"
+  },
+  "peerDependencies": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "next": "15.5.25"
+  }
+}

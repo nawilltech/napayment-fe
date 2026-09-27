@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { changePasswordSchema } from "@napayment/schemas";
 import { authedBackendClient } from "@/server/backend-client";
-import { handleRouteError, parseBody } from "@/server/route-helpers";
+import { handleRouteError, parseBody } from "@napayment/bff/route-helpers";
 
 export async function POST(request: Request) {
   try {

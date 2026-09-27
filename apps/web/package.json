@@ -12,8 +12,10 @@
   "dependencies": {
     "@hookform/resolvers": "5.9.1",
     "@napayment/api-client": "*",
+    "@napayment/bff": "*",
     "@napayment/format": "*",
     "@napayment/schemas": "*",
+    "@napayment/ui": "*",
     "@napayment/ui-tokens": "*",
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-dropdown-menu": "2.1.24",

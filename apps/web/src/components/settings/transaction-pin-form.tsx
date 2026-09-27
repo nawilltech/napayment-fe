@@ -4,12 +4,12 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ShieldCheck } from "lucide-react";
 import { setTransactionPinSchema, type SetTransactionPinInput } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
-import { PinInput } from "@/components/ui/pin-input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert } from "@/components/ui/alert";
+import { Button } from "@napayment/ui/button";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { PinInput } from "@napayment/ui/pin-input";
+import { Label } from "@napayment/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
+import { Alert } from "@napayment/ui/alert";
 import { useSetTransactionPin } from "@/hooks/use-transaction-pin";
 
 /**

@@ -4,13 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { businessSignupSchema, individualSignupSchema, DEFAULT_CALLING_CODE } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { PhoneInput } from "@/components/ui/phone-input";
-import { Label } from "@/components/ui/label";
-import { PasswordRequirements } from "@/components/ui/password-requirements";
-import { cn } from "@/lib/utils";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { PhoneInput } from "@napayment/ui/phone-input";
+import { Label } from "@napayment/ui/label";
+import { PasswordRequirements } from "@napayment/ui/password-requirements";
+import { cn } from "@napayment/ui/lib/cn";
 import { useSignup } from "@/hooks/use-auth";
 
 type FormValues = {
