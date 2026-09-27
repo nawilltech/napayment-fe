@@ -330,6 +330,29 @@ export function createBackendClient(config: ApiClientConfig) {
      * has no crypto dependency so it stays usable unchanged in a browser, a
      * Node Route Handler, or React Native.
      */
+    /** Platform admin console (FR-3) - SUPERADMIN / platform-* permissions only. */
+    admin: {
+      listBusinesses: (filter?: T.AdminBusinessFilter, params?: T.PageParams) =>
+        apiRequest<T.PageResponse<T.AdminBusinessSummary>>(config, "/api/v1/admin/businesses", {
+          query: { ...filter, ...toPageQuery(params) },
+        }),
+      businessStats: () => apiRequest<T.BusinessStats>(config, "/api/v1/admin/businesses/stats"),
+      getBusiness: (id: string) => apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}`),
+      approveKyc: (id: string) =>
+        apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/kyc/approve`, { method: "POST" }),
+      rejectKyc: (id: string, body: T.RejectKycRequest) =>
+        apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/kyc/reject`, {
+          method: "POST",
+          body,
+        }),
+      downloadKycDocument: (documentId: string) =>
+        apiRequestBinary(config, `/api/v1/admin/kyc-documents/${documentId}/download`),
+      listAuditLogs: (filter?: T.AuditLogFilter, params?: T.PageParams) =>
+        apiRequest<T.PageResponse<T.AuditLogEntry>>(config, "/api/v1/admin/audit-logs", {
+          query: { ...filter, ...toPageQuery(params) },
+        }),
+    },
+
     thirdParty: {
       collect: (body: T.CollectRequest, idempotencyKey: string) =>
         apiRequest<T.TransactionResponse>(config, "/api/v1/collect", {

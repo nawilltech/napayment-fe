@@ -2,13 +2,30 @@ services:
   web:
     build:
       context: .
-      dockerfile: apps/web/Dockerfile
+      args:
+        APP: web
     container_name: napayment-web
     restart: unless-stopped
     # apps/web/.env.local supplies NAWILL_API_BASE_URL - written from the
     # WEB_ENV_FILE GitHub secret on every deploy, not committed. Points at
     # the napayment-api container's service name on nawill-net, not
     # localhost - this is a server-side-only BFF call (see .env.example).
+    env_file:
+      - apps/web/.env.local
+    networks:
+      - nawill-net
+    mem_limit: 300m
+
+  admin:
+    build:
+      context: .
+      args:
+        APP: admin
+    container_name: napayment-admin
+    restart: unless-stopped
+    # Same backend URL as web, so it reads the same env file (written from
+    # WEB_ENV_FILE on deploy) - no second secret to keep in sync. Staff-only:
+    # expose it on its own subdomain and restrict access at the proxy.
     env_file:
       - apps/web/.env.local
     networks:

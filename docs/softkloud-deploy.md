@@ -15,11 +15,20 @@ branch. Nothing here happens automatically - each step below is one-time.
 **App checkout.** `git clone https://github.com/nawilltech/napayment-fe.git
 /opt/apps/napayment-fe`.
 
-**Caddy site block**, added to `/opt/stack/Caddyfile`:
+**DNS.** `dev.napayment.nawill.ng` (Business Console) and
+`dev.napayment-admin.nawill.ng` (admin console) both point at the server.
+
+**Caddy site blocks**, added to `/opt/stack/Caddyfile`:
 
 ```
 dev.napayment.nawill.ng {
 	reverse_proxy napayment-web:3000
+}
+
+# Staff-only admin console (apps/admin). Consider restricting it further,
+# e.g. `@outside not remote_ip <office/VPN CIDRs>` + `respond @outside 403`.
+dev.napayment-admin.nawill.ng {
+	reverse_proxy napayment-admin:3001
 }
 ```
 
@@ -42,13 +51,18 @@ GitHub **Environment** `dev`, with these environment secrets:
 | `SSH_USER` | `nawilltech` |
 | `SSH_KEY` | the deploy keypair's private half |
 | `APP_PATH` | `/opt/apps/napayment-fe` |
-| `WEB_ENV_FILE` | full contents of `apps/web/.env.local` for this environment |
+| `WEB_ENV_FILE` | full contents of `apps/web/.env.local` for this environment - read by **both** apps |
 
 ### `WEB_ENV_FILE` contents
 
 ```env
 NAWILL_API_BASE_URL=http://napayment-api:8080
+ADMIN_CONSOLE_URL=https://dev.napayment-admin.nawill.ng
 ```
+
+Both containers read this one file (docker-compose.prod.yml), so there's no
+second secret to keep in sync. `ADMIN_CONSOLE_URL` is where the Business
+Console sends staff accounts that sign in there.
 
 Server-side only (the BFF pattern - see `.env.example`) - the browser never
 calls this directly, so the internal container name is correct here, not
@@ -64,10 +78,11 @@ the public `api.dev.napayment.nawill.ng` domain.
    - `docker compose -f docker-compose.prod.yml up -d --build`, then
      prunes dangling images.
 
-`docker-compose.prod.yml` builds `apps/web/Dockerfile` (context is the
-monorepo root, so npm workspaces resolve) and starts it as
-`napayment-web` on `nawill-net`, no ports published to the host - Caddy
-reaches it by container name.
+`docker-compose.prod.yml` builds the root `Dockerfile` twice - `APP=web`
+and `APP=admin` (context is the monorepo root, so npm workspaces resolve) -
+and starts them as `napayment-web` (port 3000) and `napayment-admin`
+(port 3001) on `nawill-net`, no ports published to the host - Caddy reaches
+them by container name.
 
 ## 4. Adding `prod` later
 

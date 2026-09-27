@@ -58,7 +58,8 @@ export interface AuthResponse {
   tokenType: "Bearer";
   expiresInSeconds: number;
   userId: string;
-  businessId: string;
+  /** Null for individual accounts and platform staff - only business accounts have one. */
+  businessId: string | null;
 }
 
 export interface RefreshTokenRequest {
@@ -263,6 +264,8 @@ export interface TransactionFilter {
   type?: TransactionType;
   term?: string; // matched against sessionId
   virtualAccountId?: string;
+  /** Narrow to one business's accounts - platform admins only; others can't widen their own scope. */
+  businessId?: string;
   minAmount?: string;
   maxAmount?: string;
 }
@@ -605,4 +608,99 @@ export interface BusinessContactResponse {
   refundEmails: string[];
   supportEmail: string | null;
   generalEmail: string;
+}
+
+// ---- Platform admin (FR-3, doc 4 §C.4-C.5) - SUPERADMIN / platform-* permissions only ----
+
+export interface AdminBusinessSummary {
+  id: string;
+  name: string;
+  cacNumber: string | null;
+  cacVerified: boolean;
+  kycStatus: BusinessKycStatus;
+  kycSubmittedAt: string | null;
+  ownerName: string | null;
+  ownerEmail: string | null;
+  createdAt: string;
+}
+
+export interface AdminBusinessDetail {
+  summary: AdminBusinessSummary;
+  businessType: BusinessType | null;
+  industry: string | null;
+  addressLine: string | null;
+  cacVerifiedName: string | null;
+  cacVerificationSource: string | null;
+  kycDetailsUpdatedAt: string | null;
+  kycReviewedAt: string | null;
+  /** The rejection reason, shown back to the business. */
+  kycReviewNote: string | null;
+  ownerPhoneNo: string | null;
+  /** BVN/NIN masked to the last 4 digits. Null if never submitted. */
+  ownerIdentity: OwnerIdentityResponse | null;
+  documents: KycDocumentResponse[];
+}
+
+export interface AdminBusinessFilter {
+  term?: string;
+  kycStatus?: BusinessKycStatus;
+}
+
+export interface BusinessStats {
+  total: number;
+  byKycStatus: Record<BusinessKycStatus, number>;
+}
+
+export interface RejectKycRequest {
+  reason: string;
+}
+
+export const AUDIT_EVENT_TYPES = [
+  "SIGNUP",
+  "SIGNUP_VIA_INVITE",
+  "LOGIN",
+  "ACCOUNT_LOCKED",
+  "PASSWORD_RESET_REQUESTED",
+  "PASSWORD_RESET_COMPLETED",
+  "PASSWORD_CHANGED",
+  "TRANSACTION_PIN_SET",
+  "TRANSACTION_PIN_VERIFICATION_FAILED",
+  "TRANSACTION_PIN_LOCKED",
+  "REFRESH_TOKEN_ROTATED",
+  "REFRESH_TOKEN_REUSE_DETECTED",
+  "REFRESH_TOKEN_REVOKED",
+  "BUSINESS_KYC_DETAILS_UPDATED",
+  "OWNER_IDENTITY_SUBMITTED",
+  "KYC_DOCUMENT_UPLOADED",
+  "KYC_SUBMITTED",
+  "KYC_APPROVED",
+  "KYC_REJECTED",
+  "TEAM_INVITATION_CREATED",
+  "TEAM_INVITATION_REVOKED",
+] as const;
+export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
+
+export type AuditOutcome = "SUCCESS" | "FAILURE";
+
+export interface AuditLogEntry {
+  id: string;
+  occurredAt: string;
+  eventType: AuditEventType;
+  outcome: AuditOutcome;
+  userId: string | null;
+  businessId: string | null;
+  email: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  detail: string | null;
+}
+
+export interface AuditLogFilter {
+  eventType?: AuditEventType;
+  outcome?: AuditOutcome;
+  userId?: string;
+  businessId?: string;
+  email?: string;
+  fromDate?: string;
+  toDate?: string;
 }
