@@ -237,7 +237,7 @@ export function createBackendClient(config: ApiClientConfig) {
       revoke: (id: string) =>
         apiRequest<void>(config, `/api/v1/payment-links/${id}`, { method: "DELETE" }),
       resolve: (shortCode: string) =>
-        apiRequest<T.PaymentLinkResponse>(config, `/api/v1/pay/${shortCode}`),
+        apiRequest<T.PaymentLinkCheckoutResponse>(config, `/api/v1/pay/${shortCode}`),
       pay: (shortCode: string, body: T.PayLinkRequest, idempotencyKey: string) =>
         apiRequest<T.TransactionResponse>(config, `/api/v1/pay/${shortCode}`, {
           method: "POST",
@@ -266,21 +266,7 @@ export function createBackendClient(config: ApiClientConfig) {
         ),
     },
 
-    paymentProcessors: {
-      create: (body: T.CreatePaymentProcessorRequest) =>
-        apiRequest<T.PaymentProcessorResponse>(config, "/api/v1/payment-processors", {
-          method: "POST",
-          body,
-        }),
-      list: (params?: T.PageParams) =>
-        apiRequest<T.PageResponse<T.PaymentProcessorResponse>>(
-          config,
-          "/api/v1/payment-processors",
-          { query: toPageQuery(params) },
-        ),
-      get: (id: string) =>
-        apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/payment-processors/${id}`),
-    },
+
 
     /** FR-Auth-1: peer-to-peer transfer between two Nawill virtual accounts, gated by the transaction PIN above. */
     transfers: {
@@ -351,6 +337,81 @@ export function createBackendClient(config: ApiClientConfig) {
         apiRequest<T.PageResponse<T.AuditLogEntry>>(config, "/api/v1/admin/audit-logs", {
           query: { ...filter, ...toPageQuery(params) },
         }),
+      deactivateBusiness: (id: string, body: T.DeactivateBusinessRequest) =>
+        apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/deactivate`, {
+          method: "POST",
+          body,
+        }),
+      activateBusiness: (id: string) =>
+        apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/activate`, { method: "POST" }),
+      /** Every payment method the platform supports (for the processor form). */
+      paymentMethods: () => apiRequest<T.PaymentMethodOption[]>(config, "/api/v1/admin/payment-methods"),
+      paymentProcessors: {
+        list: (params?: T.PageParams) =>
+          apiRequest<T.PageResponse<T.PaymentProcessorResponse>>(config, "/api/v1/admin/payment-processors", {
+            query: toPageQuery(params),
+          }),
+        get: (id: string) => apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}`),
+        create: (body: T.CreatePaymentProcessorRequest) =>
+          apiRequest<T.PaymentProcessorResponse>(config, "/api/v1/admin/payment-processors", { method: "POST", body }),
+        update: (id: string, body: T.UpdatePaymentProcessorRequest) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}`, {
+            method: "PATCH",
+            body,
+          }),
+        setLogo: (id: string, logo: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
+            method: "PUT",
+            body: { logo },
+          }),
+        removeLogo: (id: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
+            method: "DELETE",
+          }),
+        enableMethod: (id: string, method: T.PaymentMethod) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
+            method: "PUT",
+          }),
+        disableMethod: (id: string, method: T.PaymentMethod) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
+            method: "DELETE",
+          }),
+        /** Platform switch (requires the staff password). */
+        setActive: (id: string, active: boolean, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentProcessorResponse>(
+            config,
+            `/api/v1/admin/payment-processors/${id}/${active ? "activate" : "deactivate"}`,
+            { method: "POST", body },
+          ),
+        /** Default for all businesses; clears their own settings (requires the staff password). */
+        setForAllBusinesses: (id: string, enabled: boolean, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.ForAllBusinessesResponse>(
+            config,
+            `/api/v1/admin/payment-processors/${id}/${enabled ? "enable" : "disable"}-for-all-businesses`,
+            { method: "POST", body },
+          ),
+      },
+      businessPaymentProcessors: {
+        list: (businessId: string) =>
+          apiRequest<T.BusinessPaymentProcessor[]>(config, `/api/v1/admin/businesses/${businessId}/payment-processors`),
+        set: (businessId: string, processorId: string, enabled: boolean) =>
+          apiRequest<T.BusinessPaymentProcessor>(
+            config,
+            `/api/v1/admin/businesses/${businessId}/payment-processors/${processorId}`,
+            { method: "PUT", body: { enabled } },
+          ),
+        reset: (businessId: string, processorId: string) =>
+          apiRequest<T.BusinessPaymentProcessor>(
+            config,
+            `/api/v1/admin/businesses/${businessId}/payment-processors/${processorId}`,
+            { method: "DELETE" },
+          ),
+      },
+    },
+
+    /** Payment methods the caller's own account can accept right now (FR-Proc-3). */
+    paymentMethods: {
+      available: () => apiRequest<T.PaymentMethodOption[]>(config, "/api/v1/payment-methods"),
     },
 
     thirdParty: {

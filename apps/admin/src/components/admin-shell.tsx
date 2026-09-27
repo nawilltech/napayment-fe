@@ -3,14 +3,15 @@
 import { useTransition } from "react";
 import { AppShell, type NavGroup, type ShellTitle } from "@napayment/ui/app-shell";
 import { signOutAction } from "@/app/actions";
+import { ROUTES } from "@/lib/routes";
 
 const TITLES: ShellTitle[] = [
   { prefix: "/overview", title: "Overview" },
   { prefix: "/kyc", title: "KYC review queue", short: "KYC review" },
   { prefix: "/businesses", title: "Businesses" },
   { prefix: "/transactions", title: "Platform transactions", short: "Transactions" },
-  { prefix: "/processors", title: "Payment processors", short: "Processors" },
-  { prefix: "/collection-account", title: "Collection account" },
+  { prefix: ROUTES.paymentProcessors, title: "Configuration · Payment processors", short: "Processors" },
+  { prefix: ROUTES.collectionAccount, title: "Configuration · Collection account", short: "Collection account" },
   { prefix: "/audit-logs", title: "Audit logs" },
   { prefix: "/settings", title: "Settings" },
 ];
@@ -27,13 +28,13 @@ function adminNav(pendingKyc: number): NavGroup[] {
     },
     { title: "Money", items: [{ href: "/transactions", label: "Transactions", icon: "transactions", matchPrefix: "/transactions" }] },
     {
-      title: "Platform",
+      title: "Configuration",
       items: [
-        { href: "/processors", label: "Payment processors", icon: "processors", matchPrefix: "/processors" },
-        { href: "/collection-account", label: "Collection account", icon: "bank", matchPrefix: "/collection-account" },
-        { href: "/audit-logs", label: "Audit logs", icon: "auditLogs", matchPrefix: "/audit-logs" },
+        { href: ROUTES.paymentProcessors, label: "Payment processors", icon: "processors", matchPrefix: ROUTES.paymentProcessors },
+        { href: ROUTES.collectionAccount, label: "Collection account", icon: "bank", matchPrefix: ROUTES.collectionAccount },
       ],
     },
+    { title: "Platform", items: [{ href: "/audit-logs", label: "Audit logs", icon: "auditLogs", matchPrefix: "/audit-logs" }] },
     { title: "Account", items: [{ href: "/settings", label: "Settings", icon: "settings", matchPrefix: "/settings" }] },
   ];
 }

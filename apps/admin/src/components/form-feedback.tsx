@@ -14,6 +14,7 @@ export function SubmitButton(props: Omit<ButtonProps, "type" | "loading">) {
 /** A server action's outcome under its form. */
 export function FormFeedback({ state, success }: { state: ActionState; success?: string }) {
   if (state.error) return <Alert variant="warning">{state.error}</Alert>;
-  if (state.ok && success) return <Alert variant="success">{success}</Alert>;
+  const message = state.message ?? success;
+  if (state.ok && message) return <Alert variant="success">{message}</Alert>;
   return null;
 }

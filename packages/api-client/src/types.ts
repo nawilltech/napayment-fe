@@ -229,7 +229,10 @@ export type TransactionType = "CREDIT" | "DEBIT";
 
 export interface CreateTransactionRequest {
   virtualAccountId: string;
-  paymentProcessorId: string;
+  /** Optional: omitted, the highest-priority processor available for the method is used (FR-Proc-4). */
+  paymentProcessorId?: string;
+  /** Defaults to TRANSFER. */
+  paymentMethod?: PaymentMethod;
   transactionType: TransactionType;
   amount: string;
 }
@@ -244,6 +247,8 @@ export interface TransactionResponse {
   virtualAccountId: string;
   /** Null for a peer-to-peer transfer leg (FR-Auth-1) - no external processor is involved. */
   paymentProcessorId: string | null;
+  /** How the payer paid; null for a peer-to-peer transfer leg. */
+  paymentMethod: PaymentMethod | null;
   /** Set only on transfer-sourced rows: a transfer produces one DEBIT + one CREDIT sharing this id. */
   transferGroupId: string | null;
   /** The other side's virtual account id, set only on transfer-sourced rows. */
@@ -406,8 +411,15 @@ export interface PaymentLinkResponse {
   linkStatus: PaymentLinkStatus;
 }
 
+/** GET /pay/{shortCode}: the link plus the methods it can be paid with now (empty if the business is deactivated). */
+export interface PaymentLinkCheckoutResponse extends PaymentLinkResponse {
+  availableMethods: PaymentMethodOption[];
+}
+
 export interface PayLinkRequest {
   amount?: string;
+  /** Defaults to TRANSFER; must be one of the link's availableMethods. */
+  paymentMethod?: PaymentMethod;
 }
 
 // ---- Dynamic (Temporary) Virtual Accounts ---------------------------------------
@@ -437,6 +449,8 @@ export interface DynamicVirtualAccountResponse {
 
 export interface CollectRequest {
   amount: string;
+  /** Defaults to TRANSFER. */
+  paymentMethod?: PaymentMethod;
 }
 
 export interface WithdrawRequest {
@@ -445,14 +459,90 @@ export interface WithdrawRequest {
 
 // ---- Payment Processor ----------------------------------------------------------
 
+/** The fixed platform list of payment methods (backend PaymentMethod); labels come from the API. */
+export const PAYMENT_METHODS = ["TRANSFER", "CARD", "USSD", "BANK_DEBIT", "QR"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export type EntityStatus = "ACTIVE" | "INACTIVE";
+
+export interface PaymentMethodOption {
+  method: PaymentMethod;
+  label: string;
+  /** False for a method a processor has disabled (kept for history). */
+  active: boolean;
+}
+
+/**
+ * Processor logo constraints, mirroring the backend's ProcessorLogo: a base64
+ * data URL of one of these image types, at most maxKb decoded. SVG is refused.
+ */
+export const PROCESSOR_LOGO = {
+  maxKb: 100,
+  mimeTypes: ["image/png", "image/jpeg", "image/webp"],
+  /** Clients downscale to fit this box before upload. */
+  maxDimensionPx: 128,
+} as const;
+
 export interface CreatePaymentProcessorRequest {
   name: string;
+  /** Optional base64 data URL - see PROCESSOR_LOGO. */
+  logo?: string;
+  /** Letters, digits, underscores; stored upper-case, never changed after creation. */
+  code: string;
+  /** Routing order, lowest first. Defaults to 100. */
+  priority?: number;
+  /** ON for every business without its own setting. Defaults to true. */
+  defaultEnabled?: boolean;
+  methods: PaymentMethod[];
+}
+
+export interface UpdatePaymentProcessorRequest {
+  name?: string;
+  priority?: number;
+}
+
+/** The signed-in staff member's own password, re-entered for a platform-wide change (FR-Admin-5). */
+export interface PasswordConfirmationRequest {
+  password: string;
 }
 
 export interface PaymentProcessorResponse {
   id: string;
   name: string;
-  status: "ACTIVE" | "INACTIVE";
+  code: string;
+  /** Base64 data URL, or null when the processor has no logo. */
+  logo: string | null;
+  priority: number;
+  /** Platform switch: INACTIVE means no business can use it. */
+  status: EntityStatus;
+  defaultEnabled: boolean;
+  methods: PaymentMethodOption[];
+  /** Businesses with their own ON / OFF setting instead of following defaultEnabled. */
+  businessesSwitchedOn: number;
+  businessesSwitchedOff: number;
+  createdAt: string;
+}
+
+export interface ForAllBusinessesResponse {
+  processor: PaymentProcessorResponse;
+  clearedBusinessSettings: number;
+}
+
+export type ProcessorAvailabilitySource = "PROCESSOR_INACTIVE" | "BUSINESS_SETTING" | "PLATFORM_DEFAULT";
+
+/** One processor as it applies to one business (FR-Admin-5). */
+export interface BusinessPaymentProcessor {
+  processorId: string;
+  name: string;
+  code: string;
+  logo: string | null;
+  processorActive: boolean;
+  defaultEnabled: boolean;
+  methods: PaymentMethodOption[];
+  /** The business's own ON/OFF; null = following the platform default. */
+  businessSetting: boolean | null;
+  available: boolean;
+  source: ProcessorAvailabilitySource;
 }
 
 // ---- Reference Data ---------------------------------------------------------------
@@ -506,6 +596,8 @@ export interface UserResponse {
   userType: UserType;
   businessName: string | null;
   cacNumber: string | null;
+  /** False when platform staff have deactivated the business: read-only until reactivated (FR-Admin-6). */
+  businessActive: boolean;
   isVerified: boolean;
   createdAt: string;
 }
@@ -620,6 +712,8 @@ export interface AdminBusinessSummary {
   cacNumber: string | null;
   cacVerified: boolean;
   kycStatus: BusinessKycStatus;
+  /** INACTIVE = deactivated by platform staff (FR-Admin-6). */
+  status: EntityStatus;
   kycSubmittedAt: string | null;
   ownerName: string | null;
   ownerEmail: string | null;
@@ -637,6 +731,9 @@ export interface AdminBusinessDetail {
   kycReviewedAt: string | null;
   /** The rejection reason, shown back to the business. */
   kycReviewNote: string | null;
+  /** Why the business was deactivated; null while active. */
+  statusReason: string | null;
+  statusChangedAt: string | null;
   ownerPhoneNo: string | null;
   /** BVN/NIN masked to the last 4 digits. Null if never submitted. */
   ownerIdentity: OwnerIdentityResponse | null;
@@ -646,6 +743,11 @@ export interface AdminBusinessDetail {
 export interface AdminBusinessFilter {
   term?: string;
   kycStatus?: BusinessKycStatus;
+  status?: EntityStatus;
+}
+
+export interface DeactivateBusinessRequest {
+  reason: string;
 }
 
 export interface BusinessStats {
@@ -679,6 +781,20 @@ export const AUDIT_EVENT_TYPES = [
   "KYC_REJECTED",
   "TEAM_INVITATION_CREATED",
   "TEAM_INVITATION_REVOKED",
+  "PAYMENT_PROCESSOR_CREATED",
+  "PAYMENT_PROCESSOR_UPDATED",
+  "PAYMENT_PROCESSOR_ACTIVATED",
+  "PAYMENT_PROCESSOR_DEACTIVATED",
+  "PAYMENT_METHOD_ENABLED",
+  "PAYMENT_METHOD_DISABLED",
+  "PAYMENT_PROCESSOR_ENABLED_FOR_ALL",
+  "PAYMENT_PROCESSOR_DISABLED_FOR_ALL",
+  "BUSINESS_PAYMENT_PROCESSOR_SET",
+  "BUSINESS_PAYMENT_PROCESSOR_RESET",
+  "BUSINESS_DEACTIVATED",
+  "BUSINESS_ACTIVATED",
+  "BANK_ACCOUNT_REGISTERED_BY_ADMIN",
+  "PASSWORD_CONFIRMATION_FAILED",
 ] as const;
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number];
 
