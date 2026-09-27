@@ -10,7 +10,11 @@
     "dev": "turbo run dev",
     "dev:web": "turbo run dev --filter=web",
     "dev:admin": "turbo run dev --filter=admin",
+    "dev:mobile": "turbo run dev --filter=mobile",
     "build": "turbo run build",
+    "start": "turbo run start --filter=web --filter=admin",
+    "start:web": "turbo run start --filter=web",
+    "start:admin": "turbo run start --filter=admin",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck"
   },
