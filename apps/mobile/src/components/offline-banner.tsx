@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import { useOnline } from '@/hooks/use-online';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { formatTime } from '@napayment/format';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 /**
  * Amber strip shown while offline, or while anything is still queued.
@@ -12,6 +13,8 @@ import { AppText } from './text';
  * the balance they're looking at is a snapshot, not live.
  */
 export function OfflineBanner({ since }: { since?: number }) {
+  const colors = useColors();
+  const styles = useStyles();
   const online = useOnline();
   const queued = useQueuedActions().length;
   if (online && queued === 0) return null;
@@ -39,7 +42,7 @@ export function OfflineBanner({ since }: { since?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   banner: {
     marginHorizontal: 16,
     marginBottom: 12,
@@ -55,4 +58,4 @@ const styles = StyleSheet.create({
   },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.warning },
   flex: { flex: 1 },
-});
+}));

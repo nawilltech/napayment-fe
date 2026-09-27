@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { LogOut, Menu, X, type LucideIcon } from "lucide-react";
+import type { IconName } from "@napayment/ui-tokens";
 import { initials } from "@napayment/format";
 import { cn } from "../lib/cn";
 import {
@@ -14,11 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { Icon } from "./icon";
 import { Logo } from "./logo";
 
 export interface NavItem {
   href: string;
   label: string;
+  icon: IconName;
   /** Active for any path under this prefix (default: exact href match). */
   matchPrefix?: string;
   /** Small mono tag on the right, e.g. "3/5". */
@@ -40,7 +42,7 @@ export interface ShellTitle {
 export interface ShellMenuItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: IconName;
 }
 
 export interface AppShellProps {
@@ -68,7 +70,7 @@ export interface AppShellProps {
 export function AppShell({ banner, children, ...props }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col overflow-y-auto bg-ink px-3.5 py-[22px] md:flex">
+      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col overflow-y-auto bg-chrome px-3.5 py-[22px] md:flex">
         <SidebarContent {...props} />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -109,11 +111,12 @@ function SidebarContent({ nav, account, footer = "A Nawill product", onNavigate 
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex items-center justify-between rounded-lg px-2.5 py-[9px] text-[13.5px] transition-colors",
+                      "flex items-center gap-2.5 rounded-lg px-2.5 py-[9px] text-[13.5px] transition-colors",
                       active ? "bg-brand font-semibold text-cream" : "text-ink-fg hover:bg-ink-raised hover:text-cream",
                     )}
                   >
-                    <span>{item.label}</span>
+                    <Icon name={item.icon} className="size-4 shrink-0" />
+                    <span className="flex-1 truncate">{item.label}</span>
                     {item.badge && <span className="font-mono text-[10px] text-ink-subtle">{item.badge}</span>}
                   </Link>
                 );
@@ -146,15 +149,15 @@ function MobileNav(props: ChromeProps) {
           className="-ml-1.5 flex size-9 items-center justify-center rounded-lg text-ink hover:bg-line-soft md:hidden"
           aria-label="Open menu"
         >
-          <Menu className="size-5" />
+          <Icon name="menu" className="size-5" />
         </button>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/40 md:hidden" />
-        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-[260px] max-w-[85vw] flex-col overflow-y-auto bg-ink px-3.5 py-[22px] shadow-xl md:hidden">
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-chrome/40 md:hidden" />
+        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-[260px] max-w-[85vw] flex-col overflow-y-auto bg-chrome px-3.5 py-[22px] shadow-xl md:hidden">
           <DialogPrimitive.Title className="sr-only">Navigation menu</DialogPrimitive.Title>
           <DialogPrimitive.Close className="absolute right-3 top-5 flex size-8 items-center justify-center rounded-lg text-ink-fg hover:bg-ink-raised hover:text-cream">
-            <X className="size-4" />
+            <Icon name="close" className="size-4" />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
           <SidebarContent {...props} onNavigate={() => setOpen(false)} />
@@ -199,17 +202,17 @@ function Header(props: ChromeProps) {
               {user?.email && <p className="truncate text-xs text-subtle">{user.email}</p>}
             </div>
             <DropdownMenuSeparator />
-            {menuItems.map(({ href, label, icon: Icon }) => (
+            {menuItems.map(({ href, label, icon }) => (
               <DropdownMenuItem key={href} asChild>
                 <Link href={href}>
-                  <Icon className="size-4 text-subtle" />
+                  <Icon name={icon} className="size-4 text-subtle" />
                   {label}
                 </Link>
               </DropdownMenuItem>
             ))}
             {menuItems.length > 0 && <DropdownMenuSeparator />}
             <DropdownMenuItem onSelect={onSignOut} className="text-danger">
-              <LogOut className="size-4" />
+              <Icon name="signOut" className="size-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

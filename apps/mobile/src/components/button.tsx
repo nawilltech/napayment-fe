@@ -1,17 +1,21 @@
 import { ActivityIndicator, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, radius } from '@/theme';
+import { radius, type Colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 import { AppText } from './text';
 
 type Variant = 'primary' | 'dark' | 'cream' | 'outline' | 'onBrand' | 'ghost';
 
-const VARIANTS: Record<Variant, { bg: string; fg: string; border?: string }> = {
-  primary: { bg: colors.brand, fg: colors.cream },
-  dark: { bg: colors.ink, fg: colors.cream },
-  cream: { bg: colors.cream, fg: colors.ink },
-  outline: { bg: colors.white, fg: colors.ink, border: colors.line },
+type Role = keyof Colors | 'transparent';
+
+/** Palette roles per variant, resolved against the active theme in Button. */
+const VARIANTS: Record<Variant, { bg: Role; fg: Role; border?: Role }> = {
+  primary: { bg: 'brand', fg: 'cream' },
+  dark: { bg: 'chrome', fg: 'cream' },
+  cream: { bg: 'cream', fg: 'chrome' },
+  outline: { bg: 'surface', fg: 'ink', border: 'line' },
   // Outline button sitting on a blue surface (receipt / account screens).
-  onBrand: { bg: 'transparent', fg: colors.cream, border: colors.brandLine },
-  ghost: { bg: 'transparent', fg: colors.brand },
+  onBrand: { bg: 'transparent', fg: 'cream', border: 'brandLine' },
+  ghost: { bg: 'transparent', fg: 'link' },
 };
 
 export function Button({
@@ -33,7 +37,10 @@ export function Button({
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
 }) {
-  const v = VARIANTS[variant];
+  const colors = useColors();
+  const role = (key: Role | undefined) => (key === undefined || key === 'transparent' ? key : colors[key]);
+  const roles = VARIANTS[variant];
+  const v = { bg: role(roles.bg), fg: role(roles.fg), border: role(roles.border) };
   const inactive = disabled || loading;
   return (
     <Pressable

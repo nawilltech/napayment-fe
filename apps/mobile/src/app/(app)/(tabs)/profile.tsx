@@ -1,7 +1,8 @@
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import Constants from 'expo-constants';
 import { router, type Href } from 'expo-router';
 import { Card, Row } from '@/components/card';
+import { Icon } from '@/components/icon';
 import { Screen } from '@/components/screen';
 import { SectionHeader } from '@/components/section-header';
 import { AppText } from '@/components/text';
@@ -9,11 +10,14 @@ import { useMe, useSettlementAccounts } from '@/hooks/queries';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { useSession } from '@/hooks/use-session';
 import { displayName, initials } from '@napayment/format';
-import { colors } from '@/theme';
+import { THEME_PREFERENCE_OPTIONS, type IconName } from '@napayment/ui-tokens';
+import { makeStyles, useColors, useTheme } from '@/theme/theme-provider';
 
-type Item = { label: string; value?: string; href?: Href; onPress?: () => void; danger?: boolean };
+type Item = { label: string; icon: IconName; value?: string; href?: Href; onPress?: () => void; danger?: boolean };
 
 function Group({ title, items }: { title: string; items: Item[] }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <>
       <SectionHeader title={title} />
@@ -26,7 +30,10 @@ function Group({ title, items }: { title: string; items: Item[] }) {
             onPress={it.onPress ?? (it.href ? () => router.push(it.href!) : undefined)}
             accessibilityLabel={it.value ? `${it.label}, ${it.value}` : it.label}
           >
-            <AppText color={it.danger ? colors.danger : colors.ink}>{it.label}</AppText>
+            <View style={styles.label}>
+              <Icon name={it.icon} size={18} color={it.danger ? colors.danger : colors.subtle} />
+              <AppText color={it.danger ? colors.danger : colors.ink}>{it.label}</AppText>
+            </View>
             <AppText size={12.5} color={colors.subtle}>
               {it.value ?? (it.href ? '›' : '')}
             </AppText>
@@ -38,6 +45,9 @@ function Group({ title, items }: { title: string; items: Item[] }) {
 }
 
 export default function ProfileScreen() {
+  const { preference } = useTheme();
+  const colors = useColors();
+  const styles = useStyles();
   const me = useMe();
   const settlement = useSettlementAccounts();
   const queued = useQueuedActions().length;
@@ -93,8 +103,14 @@ export default function ProfileScreen() {
       <Group
         title="Security"
         items={[
-          { label: 'Transaction PIN', value: 'Set or change', href: '/security/pin' },
-          { label: 'Change password', href: '/security/password' },
+          { label: 'Transaction PIN', icon: 'pin', value: 'Set or change', href: '/security/pin' },
+          { label: 'Change password', icon: 'password', href: '/security/password' },
+        ]}
+      />
+      <Group
+        title="Preferences"
+        items={[
+          { label: 'Appearance', icon: 'preferences', value: THEME_PREFERENCE_OPTIONS[preference].label, href: '/settings/appearance' },
         ]}
       />
       <Group
@@ -102,11 +118,12 @@ export default function ProfileScreen() {
         items={[
           {
             label: 'Settlement bank',
+            icon: 'bank',
             value: banks === undefined ? '—' : banks === 0 ? 'Not set' : `${banks} ${banks === 1 ? 'account' : 'accounts'}`,
             href: '/withdraw',
           },
-          { label: 'Waiting to send', value: queued ? `${queued} queued` : 'None', href: '/queue' },
-          { label: 'Sign out', onPress: confirmSignOut, danger: true },
+          { label: 'Waiting to send', icon: 'queue', value: queued ? `${queued} queued` : 'None', href: '/queue' },
+          { label: 'Sign out', icon: 'signOut', onPress: confirmSignOut, danger: true },
         ]}
       />
 
@@ -117,8 +134,9 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
+  label: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingTop: 22, paddingBottom: 16 },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.chrome, alignItems: 'center', justifyContent: 'center' },
   kyc: { marginHorizontal: 16, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row', alignItems: 'center' },
-});
+}));

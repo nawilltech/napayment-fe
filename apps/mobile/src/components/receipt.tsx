@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 // Torn bottom edge: M0 0 H320, then alternate teeth back to x=0 (same path as the brand file).
 const TEETH = 32;
@@ -10,6 +11,8 @@ const EDGE = `M0 0 H320 ${Array.from({ length: TEETH }, (_, i) => `L${310 - i * 
 
 /** Cream receipt block with the brand's torn edge - sits on the blue screens (designs 04, 07). */
 export function Receipt({ children, gap = 14 }: { children: ReactNode; gap?: number }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.wrap}>
       <View style={[styles.paper, { gap }]}>{children}</View>
@@ -22,6 +25,7 @@ export function Receipt({ children, gap = 14 }: { children: ReactNode; gap?: num
 
 /** Dashed tear line between receipt sections. */
 export function ReceiptRule() {
+  const styles = useStyles();
   return <View style={styles.rule} />;
 }
 
@@ -40,6 +44,8 @@ export function ReceiptLine({
   typewriter?: boolean;
   total?: boolean;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   const size = total ? 14 : 13.5;
   return (
     <View style={[styles.line, total && { alignItems: 'baseline' }]}>
@@ -59,10 +65,10 @@ export function ReceiptLine({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: { marginHorizontal: 18, marginTop: 22 },
   paper: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.background,
     borderTopLeftRadius: radius.card,
     borderTopRightRadius: radius.card,
     paddingHorizontal: 20,
@@ -73,4 +79,4 @@ const styles = StyleSheet.create({
   line: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   label: { flexShrink: 0 },
   value: { flexShrink: 1, textAlign: 'right' },
-});
+}));

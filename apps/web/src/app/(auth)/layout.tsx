@@ -18,7 +18,7 @@ const SECTORS = [
  */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen bg-cream lg:grid-cols-2">
+    <div className="grid min-h-screen bg-background lg:grid-cols-2">
       <main className="flex flex-col justify-center px-4 py-8 sm:px-14 lg:justify-start lg:py-14">
         <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
           <Logo size={36} wordmarkClassName="text-ink" />

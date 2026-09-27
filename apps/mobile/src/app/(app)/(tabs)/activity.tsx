@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, SectionList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, SectionList, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { TransactionFilter, TransactionResponse, TransactionType } from '@napayment/api-client';
 import { Chip } from '@/components/chip';
@@ -11,7 +11,8 @@ import { TransactionRow } from '@/components/transaction-row';
 import { useAnalytics, useTransactionFeed } from '@/hooks/queries';
 import { isForbidden } from '@/lib/api';
 import { dayLabel, formatNaira } from '@napayment/format';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 /** Monday 00:00 local - "this week" for both the chip and the tiles. */
 function startOfWeek() {
@@ -22,6 +23,8 @@ function startOfWeek() {
 }
 
 export default function ActivityScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const [type, setType] = useState<TransactionType | undefined>();
   const [thisWeek, setThisWeek] = useState(false);
   const [draft, setDraft] = useState('');
@@ -130,12 +133,12 @@ export default function ActivityScreen() {
               feed.refetch();
               week.refetch();
             }}
-            tintColor={colors.brand}
+            tintColor={colors.link}
           />
         }
         ListEmptyComponent={
           feed.isLoading ? (
-            <ActivityIndicator color={colors.brand} style={{ marginTop: 32 }} />
+            <ActivityIndicator color={colors.link} style={{ marginTop: 32 }} />
           ) : feed.isError && !feed.data ? (
             <Empty title={isForbidden(feed.error) ? "Your role can't view transactions" : "Couldn't load activity"} body="Pull down to try again." />
           ) : (
@@ -143,22 +146,22 @@ export default function ActivityScreen() {
           )
         }
         ListFooterComponent={
-          feed.isFetchingNextPage ? <ActivityIndicator color={colors.brand} style={{ marginVertical: 16 }} /> : <View style={{ height: 24 }} />
+          feed.isFetchingNextPage ? <ActivityIndicator color={colors.link} style={{ marginVertical: 16 }} /> : <View style={{ height: 24 }} />
         }
       />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.cream },
+const useStyles = makeStyles((colors) => ({
+  root: { flex: 1, backgroundColor: colors.background },
   title: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 10 },
   chips: { gap: 8, paddingHorizontal: 16, paddingTop: 12 },
   tiles: { flexDirection: 'row', gap: 8, marginHorizontal: 16, marginTop: 14 },
-  tile: { flex: 1, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line, borderRadius: radius.xl, padding: 12 },
+  tile: { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radius.xl, padding: 12 },
   sectionHead: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 6 },
   // Rows render as slices of one bordered card per day.
-  cardSlice: { marginHorizontal: 16, backgroundColor: colors.white, borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.line, overflow: 'hidden' },
+  cardSlice: { marginHorizontal: 16, backgroundColor: colors.surface, borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.line, overflow: 'hidden' },
   cardTop: { borderTopWidth: 1, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl },
   cardBottom: { borderBottomWidth: 1, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl },
-});
+}));

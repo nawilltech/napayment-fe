@@ -112,7 +112,7 @@ export function SendMoneyForm() {
           >
             Send another
           </Button>
-          <Link href="/dashboard" className="text-sm font-medium text-brand hover:underline">
+          <Link href="/dashboard" className="text-sm font-medium text-link hover:underline">
             Back to dashboard
           </Link>
         </CardFooter>

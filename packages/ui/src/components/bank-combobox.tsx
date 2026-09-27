@@ -166,7 +166,7 @@ export function BankCombobox({
                 onMouseEnter={() => setActiveIndex(index)}
                 className={cn(
                   "flex cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2 text-[14px] text-ink",
-                  index === activeIndex && "bg-brand-soft",
+                  index === activeIndex && "bg-brand-surface",
                 )}
               >
                 <span className="truncate">{bank.name}</span>

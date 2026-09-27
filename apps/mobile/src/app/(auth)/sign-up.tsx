@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Link } from 'expo-router';
 import { businessSignupSchema, DEFAULT_CALLING_CODE, individualSignupSchema } from '@napayment/schemas';
 import { AuthShell } from '@/components/auth-shell';
@@ -12,11 +12,14 @@ import { AppText } from '@/components/text';
 import { useSession } from '@/hooks/use-session';
 import { errorMessage } from '@/lib/api';
 import { validate } from '@/lib/validation';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 type Kind = 'individual' | 'business';
 
 export default function SignUpScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { signUp } = useSession();
   const [kind, setKind] = useState<Kind>('individual');
   const [form, setForm] = useState({
@@ -159,7 +162,7 @@ export default function SignUpScreen() {
       <AppText size={13} color={colors.muted} align="center">
         Already have an account?{' '}
         <Link href="/sign-in" accessibilityRole="link">
-          <AppText size={13} weight="semibold" color={colors.brand}>
+          <AppText size={13} weight="semibold" color={colors.link}>
             Sign in
           </AppText>
         </Link>
@@ -168,9 +171,9 @@ export default function SignUpScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   pair: { flexDirection: 'row', gap: 10 },
   flex: { flex: 1 },
   phoneRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-end' },
-  dial: { height: 50, paddingHorizontal: 12, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, justifyContent: 'center' },
-});
+  dial: { height: 50, paddingHorizontal: 12, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface, justifyContent: 'center' },
+}));

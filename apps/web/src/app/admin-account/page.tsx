@@ -23,7 +23,7 @@ export default async function AdminAccountPage() {
   const adminConsoleUrl = process.env.ADMIN_CONSOLE_URL;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-10">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-background px-4 py-10">
       <Logo size={36} wordmarkClassName="text-ink" />
       <Card className="w-full max-w-[440px] p-6 sm:p-8">
         <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-subtle">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ThemeHead } from "@napayment/ui/theme-head";
 import { fontVariables } from "@napayment/ui/lib/fonts";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -15,7 +16,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeHead />
+      </head>
       <body className={`${fontVariables} antialiased`}>
         <Providers>{children}</Providers>
       </body>

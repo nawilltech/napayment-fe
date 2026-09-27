@@ -1,56 +1,8 @@
-/* Napayment design tokens + base styles, shared by every web app (apps/web, apps/admin).
-   Mirrors packages/ui-tokens (the platform-neutral source, also used by mobile). */
+/* Napayment design tokens + base styles, shared by every web app (apps/web, apps/admin). */
 
-:root {
-  /* Brand tokens - Napayment identity (docs/Nawill Technology branding,
-     "Napayment Brand" + "Napayment Web"). Mirrors packages/ui-tokens. */
-
-  /* Ink: text, amounts, console sidebar */
-  --color-ink: #20264a;
-  --color-ink-raised: #2c3360;
-  --color-ink-line: #3a4270;
-  --color-ink-fg: #c9cee8;
-  --color-ink-muted: #8e9bd8;
-  --color-ink-subtle: #b7bedb;
-
-  /* Nawill Blue: primary actions, active states, links */
-  --color-brand: #4757b8;
-  --color-brand-hover: #3b4aa3;
-  --color-brand-soft: #d6daf2;
-  --color-brand-line: #9fa8de;
-  --color-brand-surface: #eef0fa;
-
-  /* Cream family: surfaces, receipts, hairlines */
-  --color-cream: #f4eedd;
-  --color-paper: #fbf9f2;
-  --color-sand: #e4dcc8;
-  --color-line: #d8cfb4;
-  --color-line-soft: #efe8d6;
-  --color-tan: #b3a37d;
-
-  /* Warm secondary text */
-  --color-muted: #4e4a33;
-  --color-subtle: #6e6648;
-  --color-faint: #8c8468;
-
-  /* Payment status - never used for decoration */
-  --color-success: #1a7f4e;
-  --color-success-surface: #e7f6ee;
-  --color-success-line: #bfe3cf;
-  --color-warning: #b4740e;
-  --color-warning-surface: #fbf0dd;
-  --color-warning-line: #e8cf9e;
-  --color-warning-ink: #5a3d0c;
-  --color-danger: #c22a2a;
-  --color-danger-surface: #fbe8e8;
-  --color-pending: #3e5aa8;
-  --color-pending-surface: #e9edfa;
-
-  --background: var(--color-cream);
-  --foreground: var(--color-ink);
-  --surface: #ffffff;
-  --border: var(--color-line);
-}
+/* Colour values are not written here: both palettes are generated from
+   @napayment/ui-tokens (palettes.ts) into CSS variables by <ThemeHead />
+   (lib/theme-css.ts). This file maps those variables into Tailwind. */
 
 @theme inline {
   --color-ink: var(--color-ink);
@@ -62,6 +14,7 @@
 
   --color-brand: var(--color-brand);
   --color-brand-hover: var(--color-brand-hover);
+  --color-link: var(--color-link);
   --color-brand-soft: var(--color-brand-soft);
   --color-brand-line: var(--color-brand-line);
   --color-brand-surface: var(--color-brand-surface);
@@ -89,10 +42,14 @@
   --color-pending: var(--color-pending);
   --color-pending-surface: var(--color-pending-surface);
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-border: var(--border);
+  --color-chrome: var(--color-chrome);
+  --color-white: var(--color-white);
+  --color-receipt-rule: var(--color-receipt-rule);
+  --color-success-ink: var(--color-success-ink);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
 
   /* IBM Plex Sans: all interface text. IBM Plex Mono: amounts, references,
      dates (digits line up in lists). Special Elite: wordmark and campaign

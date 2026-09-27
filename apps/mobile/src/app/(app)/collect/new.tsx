@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Switch, View } from 'react-native';
+import { Switch, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';
 import { AmountField } from '@/components/amount-field';
@@ -16,12 +16,15 @@ import { useOnline } from '@/hooks/use-online';
 import { errorMessage } from '@/lib/api';
 import { formatNaira, nairaToKobo } from '@napayment/format';
 import { newIdempotencyKey, outboxKeys, type CreateLinkVars } from '@/lib/outbox';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 type Method = 'account' | 'link';
 type LinkType = 'PERMANENT' | 'TEMPORARY';
 
 export default function NewCollectionScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const params = useLocalSearchParams<{ method?: Method }>();
   const online = useOnline();
   const [method, setMethod] = useState<Method>(params.method === 'link' ? 'link' : 'account');
@@ -169,18 +172,18 @@ export default function NewCollectionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   choices: { paddingHorizontal: 16, paddingTop: 14, gap: 10 },
   form: { paddingHorizontal: 20, paddingTop: 22, gap: 16 },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.line,
     borderRadius: radius.lg,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
-});
+}));

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'] as const;
 const LENGTH = 4;
@@ -29,6 +30,8 @@ export function PinSheet({
   onComplete: (pin: string) => void;
   onClose: () => void;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [pin, setPin] = useState('');
 
@@ -75,7 +78,7 @@ export function PinSheet({
 
         <View style={styles.status}>
           {busy ? (
-            <ActivityIndicator color={colors.brand} />
+            <ActivityIndicator color={colors.link} />
           ) : error ? (
             <AppText size={12.5} color={colors.danger} align="center">
               {error}
@@ -104,10 +107,10 @@ export function PinSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   scrim: { flex: 1, backgroundColor: 'rgba(32,38,74,0.35)' },
   sheet: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: radius.sheet,
     borderTopRightRadius: radius.sheet,
     paddingHorizontal: 22,
@@ -122,4 +125,4 @@ const styles = StyleSheet.create({
   status: { height: 36, justifyContent: 'center' },
   keys: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 6 },
   key: { width: '33.33%', height: 52, alignItems: 'center', justifyContent: 'center', borderRadius: radius.lg },
-});
+}));

@@ -1,9 +1,10 @@
 import { Pressable } from 'react-native';
-import { colors } from '@/theme';
 import { AppText } from './text';
+import { useColors } from '@/theme/theme-provider';
 
 /** Filter pill: ink when on, white with hairline when off (design 06). */
 export function Chip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
+  const colors = useColors();
   return (
     <Pressable
       onPress={onPress}
@@ -13,9 +14,9 @@ export function Chip({ label, on, onPress }: { label: string; on: boolean; onPre
         borderRadius: 18,
         paddingHorizontal: 14,
         paddingVertical: 8,
-        backgroundColor: on ? colors.ink : colors.white,
+        backgroundColor: on ? colors.chrome : colors.surface,
         borderWidth: 1,
-        borderColor: on ? colors.ink : colors.line,
+        borderColor: on ? colors.chrome : colors.line,
       }}
     >
       <AppText size={12.5} weight={on ? 'semibold' : 'regular'} color={on ? colors.cream : colors.ink}>

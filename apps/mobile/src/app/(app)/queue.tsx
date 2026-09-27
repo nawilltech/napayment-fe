@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { BackHeader } from '@/components/back-header';
 import { Card, Row } from '@/components/card';
@@ -11,9 +11,12 @@ import { useOnline } from '@/hooks/use-online';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { formatNaira, formatTime } from '@napayment/format';
 import { queryClient } from '@/lib/query';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 export default function QueueScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const online = useOnline();
   const queued = useQueuedActions();
   const [checkedAt, setCheckedAt] = useState(Date.now());
@@ -81,7 +84,7 @@ export default function QueueScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   body: { paddingHorizontal: 16, paddingTop: 14, gap: 14 },
   status: {
     backgroundColor: colors.warningSurface,
@@ -96,4 +99,4 @@ const styles = StyleSheet.create({
   statusOnline: { backgroundColor: colors.successSurface, borderColor: '#BFE3CF' },
   dot: { width: 10, height: 10, borderRadius: 5 },
   retry: { borderWidth: 1, borderRadius: radius.md, paddingHorizontal: 12, paddingVertical: 7 },
-});
+}));

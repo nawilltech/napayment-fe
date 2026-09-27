@@ -12,27 +12,29 @@ const TITLES: ShellTitle[] = [
   { prefix: "/processors", title: "Payment processors", short: "Processors" },
   { prefix: "/collection-account", title: "Collection account" },
   { prefix: "/audit-logs", title: "Audit logs" },
+  { prefix: "/settings", title: "Settings" },
 ];
 
 function adminNav(pendingKyc: number): NavGroup[] {
   return [
-    { title: "Overview", items: [{ href: "/overview", label: "Overview" }] },
+    { title: "Overview", items: [{ href: "/overview", label: "Overview", icon: "overview" }] },
     {
       title: "Businesses",
       items: [
-        { href: "/kyc", label: "KYC review", matchPrefix: "/kyc", badge: pendingKyc > 0 ? String(pendingKyc) : undefined },
-        { href: "/businesses", label: "All businesses", matchPrefix: "/businesses" },
+        { href: "/kyc", label: "KYC review", icon: "kycReview", matchPrefix: "/kyc", badge: pendingKyc > 0 ? String(pendingKyc) : undefined },
+        { href: "/businesses", label: "All businesses", icon: "businesses", matchPrefix: "/businesses" },
       ],
     },
-    { title: "Money", items: [{ href: "/transactions", label: "Transactions", matchPrefix: "/transactions" }] },
+    { title: "Money", items: [{ href: "/transactions", label: "Transactions", icon: "transactions", matchPrefix: "/transactions" }] },
     {
       title: "Platform",
       items: [
-        { href: "/processors", label: "Payment processors", matchPrefix: "/processors" },
-        { href: "/collection-account", label: "Collection account", matchPrefix: "/collection-account" },
-        { href: "/audit-logs", label: "Audit logs", matchPrefix: "/audit-logs" },
+        { href: "/processors", label: "Payment processors", icon: "processors", matchPrefix: "/processors" },
+        { href: "/collection-account", label: "Collection account", icon: "bank", matchPrefix: "/collection-account" },
+        { href: "/audit-logs", label: "Audit logs", icon: "auditLogs", matchPrefix: "/audit-logs" },
       ],
     },
+    { title: "Account", items: [{ href: "/settings", label: "Settings", icon: "settings", matchPrefix: "/settings" }] },
   ];
 }
 
@@ -53,6 +55,7 @@ export function AdminShell({
       titles={TITLES}
       account={{ name: "Napayment platform", caption: staff.role }}
       user={{ name: staff.name, email: staff.email }}
+      menuItems={[{ href: "/settings", label: "Settings", icon: "settings" }]}
       onSignOut={() => startTransition(() => signOutAction())}
       footer="Nawill staff only"
     >

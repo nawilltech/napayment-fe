@@ -1,10 +1,11 @@
 import { Pressable, View } from 'react-native';
 import { router } from 'expo-router';
-import { colors } from '@/theme';
 import { AppText } from './text';
+import { useColors } from '@/theme/theme-provider';
 
 /** Title block for pushed screens: back chevron, 22px bold title, optional subtitle. */
 export function BackHeader({ title, subtitle, onBrand }: { title?: string; subtitle?: string; onBrand?: boolean }) {
+  const colors = useColors();
   const fg = onBrand ? colors.cream : colors.ink;
   return (
     <View style={{ paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4 }}>

@@ -1,14 +1,15 @@
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { colors } from '@/theme';
+import type { Colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 type Kind = 'success' | 'failed' | 'held' | 'pending';
 
-const TONE: Record<Kind, string> = {
-  success: colors.success,
-  failed: colors.danger,
-  held: colors.warning,
-  pending: colors.pending,
+const TONE: Record<Kind, keyof Colors> = {
+  success: 'success',
+  failed: 'danger',
+  held: 'warning',
+  pending: 'pending',
 };
 
 // Drawn rather than typed: font glyphs for ✓/× vary by platform and face.
@@ -21,9 +22,10 @@ const PATHS: Record<Kind, string> = {
 
 /** 56px round status mark for receipts and confirmations. */
 export function StatusBadge({ kind }: { kind: Kind }) {
+  const colors = useColors();
   return (
     <View
-      style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: TONE[kind], alignItems: 'center', justifyContent: 'center' }}
+      style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors[TONE[kind]], alignItems: 'center', justifyContent: 'center' }}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >

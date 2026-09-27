@@ -12,7 +12,7 @@ export function CopyButton({ value, label, className }: { value: string; label: 
     <button
       type="button"
       onClick={() => copy(value)}
-      className={cn("inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand hover:text-ink", className)}
+      className={cn("inline-flex items-center gap-1.5 text-[13px] font-semibold text-link hover:text-ink", className)}
     >
       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
       {copied ? "Copied" : label}

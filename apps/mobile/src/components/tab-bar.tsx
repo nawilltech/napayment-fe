@@ -1,17 +1,21 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
-import { colors } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
-/** Text-only tab bar with a short blue bar over the active tab (design 02/05/06/10). */
+/** Icon + label tab bar with a short blue bar over the active tab (design 02/05/06/10). */
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 12) + 6 }]}>
       {state.routes.map((route, index) => {
         const focused = state.index === index;
-        const label = descriptors[route.key].options.title ?? route.name;
+        const { title, tabBarIcon } = descriptors[route.key].options;
+        const label = title ?? route.name;
+        const color = focused ? colors.brand : colors.subtle;
         return (
           <Pressable
             key={route.key}
@@ -24,7 +28,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             style={styles.tab}
           >
             <View style={[styles.indicator, focused && styles.indicatorOn]} />
-            <AppText size={11.5} weight={focused ? 'bold' : 'regular'} color={focused ? colors.brand : colors.subtle}>
+            {tabBarIcon?.({ focused, color, size: TAB_ICON_SIZE })}
+            <AppText size={11.5} weight={focused ? 'bold' : 'regular'} color={color}>
               {label}
             </AppText>
           </Pressable>
@@ -34,9 +39,11 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  bar: { flexDirection: 'row', backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 },
-  tab: { flex: 1, alignItems: 'center', gap: 5, minHeight: 44 },
+const TAB_ICON_SIZE = 22;
+
+const useStyles = makeStyles((colors) => ({
+  bar: { flexDirection: 'row', backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 },
+  tab: { flex: 1, alignItems: 'center', gap: 4, minHeight: 44 },
   indicator: { width: 22, height: 3, borderRadius: 2 },
   indicatorOn: { backgroundColor: colors.brand },
-});
+}));

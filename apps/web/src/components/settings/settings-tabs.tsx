@@ -2,16 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@napayment/ui/icon";
 import { cn } from "@napayment/ui/lib/cn";
+import type { IconName } from "@napayment/ui-tokens";
 import { useScrollActiveIntoView } from "@napayment/ui/lib/use-scroll-active-into-view";
 
 // businessOnly tabs call endpoints the backend rejects for accounts without a business.
-const TABS = [
-  { href: "/dashboard/settings/profile", label: "Profile" },
-  { href: "/dashboard/settings/contact", label: "Contact", businessOnly: true },
-  { href: "/dashboard/settings/team", label: "Team", businessOnly: true },
-  { href: "/dashboard/settings/api-keys", label: "API keys & webhooks", businessOnly: true },
-  { href: "/dashboard/settings/security", label: "Security" },
+const TABS: { href: string; label: string; icon: IconName; businessOnly?: boolean }[] = [
+  { href: "/dashboard/settings/profile", label: "Profile", icon: "profile" },
+  { href: "/dashboard/settings/contact", label: "Contact", icon: "contact", businessOnly: true },
+  { href: "/dashboard/settings/team", label: "Team", icon: "team", businessOnly: true },
+  { href: "/dashboard/settings/api-keys", label: "API keys & webhooks", icon: "apiKeys", businessOnly: true },
+  { href: "/dashboard/settings/security", label: "Security", icon: "security" },
+  { href: "/dashboard/settings/preferences", label: "Preferences", icon: "preferences" },
 ];
 
 export function SettingsTabs({ business }: { business: boolean }) {
@@ -28,10 +31,11 @@ export function SettingsTabs({ business }: { business: boolean }) {
               href={tab.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "-mb-px whitespace-nowrap border-b-2 border-transparent pb-3 pt-3.5 text-[13.5px] text-subtle transition-colors hover:text-ink",
+                "-mb-px flex items-center gap-1.5 whitespace-nowrap border-b-2 border-transparent pb-3 pt-3.5 text-[13.5px] text-subtle transition-colors hover:text-ink",
                 active && "border-brand font-semibold text-ink",
               )}
             >
+              <Icon name={tab.icon} className="size-4" />
               {tab.label}
             </Link>
           );

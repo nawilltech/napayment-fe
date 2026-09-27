@@ -1,4 +1,4 @@
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, View } from 'react-native';
 import { router } from 'expo-router';
 import type { PaymentLinkResponse } from '@napayment/api-client';
 import { Card, Row } from '@/components/card';
@@ -14,7 +14,8 @@ import { useQueuedActions } from '@/hooks/use-outbox';
 import { errorMessage, isForbidden } from '@/lib/api';
 import { formatDate, formatNaira } from '@napayment/format';
 import { linkLabel, linkMessage, linkUrl, shareSms, shareText, shareWhatsApp } from '@/lib/share';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 const linkKind = (l: PaymentLinkResponse) =>
   `${l.linkType === 'PERMANENT' ? 'Permanent' : 'Temporary'} · ${l.singleUse ? 'Single use' : 'Multi-use'}`;
@@ -29,6 +30,8 @@ function linkMeta(l: PaymentLinkResponse) {
 }
 
 export default function CollectScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const links = usePaymentLinks();
   const revoke = useRevokePaymentLink();
   const queued = useQueuedActions().filter((q) => q.title.startsWith('Payment link'));
@@ -109,7 +112,7 @@ export default function CollectScreen() {
           </Pressable>
           <View style={styles.shareRow}>
             <Pressable onPress={() => shareWhatsApp(linkMessage(featured))} accessibilityRole="button" style={[styles.shareBtn, styles.shareCream]}>
-              <AppText size={13.5} weight="semibold">
+              <AppText size={13.5} weight="semibold" color={colors.chrome}>
                 WhatsApp
               </AppText>
             </Pressable>
@@ -133,7 +136,7 @@ export default function CollectScreen() {
             For walk-in payments. Expires in 30 minutes.
           </AppText>
         </View>
-        <AppText size={16} color={colors.brand}>
+        <AppText size={16} color={colors.link}>
           →
         </AppText>
       </Pressable>
@@ -186,10 +189,10 @@ export default function CollectScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12 },
   newBtn: { backgroundColor: colors.brand, borderRadius: radius.lg, paddingHorizontal: 14, paddingVertical: 10 },
-  featured: { marginHorizontal: 16, backgroundColor: colors.ink, borderRadius: 16, padding: 18 },
+  featured: { marginHorizontal: 16, backgroundColor: colors.chrome, borderRadius: 16, padding: 18 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   activeTag: { backgroundColor: colors.success, borderRadius: 4, paddingHorizontal: 7, paddingVertical: 2 },
   linkBox: {
@@ -209,7 +212,7 @@ const styles = StyleSheet.create({
   oneTime: {
     marginHorizontal: 16,
     marginTop: 12,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.line,
     borderRadius: radius.xl,
@@ -219,4 +222,4 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   list: { marginHorizontal: 16 },
-});
+}));
