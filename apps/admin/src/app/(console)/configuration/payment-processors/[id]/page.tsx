@@ -9,8 +9,8 @@ import {
   ProcessorForAllSwitch,
   ProcessorLogoEditor,
   ProcessorMethodsEditor,
-  ProcessorPlatformSwitch,
 } from "@/components/processor-admin";
+import { EntityActions } from "@/components/entity-actions";
 import { LogoTile } from "@/components/processor-logo";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
@@ -43,8 +43,8 @@ export default async function PaymentProcessorPage({ params }: { params: Promise
             </div>
           </div>
         </div>
-        <Badge variant={processor.status === "ACTIVE" ? "success" : "neutral"}>
-          {processor.status === "ACTIVE" ? "Active" : "Inactive"}
+        <Badge variant={processor.archivedAt ? "warning" : processor.status === "ACTIVE" ? "success" : "neutral"}>
+          {processor.archivedAt ? "Archived" : processor.status === "ACTIVE" ? "Active" : "Inactive"}
         </Badge>
       </div>
 
@@ -81,11 +81,18 @@ export default async function PaymentProcessorPage({ params }: { params: Promise
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Platform</CardTitle>
+            <CardTitle>Status</CardTitle>
             <CardDescription>The master switch for this processor.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ProcessorPlatformSwitch processor={processor} />
+          <CardContent className="space-y-3">
+            <p className="text-[13.5px] text-muted">
+              {processor.archivedAt
+                ? "Archived: hidden from the processor list and business settings, and it can't take payments. Its history is kept."
+                : processor.status === "ACTIVE"
+                  ? "Active: businesses can use it according to their settings."
+                  : "Inactive: no business can use it. Each business's own setting is kept for when it's reactivated."}
+            </p>
+            <EntityActions kind="processor" item={processor} variant="page" />
           </CardContent>
         </Card>
       </div>

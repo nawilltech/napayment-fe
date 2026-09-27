@@ -4,11 +4,8 @@ import { notFound } from "next/navigation";
 import { ApiError, ErrorCode } from "@napayment/api-client";
 import { Badge } from "@napayment/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
-import {
-  DeletePaymentMethodButton,
-  PaymentMethodDetailsForm,
-  PaymentMethodPlatformSwitch,
-} from "@/components/payment-method-admin";
+import { EntityActions } from "@/components/entity-actions";
+import { PaymentMethodDetailsForm } from "@/components/payment-method-admin";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
 
@@ -31,8 +28,8 @@ export default async function PaymentMethodPage({ params }: { params: Promise<{ 
           <h2 className="mt-1 text-xl font-bold text-ink">{method.name}</h2>
           <p className="font-mono text-[12px] text-subtle">{method.code}</p>
         </div>
-        <Badge variant={method.status === "ACTIVE" ? "success" : "neutral"}>
-          {method.status === "ACTIVE" ? "Active" : "Inactive"}
+        <Badge variant={method.archivedAt ? "warning" : method.status === "ACTIVE" ? "success" : "neutral"}>
+          {method.archivedAt ? "Archived" : method.status === "ACTIVE" ? "Active" : "Inactive"}
         </Badge>
       </div>
 
@@ -45,25 +42,22 @@ export default async function PaymentMethodPage({ params }: { params: Promise<{ 
             <PaymentMethodDetailsForm method={method} />
           </CardContent>
         </Card>
-        <div className="flex flex-col gap-5">
-          <Card>
-            <CardHeader>
-              <CardTitle>Platform</CardTitle>
-              <CardDescription>The master switch for this payment method.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PaymentMethodPlatformSwitch method={method} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Delete</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DeletePaymentMethodButton method={method} />
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Status</CardTitle>
+            <CardDescription>The master switch for this payment method.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-[13.5px] text-muted">
+              {method.archivedAt
+                ? "Archived: hidden from the list and processor forms, and it can't take payments. Processors and past transactions keep referring to it."
+                : method.status === "ACTIVE"
+                  ? `Active: ${method.processorCount} processor(s) can take payments with it.`
+                  : "Inactive: no processor can take new payments with it."}
+            </p>
+            <EntityActions kind="paymentMethod" item={method} variant="page" />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

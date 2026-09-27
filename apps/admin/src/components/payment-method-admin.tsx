@@ -1,21 +1,15 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect } from "react";
 import type { PaymentMethodResponse } from "@napayment/api-client";
-import type { ActionState } from "@napayment/bff/actions";
-import { plural } from "@napayment/format";
-import { Button } from "@napayment/ui/button";
 import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
 import {
   createPaymentMethodAction,
-  deletePaymentMethodAction,
-  setPaymentMethodActiveAction,
   updatePaymentMethodAction,
 } from "@/app/actions";
 import { CreateDialog } from "./create-dialog";
 import { FormFeedback, SubmitButton } from "./form-feedback";
-import { PasswordConfirmButton } from "./password-confirm-button";
 
 /** "+ Add payment method": the create form in a dialog. */
 export function AddPaymentMethodButton() {
@@ -91,67 +85,3 @@ export function PaymentMethodDetailsForm({ method }: { method: PaymentMethodResp
   );
 }
 
-export function PaymentMethodPlatformSwitch({ method }: { method: PaymentMethodResponse }) {
-  const active = method.status === "ACTIVE";
-  return (
-    <div className="space-y-3">
-      <p className="text-[13.5px] text-muted">
-        {active
-          ? "Active: processors that offer it can take payments with it."
-          : "Inactive: no processor can take new payments with it. Processors keep it listed for when it's reactivated."}
-      </p>
-      <PasswordConfirmButton
-        label={active ? "Deactivate for the platform" : "Activate for the platform"}
-        title={active ? `Deactivate ${method.name}?` : `Activate ${method.name}?`}
-        description={
-          active
-            ? `Payments with ${method.name} will stop across every processor and business until it's reactivated.`
-            : `Processors that offer ${method.name} will be able to take payments with it again.`
-        }
-        confirmLabel={active ? "Deactivate" : "Activate"}
-        variant={active ? "destructive" : "primary"}
-        onConfirm={(password) => setPaymentMethodActiveAction(method.id, !active, password)}
-      />
-    </div>
-  );
-}
-
-/** Delete while unused; once processors or transactions use it, only deactivation is possible. */
-export function DeletePaymentMethodButton({ method }: { method: PaymentMethodResponse }) {
-  const [confirming, setConfirming] = useState(false);
-  const [state, setState] = useState<ActionState>({});
-  const [pending, startTransition] = useTransition();
-
-  if (method.processorCount > 0) {
-    return (
-      <p className="text-[13.5px] text-muted">
-        Used by {plural(method.processorCount, "processor")}, so it can&apos;t be deleted - deactivate it instead.
-      </p>
-    );
-  }
-  return (
-    <div className="space-y-3">
-      <p className="text-[13.5px] text-muted">Not used by any processor. Deleting is permanent.</p>
-      <FormFeedback state={state} />
-      {confirming ? (
-        <div className="flex gap-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            loading={pending}
-            onClick={() => startTransition(async () => setState(await deletePaymentMethodAction(method.id)))}
-          >
-            Delete {method.name}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => setConfirming(false)}>
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <Button variant="outline" size="sm" onClick={() => setConfirming(true)}>
-          Delete…
-        </Button>
-      )}
-    </div>
-  );
-}

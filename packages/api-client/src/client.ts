@@ -346,7 +346,11 @@ export function createBackendClient(config: ApiClientConfig) {
         apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/activate`, { method: "POST" }),
       /** The payment method catalogue (FR-Proc-2). */
       paymentMethods: {
-        list: () => apiRequest<T.PaymentMethodResponse[]>(config, "/api/v1/admin/payment-methods"),
+        /** Archived methods are hidden unless `archived` asks for exactly those. */
+        list: (filter?: { archived?: boolean }) =>
+          apiRequest<T.PaymentMethodResponse[]>(config, "/api/v1/admin/payment-methods", {
+            query: { archived: filter?.archived },
+          }),
         get: (id: string) => apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}`),
         create: (body: T.CreatePaymentMethodRequest) =>
           apiRequest<T.PaymentMethodResponse>(config, "/api/v1/admin/payment-methods", { method: "POST", body }),
@@ -359,13 +363,29 @@ export function createBackendClient(config: ApiClientConfig) {
             `/api/v1/admin/payment-methods/${id}/${active ? "activate" : "deactivate"}`,
             { method: "POST", body },
           ),
-        /** Only while unused - otherwise PAYMENT_METHOD_IN_USE; deactivate instead. */
-        delete: (id: string) => apiRequest<void>(config, `/api/v1/admin/payment-methods/${id}`, { method: "DELETE" }),
+        /** Soft delete: deactivates and hides it (requires the staff password). */
+        archive: (id: string, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}/archive`, { method: "POST", body }),
+        /** Back in the catalogue, still inactive. */
+        restore: (id: string) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}/restore`, { method: "POST" }),
       },
       paymentProcessors: {
-        list: (params?: T.PageParams) =>
+        /** Archived processors are hidden unless `archived` asks for exactly those. */
+        list: (params?: T.PageParams, filter?: { archived?: boolean }) =>
           apiRequest<T.PageResponse<T.PaymentProcessorResponse>>(config, "/api/v1/admin/payment-processors", {
-            query: toPageQuery(params),
+            query: { ...toPageQuery(params), archived: filter?.archived },
+          }),
+        /** Soft delete: deactivates and hides it (requires the staff password). */
+        archive: (id: string, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/archive`, {
+            method: "POST",
+            body,
+          }),
+        /** Back in the lists, still inactive. */
+        restore: (id: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/restore`, {
+            method: "POST",
           }),
         get: (id: string) => apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}`),
         create: (body: T.CreatePaymentProcessorRequest) =>

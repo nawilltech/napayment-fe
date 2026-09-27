@@ -15,7 +15,6 @@ import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
 import {
   createProcessorAction,
-  setProcessorActiveAction,
   setProcessorForAllAction,
   setProcessorLogoAction,
   setProcessorMethodAction,
@@ -23,7 +22,7 @@ import {
 } from "@/app/actions";
 import { CreateDialog } from "./create-dialog";
 import { FormFeedback, SubmitButton } from "./form-feedback";
-import { PasswordConfirmButton } from "./password-confirm-button";
+import { ConfirmAction } from "./confirm-action";
 import { LogoPicker } from "./processor-logo";
 
 /** Payment method chips; retired methods are struck through. */
@@ -203,31 +202,6 @@ export function ProcessorMethodsEditor({
   );
 }
 
-export function ProcessorPlatformSwitch({ processor }: { processor: PaymentProcessorResponse }) {
-  const active = processor.status === "ACTIVE";
-  return (
-    <div className="space-y-3">
-      <p className="text-[13.5px] text-muted">
-        {active
-          ? "Active: businesses can use it according to their settings below."
-          : "Inactive: no business can use it. Each business's own setting is kept for when it's reactivated."}
-      </p>
-      <PasswordConfirmButton
-        label={active ? "Deactivate for the platform" : "Activate for the platform"}
-        title={active ? `Deactivate ${processor.name}?` : `Activate ${processor.name}?`}
-        description={
-          active
-            ? "No business will be able to take payments through it until it's reactivated."
-            : "Businesses will be able to use it again, following their own settings or the default."
-        }
-        confirmLabel={active ? "Deactivate" : "Activate"}
-        variant={active ? "destructive" : "primary"}
-        onConfirm={(password) => setProcessorActiveAction(processor.id, !active, password)}
-      />
-    </div>
-  );
-}
-
 export function ProcessorForAllSwitch({ processor }: { processor: PaymentProcessorResponse }) {
   const overrides = processor.businessesSwitchedOn + processor.businessesSwitchedOff;
   const clears = overrides > 0 ? ` This clears ${plural(overrides, "business setting")}.` : "";
@@ -238,19 +212,21 @@ export function ProcessorForAllSwitch({ processor }: { processor: PaymentProcess
         {processor.businessesSwitchedOn} switched on and {processor.businessesSwitchedOff} switched off individually.
       </p>
       <div className="flex flex-wrap items-start gap-2">
-        <PasswordConfirmButton
+        <ConfirmAction
+          icon="activate"
           label="Switch on for all businesses"
           title={`Switch ${processor.name} on for all businesses?`}
           description={`Every business will be able to use it.${clears}`}
           confirmLabel="Switch on for all"
           onConfirm={(password) => setProcessorForAllAction(processor.id, true, password)}
         />
-        <PasswordConfirmButton
+        <ConfirmAction
+          icon="deactivate"
           label="Switch off for all businesses"
           title={`Switch ${processor.name} off for all businesses?`}
           description={`No business will be able to use it unless switched on individually later.${clears}`}
           confirmLabel="Switch off for all"
-          variant="destructive"
+          destructive
           onConfirm={(password) => setProcessorForAllAction(processor.id, false, password)}
         />
       </div>

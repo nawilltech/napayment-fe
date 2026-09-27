@@ -183,14 +183,15 @@ export async function setPaymentMethodActiveAction(id: string, active: boolean, 
   return paymentMethodChange(id, (client) => client.admin.paymentMethods.setActive(id, active, parsed.data));
 }
 
-/** Deletes an unused method and returns to the list; the backend refuses one still in use. */
-export async function deletePaymentMethodAction(id: string): Promise<ActionState> {
-  const state = await toActionState(async () => {
-    await (await authedBackendClient()).admin.paymentMethods.delete(id);
-  });
-  if (state.error) return state;
-  revalidatePath(ROUTES.paymentMethods);
-  redirect(ROUTES.paymentMethods);
+/** Soft delete - deactivates and hides it; password-confirmed. */
+export async function archivePaymentMethodAction(id: string, password: string): Promise<ActionState> {
+  const parsed = passwordSchema.safeParse({ password });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.archive(id, parsed.data));
+}
+
+export async function restorePaymentMethodAction(id: string): Promise<ActionState> {
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.restore(id));
 }
 
 async function paymentMethodChange(id: string, change: (client: BackendClient) => Promise<unknown>): Promise<ActionState> {
@@ -202,6 +203,17 @@ async function paymentMethodChange(id: string, change: (client: BackendClient) =
   // Processor pages label methods from the catalogue.
   revalidatePath(ROUTES.paymentProcessors);
   return state;
+}
+
+/** Soft delete - deactivates and hides it from lists and business settings; password-confirmed. */
+export async function archiveProcessorAction(id: string, password: string): Promise<ActionState> {
+  const parsed = passwordSchema.safeParse({ password });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return processorChange(id, (client) => client.admin.paymentProcessors.archive(id, parsed.data));
+}
+
+export async function restoreProcessorAction(id: string): Promise<ActionState> {
+  return processorChange(id, (client) => client.admin.paymentProcessors.restore(id));
 }
 
 export type BusinessProcessorSetting = "on" | "off" | "default";

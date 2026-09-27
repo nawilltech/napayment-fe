@@ -472,8 +472,10 @@ export interface PaymentMethodResponse {
   displayOrder: number;
   /** Platform switch: INACTIVE = no processor may take new payments with it. */
   status: EntityStatus;
-  /** Processors that list it; a method is deletable only while unused. */
+  /** Processors that list it. */
   processorCount: number;
+  /** When it was archived (hidden from lists, kept for history); null = not archived. */
+  archivedAt: string | null;
   createdAt: string;
 }
 
@@ -549,6 +551,8 @@ export interface PaymentProcessorResponse {
   /** Businesses with their own ON / OFF setting instead of following defaultEnabled. */
   businessesSwitchedOn: number;
   businessesSwitchedOff: number;
+  /** When it was archived (hidden from lists, kept for history); null = not archived. */
+  archivedAt: string | null;
   createdAt: string;
 }
 
@@ -814,13 +818,16 @@ export const AUDIT_EVENT_TYPES = [
   "PAYMENT_PROCESSOR_UPDATED",
   "PAYMENT_PROCESSOR_ACTIVATED",
   "PAYMENT_PROCESSOR_DEACTIVATED",
+  "PAYMENT_PROCESSOR_ARCHIVED",
+  "PAYMENT_PROCESSOR_RESTORED",
   "PAYMENT_METHOD_ENABLED",
   "PAYMENT_METHOD_DISABLED",
   "PAYMENT_METHOD_CREATED",
   "PAYMENT_METHOD_UPDATED",
   "PAYMENT_METHOD_ACTIVATED",
   "PAYMENT_METHOD_DEACTIVATED",
-  "PAYMENT_METHOD_DELETED",
+  "PAYMENT_METHOD_ARCHIVED",
+  "PAYMENT_METHOD_RESTORED",
   "PAYMENT_PROCESSOR_ENABLED_FOR_ALL",
   "PAYMENT_PROCESSOR_DISABLED_FOR_ALL",
   "BUSINESS_PAYMENT_PROCESSOR_SET",
