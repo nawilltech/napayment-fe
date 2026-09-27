@@ -11,7 +11,7 @@ import { useMe, useTransaction } from '@/hooks/queries';
 import { errorMessage } from '@/lib/api';
 import { describeTransaction, displayName, formatDateTime, formatNaira } from '@napayment/format';
 import { shareText } from '@/lib/share';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 function headline(txn: TransactionResponse) {
   const { credit } = describeTransaction(txn);
@@ -29,6 +29,7 @@ function headline(txn: TransactionResponse) {
 }
 
 export default function ReceiptScreen() {
+  const colors = useColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const txn = useTransaction(id);
   const me = useMe();

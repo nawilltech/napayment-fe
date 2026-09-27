@@ -1,10 +1,11 @@
 import { Field, type FieldProps } from './field';
 import { AppText } from './text';
 import { formatAmountInput } from '@napayment/format';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 /** Large mono naira entry (design 03): "₦" prefix, thousands grouped as you type. */
 export function AmountField({ value, onChangeText, ...props }: FieldProps & { value: string; onChangeText: (v: string) => void }) {
+  const colors = useColors();
   return (
     <Field
       large

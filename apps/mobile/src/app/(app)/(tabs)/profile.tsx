@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import Constants from 'expo-constants';
 import { router, type Href } from 'expo-router';
 import { Card, Row } from '@/components/card';
@@ -10,12 +10,14 @@ import { useMe, useSettlementAccounts } from '@/hooks/queries';
 import { useQueuedActions } from '@/hooks/use-outbox';
 import { useSession } from '@/hooks/use-session';
 import { displayName, initials } from '@napayment/format';
-import { colors } from '@/theme';
-import type { IconName } from '@napayment/ui-tokens';
+import { THEME_PREFERENCE_OPTIONS, type IconName } from '@napayment/ui-tokens';
+import { makeStyles, useColors, useTheme } from '@/theme/theme-provider';
 
 type Item = { label: string; icon: IconName; value?: string; href?: Href; onPress?: () => void; danger?: boolean };
 
 function Group({ title, items }: { title: string; items: Item[] }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <>
       <SectionHeader title={title} />
@@ -43,6 +45,9 @@ function Group({ title, items }: { title: string; items: Item[] }) {
 }
 
 export default function ProfileScreen() {
+  const { preference } = useTheme();
+  const colors = useColors();
+  const styles = useStyles();
   const me = useMe();
   const settlement = useSettlementAccounts();
   const queued = useQueuedActions().length;
@@ -103,6 +108,12 @@ export default function ProfileScreen() {
         ]}
       />
       <Group
+        title="Preferences"
+        items={[
+          { label: 'Appearance', icon: 'preferences', value: THEME_PREFERENCE_OPTIONS[preference].label, href: '/settings/appearance' },
+        ]}
+      />
+      <Group
         title="Account"
         items={[
           {
@@ -123,9 +134,9 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   label: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingTop: 22, paddingBottom: 16 },
-  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.chrome, alignItems: 'center', justifyContent: 'center' },
   kyc: { marginHorizontal: 16, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row', alignItems: 'center' },
-});
+}));

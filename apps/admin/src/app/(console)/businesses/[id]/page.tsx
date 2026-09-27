@@ -143,7 +143,7 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
                       {doc.fileName} · {(doc.sizeBytes / 1024 / 1024).toFixed(1)} MB
                     </span>
                   </span>
-                  <a href={`/api/kyc-documents/${doc.id}`} className="shrink-0 text-[13px] font-semibold text-brand hover:text-ink">
+                  <a href={`/api/kyc-documents/${doc.id}`} className="shrink-0 text-[13px] font-semibold text-link hover:text-ink">
                     Download
                   </a>
                 </li>

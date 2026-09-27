@@ -1,10 +1,14 @@
 import { View } from 'react-native';
-import { colors, statusTone, type StatusKey } from '@/theme';
+import { statusTone, type StatusKey } from '@/theme';
 import { AppText } from './text';
+import { useColors } from '@/theme/theme-provider';
 
 /** Mono stamp for payment state. `plain` drops the surface (list meta line in the design). */
 export function StatusTag({ status, plain }: { status: string; plain?: boolean }) {
-  const [fg, bg] = statusTone[status as StatusKey] ?? [colors.subtle, colors.lineSoft];
+  const colors = useColors();
+  const [fgRole, bgRole] = statusTone[status as StatusKey] ?? (['subtle', 'lineSoft'] as const);
+  const fg = colors[fgRole];
+  const bg = colors[bgRole];
   const label = status.replaceAll('_', ' ');
   if (plain) {
     return (

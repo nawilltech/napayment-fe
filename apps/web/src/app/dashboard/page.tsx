@@ -60,7 +60,7 @@ export default async function DashboardPage() {
             <div className="mt-[18px] flex flex-wrap gap-2.5">
               <Link
                 href="/dashboard/send"
-                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-cream px-3.5 text-[13.5px] font-semibold text-ink transition-colors hover:bg-sand"
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-cream px-3.5 text-[13.5px] font-semibold text-chrome transition-opacity hover:opacity-90"
               >
                 <Icon name="send" className="size-4" />
                 Send money
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
             {recentTransactions && (
               <Link
                 href="/dashboard/transactions"
-                className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:text-ink"
+                className="inline-flex items-center gap-1 text-[13px] font-semibold text-link hover:text-ink"
               >
                 View all
                 <ArrowRight className="size-3.5" />
@@ -204,16 +204,16 @@ export default async function DashboardPage() {
               .map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="group flex items-center gap-3 py-2.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-surface text-brand">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-surface text-link">
                     <Icon name={item.icon} className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[13.5px] font-semibold text-ink group-hover:text-brand">
+                    <span className="block text-[13.5px] font-semibold text-ink group-hover:text-link">
                       {item.label}
                     </span>
                     <span className="block truncate text-xs text-subtle">{item.hint}</span>
                   </span>
-                  <ArrowRight className="size-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
+                  <ArrowRight className="size-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-link" />
                 </Link>
               </li>
             ))}

@@ -15,7 +15,7 @@ import { useOnline } from '@/hooks/use-online';
 import { errorMessage, isForbidden } from '@/lib/api';
 import { formatNaira, nairaToKobo } from '@napayment/format';
 import { newIdempotencyKey, outboxKeys, type SettleVars } from '@/lib/outbox';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 /**
  * Withdraw = settle the wallet balance out to the business's settlement
@@ -25,6 +25,7 @@ import { colors } from '@/theme';
  * this confirms explicitly instead of showing a PIN pad that nothing checks.
  */
 export default function WithdrawScreen() {
+  const colors = useColors();
   const online = useOnline();
   const wallet = useWallet();
   const settlementAccounts = useSettlementAccounts();

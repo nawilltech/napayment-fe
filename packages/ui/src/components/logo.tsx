@@ -9,7 +9,7 @@ type Tone = "brand" | "cream" | "ink";
 const TILE: Record<Tone, { fill: string; letter: string }> = {
   brand: { fill: "fill-brand", letter: "text-cream" },
   cream: { fill: "fill-cream", letter: "text-ink" },
-  ink: { fill: "fill-ink", letter: "text-cream" },
+  ink: { fill: "fill-ink", letter: "text-background" },
 };
 
 /**

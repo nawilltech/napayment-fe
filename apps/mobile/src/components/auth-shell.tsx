@@ -1,13 +1,16 @@
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { LogoMark, Wordmark } from './logo';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 /** Blue brand panel over a cream sheet (design 01 Sign in). `compact` shrinks the panel for longer forms. */
 export function AuthShell({ children, compact }: { children: ReactNode; compact?: boolean }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <SafeAreaView edges={['top']} style={styles.root}>
       <StatusBar style="light" />
@@ -31,13 +34,13 @@ export function AuthShell({ children, compact }: { children: ReactNode; compact?
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   root: { flex: 1, backgroundColor: colors.brand },
   scroll: { flexGrow: 1 },
   hero: { flex: 1, minHeight: 300, alignItems: 'center', justifyContent: 'center', gap: 16, paddingHorizontal: 28, paddingVertical: 32 },
   heroCompact: { minHeight: 0, flex: 0, gap: 10, paddingVertical: 24 },
   sheet: {
-    backgroundColor: colors.cream,
+    backgroundColor: colors.background,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 22,
@@ -46,9 +49,9 @@ const styles = StyleSheet.create({
     gap: 14,
     flexGrow: 0,
   },
-});
+}));
 
-export const authStyles = StyleSheet.create({
+export const useAuthStyles = makeStyles((colors) => ({
   links: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   errorBox: { backgroundColor: colors.dangerSurface, borderRadius: radius.lg, padding: 12 },
-});
+}));

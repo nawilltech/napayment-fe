@@ -82,7 +82,7 @@ export async function BusinessList({
             {businesses.content.map((b) => (
               <Tr key={b.id} className="hover:bg-paper">
                 <Td>
-                  <Link href={`/businesses/${b.id}`} className="font-semibold text-ink hover:text-brand">
+                  <Link href={`/businesses/${b.id}`} className="font-semibold text-ink hover:text-link">
                     {b.name}
                   </Link>
                 </Td>

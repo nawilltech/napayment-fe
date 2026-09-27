@@ -1,7 +1,8 @@
 import { forwardRef, useState, type ReactNode } from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
-import { colors, fonts, radius } from '@/theme';
+import { TextInput, View, type TextInputProps } from 'react-native';
+import { fonts, radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 export interface FieldProps extends TextInputProps {
   label?: string;
@@ -20,6 +21,8 @@ export const Field = forwardRef<TextInput, FieldProps>(function Field(
   { label, hint, error, mono, prefix, suffix, large, style, onFocus, onBlur, ...props },
   ref,
 ) {
+  const colors = useColors();
+  const styles = useStyles();
   const [focused, setFocused] = useState(false);
   return (
     <View style={styles.wrap}>
@@ -71,13 +74,13 @@ export const Field = forwardRef<TextInput, FieldProps>(function Field(
   );
 });
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   wrap: { gap: 6 },
   box: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.white,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.line,
     borderRadius: radius.lg,
@@ -86,4 +89,4 @@ const styles = StyleSheet.create({
   focused: { borderWidth: 2, borderColor: colors.brand, paddingHorizontal: 13 },
   errored: { borderColor: colors.danger },
   input: { flex: 1, height: '100%', color: colors.ink, paddingVertical: 0 },
-});
+}));

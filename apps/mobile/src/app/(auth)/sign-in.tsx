@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { View, type TextInput } from 'react-native';
 import { Link } from 'expo-router';
 import { loginSchema } from '@napayment/schemas';
-import { AuthShell, authStyles } from '@/components/auth-shell';
+import { AuthShell, useAuthStyles } from '@/components/auth-shell';
 import { Button } from '@/components/button';
 import { Field } from '@/components/field';
 import { FormError } from '@/components/form-error';
@@ -11,10 +11,12 @@ import { AppText } from '@/components/text';
 import { useSession } from '@/hooks/use-session';
 import { errorMessage } from '@/lib/api';
 import { validate } from '@/lib/validation';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 // Backend login is email + password (LoginRequest) - the design's phone field waits on phone login.
 export default function SignInScreen() {
+  const authStyles = useAuthStyles();
+  const colors = useColors();
   const { signIn } = useSession();
   const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState('');
@@ -70,14 +72,14 @@ export default function SignInScreen() {
       <Button title="Sign in" onPress={submit} loading={busy} style={{ marginTop: 4 }} />
       <View style={authStyles.links}>
         <Link href="/forgot-password" accessibilityRole="link">
-          <AppText size={13} weight="semibold" color={colors.brand}>
+          <AppText size={13} weight="semibold" color={colors.link}>
             Forgot password?
           </AppText>
         </Link>
         <AppText size={13} color={colors.muted}>
           New here?{' '}
           <Link href="/sign-up" accessibilityRole="link">
-            <AppText size={13} weight="semibold" color={colors.brand}>
+            <AppText size={13} weight="semibold" color={colors.link}>
               Sign up
             </AppText>
           </Link>

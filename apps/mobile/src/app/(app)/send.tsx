@@ -18,13 +18,14 @@ import { newIdempotencyKey, useResolveRecipient, useTransfer, useWallet } from '
 import { useOnline } from '@/hooks/use-online';
 import { errorMessage } from '@/lib/api';
 import { formatDateTime, formatNaira, nairaToKobo } from '@napayment/format';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 /**
  * Send to another Napayment account (FR-Auth-1). Online-only: the PIN is
  * required per transfer and is never written to the offline outbox.
  */
 export default function SendScreen() {
+  const colors = useColors();
   const online = useOnline();
   const wallet = useWallet();
   const resolve = useResolveRecipient();
@@ -150,7 +151,7 @@ export default function SendScreen() {
                 <AppText
                   size={12.5}
                   weight="semibold"
-                  color={colors.brand}
+                  color={colors.link}
                   onPress={() => {
                     setRecipient(null);
                     setAmount('');

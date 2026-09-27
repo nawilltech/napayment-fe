@@ -9,10 +9,11 @@ import { FormError } from '@/components/form-error';
 import { AppText } from '@/components/text';
 import { errorMessage, publicClient } from '@/lib/api';
 import { validate } from '@/lib/validation';
-import { colors } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 /** Two steps on one screen: request a 6-digit code, then set a new password with it. */
 export default function ForgotPasswordScreen() {
+  const colors = useColors();
   const [step, setStep] = useState<'request' | 'reset' | 'done'>('request');
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');

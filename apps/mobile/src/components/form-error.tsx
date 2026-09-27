@@ -1,8 +1,10 @@
 import { View } from 'react-native';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { useColors } from '@/theme/theme-provider';
 
 export function FormError({ message }: { message?: string | null }) {
+  const colors = useColors();
   if (!message) return null;
   return (
     <View accessibilityLiveRegion="polite" style={{ backgroundColor: colors.dangerSurface, borderRadius: radius.lg, padding: 12 }}>

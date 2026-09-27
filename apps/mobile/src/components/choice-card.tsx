@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native';
-import { colors, radius } from '@/theme';
+import { Pressable, View } from 'react-native';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 /** Radio card (design 03): 2px blue border + filled ring when selected. */
 export function ChoiceCard({
@@ -14,6 +15,8 @@ export function ChoiceCard({
   selected: boolean;
   onPress: () => void;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -34,11 +37,11 @@ export function ChoiceCard({
   );
 }
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: colors.white, borderRadius: radius.card, padding: 16, flexDirection: 'row', gap: 14 },
+const useStyles = makeStyles((colors) => ({
+  card: { backgroundColor: colors.surface, borderRadius: radius.card, padding: 16, flexDirection: 'row', gap: 14 },
   on: { borderWidth: 2, borderColor: colors.brand, padding: 15 },
   off: { borderWidth: 1, borderColor: colors.line },
   ring: { width: 22, height: 22, borderRadius: 11, marginTop: 2 },
   ringOn: { borderWidth: 6, borderColor: colors.brand },
   ringOff: { borderWidth: 2, borderColor: colors.tan },
-});
+}));

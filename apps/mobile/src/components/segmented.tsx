@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native';
-import { colors, radius } from '@/theme';
+import { Pressable, View } from 'react-native';
+import { radius } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 export function Segmented<T extends string>({
   value,
@@ -11,6 +12,8 @@ export function Segmented<T extends string>({
   options: { value: T; label: string }[];
   onChange: (value: T) => void;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.track} accessibilityRole="radiogroup">
       {options.map((o) => {
@@ -33,8 +36,8 @@ export function Segmented<T extends string>({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   track: { flexDirection: 'row', backgroundColor: colors.lineSoft, borderRadius: radius.md, padding: 4 },
   item: { flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: radius.sm },
-  on: { backgroundColor: colors.white, boxShadow: '0 1px 2px rgba(32,38,74,0.1)' },
-});
+  on: { backgroundColor: colors.surface, boxShadow: '0 1px 2px rgba(32,38,74,0.1)' },
+}));

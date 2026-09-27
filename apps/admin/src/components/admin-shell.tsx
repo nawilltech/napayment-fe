@@ -12,6 +12,7 @@ const TITLES: ShellTitle[] = [
   { prefix: "/processors", title: "Payment processors", short: "Processors" },
   { prefix: "/collection-account", title: "Collection account" },
   { prefix: "/audit-logs", title: "Audit logs" },
+  { prefix: "/settings", title: "Settings" },
 ];
 
 function adminNav(pendingKyc: number): NavGroup[] {
@@ -33,6 +34,7 @@ function adminNav(pendingKyc: number): NavGroup[] {
         { href: "/audit-logs", label: "Audit logs", icon: "auditLogs", matchPrefix: "/audit-logs" },
       ],
     },
+    { title: "Account", items: [{ href: "/settings", label: "Settings", icon: "settings", matchPrefix: "/settings" }] },
   ];
 }
 
@@ -53,6 +55,7 @@ export function AdminShell({
       titles={TITLES}
       account={{ name: "Napayment platform", caption: staff.role }}
       user={{ name: staff.name, email: staff.email }}
+      menuItems={[{ href: "/settings", label: "Settings", icon: "settings" }]}
       onSignOut={() => startTransition(() => signOutAction())}
       footer="Nawill staff only"
     >

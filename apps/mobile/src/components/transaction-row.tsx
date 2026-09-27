@@ -2,10 +2,10 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import type { TransactionResponse } from '@napayment/api-client';
 import { describeTransaction, formatTime } from '@napayment/format';
-import { colors } from '@/theme';
 import { Row } from './card';
 import { StatusTag } from './status-tag';
 import { AppText } from './text';
+import { useColors } from '@/theme/theme-provider';
 
 export function TransactionRow({
   txn,
@@ -17,6 +17,7 @@ export function TransactionRow({
   /** Status as a tinted tag (Activity) rather than plain mono text (Home). */
   tagged?: boolean;
 }) {
+  const colors = useColors();
   const { title, method, signedAmount } = describeTransaction(txn);
   return (
     <Row

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "@napayment/ui/theme";
+import { ThemeHead } from "@napayment/ui/theme-head";
 import { fontVariables } from "@napayment/ui/lib/fonts";
 import "./globals.css";
 
@@ -10,8 +12,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${fontVariables} antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeHead />
+      </head>
+      <body className={`${fontVariables} antialiased`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

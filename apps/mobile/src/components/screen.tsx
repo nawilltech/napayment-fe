@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { colors } from '@/theme';
+import { useTheme } from '@/theme/theme-provider';
 
 /**
  * Page frame. Cream by default; `tone="brand"` is the blue full-bleed used by
@@ -29,10 +29,11 @@ export function Screen({
   onRefresh?: () => void;
   contentStyle?: ViewStyle;
 }) {
-  const bg = tone === 'brand' ? colors.brand : colors.cream;
+  const { colors, scheme } = useTheme();
+  const bg = tone === 'brand' ? colors.brand : colors.background;
   return (
     <SafeAreaView edges={edges} style={[styles.flex, { backgroundColor: bg }]}>
-      <StatusBar style={tone === 'brand' ? 'light' : 'dark'} />
+      <StatusBar style={tone === 'brand' || scheme === 'dark' ? 'light' : 'dark'} />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {scroll ? (
           <ScrollView
@@ -44,7 +45,7 @@ export function Screen({
                 <RefreshControl
                   refreshing={!!refreshing}
                   onRefresh={onRefresh}
-                  tintColor={tone === 'brand' ? colors.cream : colors.brand}
+                  tintColor={tone === 'brand' ? colors.cream : colors.link}
                 />
               ) : undefined
             }

@@ -70,7 +70,7 @@ export interface AppShellProps {
 export function AppShell({ banner, children, ...props }: AppShellProps) {
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col overflow-y-auto bg-ink px-3.5 py-[22px] md:flex">
+      <aside className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col overflow-y-auto bg-chrome px-3.5 py-[22px] md:flex">
         <SidebarContent {...props} />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -153,8 +153,8 @@ function MobileNav(props: ChromeProps) {
         </button>
       </DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-ink/40 md:hidden" />
-        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-[260px] max-w-[85vw] flex-col overflow-y-auto bg-ink px-3.5 py-[22px] shadow-xl md:hidden">
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-chrome/40 md:hidden" />
+        <DialogPrimitive.Content className="fixed inset-y-0 left-0 z-50 flex w-[260px] max-w-[85vw] flex-col overflow-y-auto bg-chrome px-3.5 py-[22px] shadow-xl md:hidden">
           <DialogPrimitive.Title className="sr-only">Navigation menu</DialogPrimitive.Title>
           <DialogPrimitive.Close className="absolute right-3 top-5 flex size-8 items-center justify-center rounded-lg text-ink-fg hover:bg-ink-raised hover:text-cream">
             <Icon name="close" className="size-4" />

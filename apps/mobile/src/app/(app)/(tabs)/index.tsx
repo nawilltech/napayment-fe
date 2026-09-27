@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { Card } from '@/components/card';
 import { useCopy } from '@/components/copy';
@@ -11,9 +11,10 @@ import { TransactionRow } from '@/components/transaction-row';
 import { useMe, useRecentTransactions, useWallet } from '@/hooks/queries';
 import { isForbidden } from '@/lib/api';
 import { displayName, formatNaira, greeting, groupAccountNumber, initials } from '@napayment/format';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
 import { Icon } from '@/components/icon';
 import type { IconName } from '@napayment/ui-tokens';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 const ACTIONS: { label: string; icon: IconName; href: Href; primary?: boolean }[] = [
   { label: 'Collect', icon: 'collect', href: '/collect/new', primary: true },
@@ -22,6 +23,8 @@ const ACTIONS: { label: string; icon: IconName; href: Href; primary?: boolean }[
 ];
 
 export default function HomeScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const me = useMe();
   const wallet = useWallet();
   const recent = useRecentTransactions(4);
@@ -125,7 +128,7 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 20, paddingTop: 14, paddingBottom: 12 },
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.sand, alignItems: 'center', justifyContent: 'center' },
   balance: { marginHorizontal: 16, backgroundColor: colors.brand, borderRadius: 16, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 16 },
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   copy: { backgroundColor: colors.cream, borderRadius: radius.md, paddingHorizontal: 12, paddingVertical: 8 },
   actions: { flexDirection: 'row', gap: 8, marginHorizontal: 16, marginTop: 12 },
   action: { flex: 1, height: 64, borderRadius: radius.xl, alignItems: 'center', justifyContent: 'center', gap: 4 },
-  actionPrimary: { backgroundColor: colors.ink },
-  actionPlain: { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
+  actionPrimary: { backgroundColor: colors.chrome },
+  actionPlain: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
   list: { marginHorizontal: 16 },
-});
+}));

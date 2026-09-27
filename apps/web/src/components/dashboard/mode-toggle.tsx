@@ -44,7 +44,7 @@ export function ModeToggle() {
       className={cn(
         "flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-[5px] font-mono text-[11px] uppercase transition-colors sm:px-2.5",
         isLive
-          ? "border-transparent bg-success-surface text-[#12573A] hover:border-success-line"
+          ? "border-transparent bg-success-surface text-success-ink hover:border-success-line"
           : "border-transparent bg-warning-surface text-warning-ink hover:border-warning-line",
       )}
     >

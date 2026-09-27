@@ -1,5 +1,6 @@
 import { Text, type TextProps, type TextStyle } from 'react-native';
-import { colors, fonts } from '@/theme';
+import { fonts } from '@/theme';
+import { useColors } from '@/theme/theme-provider';
 
 type Weight = 'regular' | 'medium' | 'semibold' | 'bold';
 
@@ -44,6 +45,7 @@ export function AppText({
   style,
   ...props
 }: AppTextProps) {
+  const colors = useColors();
   const fontFamily = display ? fonts.display : mono || eyebrow ? MONO[weight] : SANS[weight];
   const fontSize = size ?? (eyebrow ? 11 : 14);
   return (

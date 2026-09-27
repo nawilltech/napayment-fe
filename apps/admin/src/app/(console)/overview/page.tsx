@@ -41,7 +41,7 @@ export default async function OverviewPage() {
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between border-b border-line-soft px-5 py-4">
             <h2 className="text-[15px] font-bold text-ink">Next up for review</h2>
-            <Link href="/kyc" className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:text-ink">
+            <Link href="/kyc" className="inline-flex items-center gap-1 text-[13px] font-semibold text-link hover:text-ink">
               Queue <ArrowRight className="size-3.5" />
             </Link>
           </div>
@@ -65,7 +65,7 @@ export default async function OverviewPage() {
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <h2 className="text-[15px] font-bold text-ink">Recent security events</h2>
-          <Link href="/audit-logs" className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:text-ink">
+          <Link href="/audit-logs" className="inline-flex items-center gap-1 text-[13px] font-semibold text-link hover:text-ink">
             All events <ArrowRight className="size-3.5" />
           </Link>
         </div>

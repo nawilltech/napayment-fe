@@ -33,7 +33,7 @@ export function AuditLogTable({ entries, showBusiness = true }: { entries: Audit
             {showBusiness && (
               <Td className="font-mono text-xs">
                 {entry.businessId ? (
-                  <Link href={`/businesses/${entry.businessId}`} className="text-brand hover:text-ink">
+                  <Link href={`/businesses/${entry.businessId}`} className="text-link hover:text-ink">
                     ···{entry.businessId.slice(-8)}
                   </Link>
                 ) : (

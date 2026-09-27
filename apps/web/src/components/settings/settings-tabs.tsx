@@ -14,6 +14,7 @@ const TABS: { href: string; label: string; icon: IconName; businessOnly?: boolea
   { href: "/dashboard/settings/team", label: "Team", icon: "team", businessOnly: true },
   { href: "/dashboard/settings/api-keys", label: "API keys & webhooks", icon: "apiKeys", businessOnly: true },
   { href: "/dashboard/settings/security", label: "Security", icon: "security" },
+  { href: "/dashboard/settings/preferences", label: "Preferences", icon: "preferences" },
 ];
 
 export function SettingsTabs({ business }: { business: boolean }) {

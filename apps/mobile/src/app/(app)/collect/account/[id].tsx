@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { BackHeader } from '@/components/back-header';
 import { Button } from '@/components/button';
@@ -10,9 +10,12 @@ import { useDynamicAccount, useMe } from '@/hooks/queries';
 import { useNow } from '@/hooks/use-now';
 import { countdown, displayName, formatNaira, groupAccountNumber } from '@napayment/format';
 import { shareSms } from '@/lib/share';
-import { colors, radius } from '@/theme';
+import { radius } from '@/theme';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 export default function OneTimeAccountScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const account = useDynamicAccount(id);
   const me = useMe();
@@ -118,10 +121,10 @@ export default function OneTimeAccountScreen() {
 }
 
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((colors) => ({
   head: { paddingHorizontal: 22, paddingTop: 8 },
   state: { borderRadius: radius.lg, paddingHorizontal: 12, paddingVertical: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   waiting: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingHorizontal: 22, paddingTop: 16 },
   pulse: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.cream, opacity: 0.9 },
   footerRow: { flexDirection: 'row', gap: 10 },
-});
+}));

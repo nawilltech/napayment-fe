@@ -1,11 +1,13 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
-import { colors } from '@/theme';
 import { AppText } from './text';
+import { makeStyles, useColors } from '@/theme/theme-provider';
 
 /** Icon + label tab bar with a short blue bar over the active tab (design 02/05/06/10). */
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 12) + 6 }]}>
@@ -39,9 +41,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
 const TAB_ICON_SIZE = 22;
 
-const styles = StyleSheet.create({
-  bar: { flexDirection: 'row', backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 },
+const useStyles = makeStyles((colors) => ({
+  bar: { flexDirection: 'row', backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.line, paddingTop: 10 },
   tab: { flex: 1, alignItems: 'center', gap: 4, minHeight: 44 },
   indicator: { width: 22, height: 3, borderRadius: 2 },
   indicatorOn: { backgroundColor: colors.brand },
-});
+}));

@@ -13,7 +13,7 @@ export function CopyField({ value, mono = true, className }: { value: string; mo
       <button
         type="button"
         onClick={() => copy(value)}
-        className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 font-sans text-[12.5px] font-semibold text-brand hover:bg-brand-surface"
+        className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 font-sans text-[12.5px] font-semibold text-link hover:bg-brand-surface"
       >
         {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
         {copied ? "Copied" : "Copy"}

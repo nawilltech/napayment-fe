@@ -33,6 +33,10 @@ export const ICON_NAMES = [
   "pin",
   "queue",
   "signOut",
+  "preferences",
+  "themeAuto",
+  "themeLight",
+  "themeDark",
   // Chrome
   "menu",
   "close",
