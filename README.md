@@ -43,8 +43,8 @@ cp apps/admin/.env.example apps/admin/.env.local # ...and the admin console (Nex
 ```bash
 npm run dev:web       # Business Console at http://localhost:3000
 npm run dev:admin     # Admin console (staff only) at http://localhost:3001
-npm run dev:mobile     # Expo CLI — press i/a/w for iOS/Android/web, or scan the QR code
-npm run dev            # everything, via Turborepo (turbo run dev)
+npm run dev:mobile    # Expo CLI — press i/a/w for iOS/Android/web, or scan the QR code
+npm run dev           # all three (web + admin + mobile), via Turborepo
 ```
 
 Installing a package into just one workspace (don't run `npm install <pkg>`
@@ -58,7 +58,10 @@ npm install <package> --workspace=@napayment/schemas   # a shared package
 ## Building & checking
 
 ```bash
-npm run build        # turbo run build — currently just apps/web (apps/mobile has no build script yet)
+npm run build         # production build of web + admin (mobile ships through Expo, no build step)
+npm run start         # build if needed, then serve web (:3000) + admin (:3001) in production mode
+npm run start:web     # or just one of them
+npm run start:admin
 npm run typecheck     # turbo run typecheck
 npm run lint          # turbo run lint
 ```
