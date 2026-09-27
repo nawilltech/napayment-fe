@@ -4,6 +4,7 @@ import { Badge } from "@napayment/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
 import { Table, TableCard, TableMessage, Td, Th, THead, Tr } from "@napayment/ui/table";
 import { CreateProcessorForm, MethodChips } from "@/components/processor-admin";
+import { LogoTile } from "@/components/processor-logo";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
 
@@ -32,10 +33,15 @@ export default async function PaymentProcessorsPage() {
             {processors.content.map((processor) => (
               <Tr key={processor.id}>
                 <Td>
-                  <Link href={ROUTES.paymentProcessor(processor.id)} className="font-semibold text-ink hover:text-link">
-                    {processor.name}
-                  </Link>
-                  <span className="block font-mono text-[11.5px] text-subtle">{processor.code}</span>
+                  <span className="flex items-center gap-2.5">
+                    <LogoTile name={processor.name} logo={processor.logo} />
+                    <span>
+                      <Link href={ROUTES.paymentProcessor(processor.id)} className="font-semibold text-ink hover:text-link">
+                        {processor.name}
+                      </Link>
+                      <span className="block font-mono text-[11.5px] text-subtle">{processor.code}</span>
+                    </span>
+                  </span>
                 </Td>
                 <Td>
                   <MethodChips methods={processor.methods} />

@@ -69,6 +69,7 @@ const processorSchema = z.object({
   priority: optionalPriority,
   defaultEnabled: z.boolean(),
   methods: z.array(z.enum(PAYMENT_METHODS)).min(1, VALIDATION_MESSAGES.processorMethodsRequired),
+  logo: z.string().optional().transform((value) => value || undefined),
 });
 
 export async function createProcessorAction(_prev: ActionState, form: FormData): Promise<ActionState> {
@@ -78,6 +79,7 @@ export async function createProcessorAction(_prev: ActionState, form: FormData):
     priority: form.get("priority") ?? "",
     defaultEnabled: form.get("defaultEnabled") === "on",
     methods: form.getAll("methods"),
+    logo: form.get("logo") ?? undefined,
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
   const state = await toActionState(async () => {
@@ -96,6 +98,13 @@ export async function updateProcessorAction(id: string, _prev: ActionState, form
   const parsed = processorUpdateSchema.safeParse({ name: form.get("name"), priority: form.get("priority") ?? "" });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message };
   return processorChange(id, (client) => client.admin.paymentProcessors.update(id, parsed.data));
+}
+
+/** Sets the processed logo, or removes it when null. */
+export async function setProcessorLogoAction(id: string, logo: string | null): Promise<ActionState> {
+  return processorChange(id, (client) =>
+    logo ? client.admin.paymentProcessors.setLogo(id, logo) : client.admin.paymentProcessors.removeLogo(id),
+  );
 }
 
 export async function setProcessorMethodAction(id: string, method: PaymentMethod, enabled: boolean): Promise<ActionState> {

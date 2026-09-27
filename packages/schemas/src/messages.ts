@@ -40,6 +40,8 @@ export const VALIDATION_MESSAGES = {
   processorCodeInvalid: "Use 2-32 letters, digits or underscores, starting with a letter",
   processorMethodsRequired: "Choose at least one payment method",
   priorityInvalid: "Priority is a whole number from 0 to 1000",
+  logoTypeInvalid: "Choose a PNG, JPEG or WebP image",
+  logoTooLarge: (maxKb: number) => `The logo must be ${maxKb} KB or smaller - try a simpler image`,
   deactivationReasonRequired: "Give a reason for deactivating",
   passwordRequired: "Enter your password",
   kycRejectReasonRequired: "Give a reason - the business sees it",

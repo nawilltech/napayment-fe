@@ -12,11 +12,13 @@ import {
   createProcessorAction,
   setProcessorActiveAction,
   setProcessorForAllAction,
+  setProcessorLogoAction,
   setProcessorMethodAction,
   updateProcessorAction,
 } from "@/app/actions";
 import { FormFeedback, SubmitButton } from "./form-feedback";
 import { PasswordConfirmButton } from "./password-confirm-button";
+import { LogoPicker } from "./processor-logo";
 
 /** Payment method chips; retired methods are struck through. */
 export function MethodChips({ methods }: { methods: PaymentMethodOption[] }) {
@@ -35,8 +37,10 @@ export function MethodChips({ methods }: { methods: PaymentMethodOption[] }) {
 /** Configuration -> Payment processors: add one with the methods it offers (FR-Proc-1/2). */
 export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[] }) {
   const [state, action] = useActionState(createProcessorAction, {});
+  const [logo, setLogo] = useState<string | null>(null);
   return (
     <form action={action} className="space-y-4">
+      <LogoPicker name="logo" label="New processor" value={logo} onChange={setLogo} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_120px]">
         <div>
           <Label htmlFor="name">Name</Label>
@@ -72,6 +76,22 @@ export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[
       <FormFeedback state={state} success="Processor added." />
       <SubmitButton>Add processor</SubmitButton>
     </form>
+  );
+}
+
+/** Logo on the processor page: changes save immediately. */
+export function ProcessorLogoEditor({ processor }: { processor: PaymentProcessorResponse }) {
+  const [state, setState] = useState<ActionState>({});
+  const [, startTransition] = useTransition();
+  return (
+    <div className="space-y-3">
+      <LogoPicker
+        label={processor.name}
+        value={processor.logo}
+        onChange={(logo) => startTransition(async () => setState(await setProcessorLogoAction(processor.id, logo)))}
+      />
+      <FormFeedback state={state} success="Logo saved." />
+    </div>
   );
 }
 

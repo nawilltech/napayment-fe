@@ -359,6 +359,15 @@ export function createBackendClient(config: ApiClientConfig) {
             method: "PATCH",
             body,
           }),
+        setLogo: (id: string, logo: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
+            method: "PUT",
+            body: { logo },
+          }),
+        removeLogo: (id: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
+            method: "DELETE",
+          }),
         enableMethod: (id: string, method: T.PaymentMethod) =>
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
             method: "PUT",

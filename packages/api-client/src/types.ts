@@ -472,8 +472,21 @@ export interface PaymentMethodOption {
   active: boolean;
 }
 
+/**
+ * Processor logo constraints, mirroring the backend's ProcessorLogo: a base64
+ * data URL of one of these image types, at most maxKb decoded. SVG is refused.
+ */
+export const PROCESSOR_LOGO = {
+  maxKb: 100,
+  mimeTypes: ["image/png", "image/jpeg", "image/webp"],
+  /** Clients downscale to fit this box before upload. */
+  maxDimensionPx: 128,
+} as const;
+
 export interface CreatePaymentProcessorRequest {
   name: string;
+  /** Optional base64 data URL - see PROCESSOR_LOGO. */
+  logo?: string;
   /** Letters, digits, underscores; stored upper-case, never changed after creation. */
   code: string;
   /** Routing order, lowest first. Defaults to 100. */
@@ -497,6 +510,8 @@ export interface PaymentProcessorResponse {
   id: string;
   name: string;
   code: string;
+  /** Base64 data URL, or null when the processor has no logo. */
+  logo: string | null;
   priority: number;
   /** Platform switch: INACTIVE means no business can use it. */
   status: EntityStatus;
@@ -520,6 +535,7 @@ export interface BusinessPaymentProcessor {
   processorId: string;
   name: string;
   code: string;
+  logo: string | null;
   processorActive: boolean;
   defaultEnabled: boolean;
   methods: PaymentMethodOption[];

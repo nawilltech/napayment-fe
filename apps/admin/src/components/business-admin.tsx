@@ -18,6 +18,7 @@ import {
 } from "@/app/actions";
 import { FormFeedback, SubmitButton } from "./form-feedback";
 import { MethodChips } from "./processor-admin";
+import { LogoTile } from "./processor-logo";
 
 /** FR-Admin-6: deactivate (with a reason) or reactivate a business. */
 export function BusinessStatusControl({
@@ -123,6 +124,7 @@ export function BusinessProcessorsTable({ businessId, rows }: { businessId: stri
             <li key={row.processorId} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
+                  <LogoTile name={row.name} logo={row.logo} size={24} />
                   <span className="text-[13.5px] font-semibold text-ink">{row.name}</span>
                   <Badge variant={row.available ? "success" : "neutral"}>{row.available ? "Available" : "Unavailable"}</Badge>
                 </div>

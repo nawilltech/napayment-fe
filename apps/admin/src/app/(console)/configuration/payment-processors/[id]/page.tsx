@@ -7,9 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napa
 import {
   ProcessorDetailsForm,
   ProcessorForAllSwitch,
+  ProcessorLogoEditor,
   ProcessorMethodsEditor,
   ProcessorPlatformSwitch,
 } from "@/components/processor-admin";
+import { LogoTile } from "@/components/processor-logo";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
 
@@ -33,8 +35,13 @@ export default async function PaymentProcessorPage({ params }: { params: Promise
           <Link href={ROUTES.paymentProcessors} className="text-[13px] font-semibold text-link hover:text-ink">
             ← Payment processors
           </Link>
-          <h2 className="mt-1 text-xl font-bold text-ink">{processor.name}</h2>
-          <p className="font-mono text-[12px] text-subtle">{processor.code}</p>
+          <div className="mt-1 flex items-center gap-3">
+            <LogoTile name={processor.name} logo={processor.logo} size={40} />
+            <div>
+              <h2 className="text-xl font-bold text-ink">{processor.name}</h2>
+              <p className="font-mono text-[12px] text-subtle">{processor.code}</p>
+            </div>
+          </div>
         </div>
         <Badge variant={processor.status === "ACTIVE" ? "success" : "neutral"}>
           {processor.status === "ACTIVE" ? "Active" : "Inactive"}
@@ -46,7 +53,8 @@ export default async function PaymentProcessorPage({ params }: { params: Promise
           <CardHeader>
             <CardTitle>Details</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-5">
+            <ProcessorLogoEditor processor={processor} />
             <ProcessorDetailsForm processor={processor} />
           </CardContent>
         </Card>
