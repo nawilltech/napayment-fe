@@ -8,7 +8,8 @@ export function ConsoleShell({
   banner,
   children,
 }: {
-  activation: ActivationProgress;
+  /** Absent for accounts without a business - hides activation in the nav. */
+  activation?: ActivationProgress;
   banner?: React.ReactNode;
   children: React.ReactNode;
 }) {
