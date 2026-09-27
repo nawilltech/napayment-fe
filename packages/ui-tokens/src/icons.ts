@@ -39,6 +39,7 @@ export const ICON_NAMES = [
   "themeLight",
   "themeDark",
   // Chrome
+  "add",
   "menu",
   "close",
 ] as const;

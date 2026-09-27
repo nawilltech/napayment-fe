@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import type {
   PaymentMethodCode,
   PaymentMethodOption,
@@ -21,6 +21,7 @@ import {
   setProcessorMethodAction,
   updateProcessorAction,
 } from "@/app/actions";
+import { CreateDialog } from "./create-dialog";
 import { FormFeedback, SubmitButton } from "./form-feedback";
 import { PasswordConfirmButton } from "./password-confirm-button";
 import { LogoPicker } from "./processor-logo";
@@ -39,10 +40,27 @@ export function MethodChips({ methods }: { methods: PaymentMethodOption[] }) {
   );
 }
 
+/** "+ Add processor": the create form in a dialog. */
+export function AddProcessorButton({ methods }: { methods: PaymentMethodResponse[] }) {
+  return (
+    <CreateDialog
+      label="Add processor"
+      title="Add a payment processor"
+      description="Its API keys live in the deployment configuration under the processor's code - never here."
+      wide
+    >
+      {(close) => <CreateProcessorForm methods={methods} onSaved={close} />}
+    </CreateDialog>
+  );
+}
+
 /** Configuration -> Payment processors: add one with the methods it offers (FR-Proc-1/2). */
-export function CreateProcessorForm({ methods }: { methods: PaymentMethodResponse[] }) {
+export function CreateProcessorForm({ methods, onSaved }: { methods: PaymentMethodResponse[]; onSaved?: () => void }) {
   const [state, action] = useActionState(createProcessorAction, {});
   const [logo, setLogo] = useState<string | null>(null);
+  useEffect(() => {
+    if (state.ok) onSaved?.();
+  }, [state, onSaved]);
   return (
     <form action={action} className="space-y-4">
       <LogoPicker name="logo" label="New processor" value={logo} onChange={setLogo} />

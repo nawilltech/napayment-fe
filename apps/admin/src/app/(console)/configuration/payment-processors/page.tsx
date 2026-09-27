@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { plural } from "@napayment/format";
 import { Badge } from "@napayment/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
 import { Table, TableCard, TableMessage, Td, Th, THead, Tr } from "@napayment/ui/table";
-import { CreateProcessorForm, MethodChips } from "@/components/processor-admin";
+import { AddProcessorButton, MethodChips } from "@/components/processor-admin";
 import { LogoTile } from "@/components/processor-logo";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
@@ -18,7 +18,13 @@ export default async function PaymentProcessorsPage() {
   ]);
 
   return (
-    <div className="max-w-5xl space-y-5">
+    <div className="max-w-5xl space-y-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[13.5px] text-muted">
+          {plural(processors.totalElements, "processor")}, routed by priority (lowest first).
+        </p>
+        <AddProcessorButton methods={methods} />
+      </div>
       <TableCard>
         <Table minWidth={760}>
           <THead>
@@ -29,7 +35,7 @@ export default async function PaymentProcessorsPage() {
             <Th>Businesses</Th>
           </THead>
           <tbody>
-            {processors.content.length === 0 && <TableMessage colSpan={5}>No processors yet - add the first below.</TableMessage>}
+            {processors.content.length === 0 && <TableMessage colSpan={5}>No processors yet - use &ldquo;Add processor&rdquo; to create the first.</TableMessage>}
             {processors.content.map((processor) => (
               <Tr key={processor.id}>
                 <Td>
@@ -65,17 +71,6 @@ export default async function PaymentProcessorsPage() {
         </Table>
       </TableCard>
 
-      <Card className="max-w-3xl">
-        <CardHeader>
-          <CardTitle>Add a payment processor</CardTitle>
-          <CardDescription>
-            Its API keys live in the deployment configuration under the processor&apos;s code - never here.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CreateProcessorForm methods={methods} />
-        </CardContent>
-      </Card>
     </div>
   );
 }

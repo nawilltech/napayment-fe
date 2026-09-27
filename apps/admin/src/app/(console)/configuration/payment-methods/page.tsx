@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { plural } from "@napayment/format";
 import { Badge } from "@napayment/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
 import { Table, TableCard, TableMessage, Td, Th, THead, Tr } from "@napayment/ui/table";
-import { CreatePaymentMethodForm } from "@/components/payment-method-admin";
+import { AddPaymentMethodButton } from "@/components/payment-method-admin";
 import { ROUTES } from "@/lib/routes";
 import { authedBackendClient } from "@/server/backend-client";
 
@@ -13,7 +13,13 @@ export default async function PaymentMethodsPage() {
   const methods = await (await authedBackendClient()).admin.paymentMethods.list();
 
   return (
-    <div className="max-w-5xl space-y-5">
+    <div className="max-w-5xl space-y-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[13.5px] text-muted">
+          {plural(methods.length, "payment method")}, in the order payers see them.
+        </p>
+        <AddPaymentMethodButton />
+      </div>
       <TableCard>
         <Table minWidth={680}>
           <THead>
@@ -24,7 +30,7 @@ export default async function PaymentMethodsPage() {
             <Th>Platform</Th>
           </THead>
           <tbody>
-            {methods.length === 0 && <TableMessage colSpan={5}>No payment methods yet.</TableMessage>}
+            {methods.length === 0 && <TableMessage colSpan={5}>No payment methods yet - use &ldquo;Add payment method&rdquo; to create the first.</TableMessage>}
             {methods.map((method) => (
               <Tr key={method.id}>
                 <Td>
@@ -51,17 +57,6 @@ export default async function PaymentMethodsPage() {
         </Table>
       </TableCard>
 
-      <Card className="max-w-3xl">
-        <CardHeader>
-          <CardTitle>Add a payment method</CardTitle>
-          <CardDescription>
-            Once added, payment processors can offer it. Its code is permanent - processors and transactions refer to it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CreatePaymentMethodForm />
-        </CardContent>
-      </Card>
     </div>
   );
 }

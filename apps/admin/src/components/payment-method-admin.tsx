@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import type { PaymentMethodResponse } from "@napayment/api-client";
 import type { ActionState } from "@napayment/bff/actions";
 import { plural } from "@napayment/format";
@@ -13,12 +13,30 @@ import {
   setPaymentMethodActiveAction,
   updatePaymentMethodAction,
 } from "@/app/actions";
+import { CreateDialog } from "./create-dialog";
 import { FormFeedback, SubmitButton } from "./form-feedback";
 import { PasswordConfirmButton } from "./password-confirm-button";
 
+/** "+ Add payment method": the create form in a dialog. */
+export function AddPaymentMethodButton() {
+  return (
+    <CreateDialog
+      label="Add payment method"
+      title="Add a payment method"
+      description="Once added, payment processors can offer it. Its code is permanent - processors and transactions refer to it."
+      wide
+    >
+      {(close) => <CreatePaymentMethodForm onSaved={close} />}
+    </CreateDialog>
+  );
+}
+
 /** Configuration -> Payment methods: add one to the catalogue (FR-Proc-2). */
-export function CreatePaymentMethodForm() {
+export function CreatePaymentMethodForm({ onSaved }: { onSaved?: () => void }) {
   const [state, action] = useActionState(createPaymentMethodAction, {});
+  useEffect(() => {
+    if (state.ok) onSaved?.();
+  }, [state, onSaved]);
   return (
     <form action={action} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1fr_120px]">

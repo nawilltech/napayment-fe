@@ -15,6 +15,7 @@ import {
   LogOut,
   Mail,
   Menu,
+  Plus,
   Moon,
   RectangleEllipsis,
   Rocket,
@@ -67,6 +68,7 @@ export const ICONS = {
   themeAuto: SunMoon,
   themeLight: Sun,
   themeDark: Moon,
+  add: Plus,
   menu: Menu,
   close: X,
 } satisfies Record<IconName, LucideIcon>;
