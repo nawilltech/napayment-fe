@@ -325,10 +325,10 @@ export interface BankAccountResponse {
   accountName: string;
 }
 
+/** GET /api/v1/banks/resolve-account - the provider's (Paystack) Name Enquiry result. */
 export interface ResolvedBankAccountResponse {
   accountNumber: string;
   accountName: string;
-  bankId: string;
 }
 
 // ---- Settlement Accounts / Settlements -----------------------------------------
@@ -367,10 +367,10 @@ export interface SettlementResponse {
 
 // ---- Collection Account (superadmin only) --------------------------------------
 
+/** No accountName: the backend resolves it via Name Enquiry and stores that, never a typed-in name. */
 export interface CreateCollectionAccountRequest {
   bankId: string;
   accountNumber: string;
-  accountName: string;
 }
 
 export interface CollectionAccountResponse {

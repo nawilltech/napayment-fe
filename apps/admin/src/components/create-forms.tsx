@@ -1,10 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-import type { BankResponse } from "@napayment/api-client";
+import { useActionState, useEffect, useState } from "react";
+import type { BankResponse, PageResponse, ResolvedBankAccountResponse } from "@napayment/api-client";
+import { BankCombobox } from "@napayment/ui/bank-combobox";
 import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
-import { Select } from "@napayment/ui/select";
 import { createCollectionAccountAction, createProcessorAction } from "@/app/actions";
 import { FormFeedback, SubmitButton } from "./form-feedback";
 
@@ -24,36 +24,94 @@ export function CreateProcessorForm() {
   );
 }
 
-/** Where every collection is mirrored (SUPERADMIN only). One per platform. */
-export function CreateCollectionAccountForm({ banks }: { banks: BankResponse[] }) {
+async function searchBanks(term: string): Promise<BankResponse[]> {
+  const response = await fetch(`/api/banks?term=${encodeURIComponent(term)}`);
+  if (!response.ok) throw new Error(`Bank search failed: ${response.status}`);
+  return ((await response.json()) as PageResponse<BankResponse>).content;
+}
+
+type NameLookup =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "resolved"; accountName: string }
+  | { status: "failed"; message: string };
+
+async function resolveAccountName(bankId: string, accountNumber: string): Promise<ResolvedBankAccountResponse> {
+  const query = new URLSearchParams({ bankId, accountNumber });
+  const response = await fetch(`/api/banks/resolve-account?${query}`);
+  const body = await response.json();
+  if (!response.ok) throw new Error(body?.message ?? "Couldn't verify this account");
+  return body as ResolvedBankAccountResponse;
+}
+
+/**
+ * Where every collection is mirrored (SUPERADMIN only). One per platform.
+ * The account name is never typed in: it comes from Name Enquiry once a bank
+ * and a 10-digit number are entered, and the backend stores its own
+ * resolved name on save.
+ */
+export function CreateCollectionAccountForm() {
   const [state, action] = useActionState(createCollectionAccountAction, {});
+  const [bank, setBank] = useState<BankResponse | null>(null);
+  const [accountNumber, setAccountNumber] = useState("");
+  const [lookup, setLookup] = useState<NameLookup>({ status: "idle" });
+
+  useEffect(() => {
+    if (!bank || !/^\d{10}$/.test(accountNumber)) {
+      setLookup({ status: "idle" });
+      return;
+    }
+    let current = true;
+    setLookup({ status: "loading" });
+    resolveAccountName(bank.id, accountNumber)
+      .then((resolved) => current && setLookup({ status: "resolved", accountName: resolved.accountName }))
+      .catch((error: Error) => current && setLookup({ status: "failed", message: error.message }));
+    return () => {
+      current = false;
+    };
+  }, [bank, accountNumber]);
+
   return (
     <form action={action} className="space-y-4">
       <div>
         <Label htmlFor="bankId">Bank</Label>
-        <Select id="bankId" name="bankId" required defaultValue="">
-          <option value="" disabled>
-            Choose a bank
-          </option>
-          {banks.map((bank) => (
-            <option key={bank.id} value={bank.id}>
-              {bank.name}
-            </option>
-          ))}
-        </Select>
+        <BankCombobox id="bankId" name="bankId" search={searchBanks} onChange={setBank} required />
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <Label htmlFor="accountNumber">Account number</Label>
-          <Input id="accountNumber" name="accountNumber" inputMode="numeric" maxLength={10} className="font-mono" required />
-        </div>
-        <div>
-          <Label htmlFor="accountName">Account name</Label>
-          <Input id="accountName" name="accountName" required />
-        </div>
+      <div>
+        <Label htmlFor="accountNumber">Account number</Label>
+        <Input
+          id="accountNumber"
+          name="accountNumber"
+          inputMode="numeric"
+          maxLength={10}
+          className="font-mono"
+          value={accountNumber}
+          onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="accountName">Account name</Label>
+        <Input
+          id="accountName"
+          readOnly
+          tabIndex={-1}
+          aria-live="polite"
+          aria-invalid={lookup.status === "failed"}
+          className="bg-paper"
+          placeholder="Filled in automatically from the bank"
+          value={
+            lookup.status === "resolved"
+              ? lookup.accountName
+              : lookup.status === "loading"
+                ? "Looking up account name…"
+                : ""
+          }
+        />
+        {lookup.status === "failed" ? <p className="mt-1.5 text-[13px] text-danger">{lookup.message}</p> : null}
       </div>
       <FormFeedback state={state} />
-      <SubmitButton>Save collection account</SubmitButton>
+      <SubmitButton disabled={lookup.status !== "resolved"}>Save collection account</SubmitButton>
     </form>
   );
 }

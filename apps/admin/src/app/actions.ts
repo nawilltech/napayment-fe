@@ -71,7 +71,6 @@ export async function createProcessorAction(_prev: ActionState, form: FormData):
 const collectionAccountSchema = z.object({
   bankId: z.string().min(1, "Choose the bank"),
   accountNumber: z.string().regex(/^\d{10}$/, "Account number is 10 digits"),
-  accountName: z.string().trim().min(2, "Enter the account name").max(128),
 });
 
 export async function createCollectionAccountAction(_prev: ActionState, form: FormData): Promise<ActionState> {
