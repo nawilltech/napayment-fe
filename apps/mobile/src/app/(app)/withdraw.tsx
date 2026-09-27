@@ -13,9 +13,11 @@ import { AppText } from '@/components/text';
 import { useBankAccounts, useBanks, useSettlementAccounts, useWallet } from '@/hooks/queries';
 import { useOnline } from '@/hooks/use-online';
 import { errorMessage, isForbidden } from '@/lib/api';
+import { VALIDATION_MESSAGES } from '@napayment/schemas';
 import { formatNaira, nairaToKobo } from '@napayment/format';
 import { newIdempotencyKey, outboxKeys, type SettleVars } from '@/lib/outbox';
 import { useColors } from '@/theme/theme-provider';
+import { CLIENT_ERROR_MESSAGES } from '@napayment/api-client';
 
 /**
  * Withdraw = settle the wallet balance out to the business's settlement
@@ -56,8 +58,8 @@ export default function WithdrawScreen() {
 
   function confirm() {
     setError(null);
-    if (amount.trim() && !amountKobo) return setError('Enter a valid amount, or leave it empty to withdraw everything.');
-    if (tooMuch) return setError('That is more than your available balance.');
+    if (amount.trim() && !amountKobo) return setError(VALIDATION_MESSAGES.amountInvalidOrEmptyToWithdrawAll);
+    if (tooMuch) return setError(VALIDATION_MESSAGES.amountExceedsBalance);
     const where = destinations.length === 1 ? `${destinations[0].bankName} ···${destinations[0].last4}` : `${destinations.length} accounts, split by your settings`;
     Alert.alert('Confirm withdrawal', `Send ${label} to ${where}?`, [
       { text: 'Cancel', style: 'cancel' },
@@ -133,7 +135,7 @@ export default function WithdrawScreen() {
           )}
           {settlementAccounts.isError && !settlementAccounts.data && (
             <Empty
-              title={isForbidden(settlementAccounts.error) ? "Your role can't withdraw" : "Couldn't load your bank"}
+              title={isForbidden(settlementAccounts.error) ? CLIENT_ERROR_MESSAGES.forbiddenWithdraw : CLIENT_ERROR_MESSAGES.loadBankFailed}
               body={isForbidden(settlementAccounts.error) ? 'Ask the account owner.' : 'Check your connection.'}
             />
           )}

@@ -15,6 +15,7 @@ import { radius } from '@/theme';
 import { Icon } from '@/components/icon';
 import type { IconName } from '@napayment/ui-tokens';
 import { makeStyles, useColors } from '@/theme/theme-provider';
+import { CLIENT_ERROR_MESSAGES } from '@napayment/api-client';
 
 const ACTIONS: { label: string; icon: IconName; href: Href; primary?: boolean }[] = [
   { label: 'Collect', icon: 'collect', href: '/collect/new', primary: true },
@@ -120,7 +121,7 @@ export default function HomeScreen() {
         ))}
         {recent.data?.content.length === 0 && <Empty title="No payments yet" body="They'll show here as soon as one lands." />}
         {recent.isError && !recent.data && (
-          <Empty title={isForbidden(recent.error) ? "Your role can't view transactions" : "Couldn't load activity"} body={isForbidden(recent.error) ? undefined : 'Pull down to try again.'} />
+          <Empty title={isForbidden(recent.error) ? CLIENT_ERROR_MESSAGES.forbiddenTransactions : CLIENT_ERROR_MESSAGES.loadActivityFailed} body={isForbidden(recent.error) ? undefined : 'Pull down to try again.'} />
         )}
         {recent.isLoading && <Empty title="Loading…" />}
       </Card>

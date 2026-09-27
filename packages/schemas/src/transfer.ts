@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VALIDATION_MESSAGES } from "./messages";
 
 /**
  * FR-Auth-1. `amount` here is already in kobo (minor units, matching the
@@ -8,12 +9,12 @@ import { z } from "zod";
  * locally rather than centralizing currency conversion in this package.
  */
 export const transferSchema = z.object({
-  recipientIdentifier: z.string().min(1, "Enter an account number or phone number"),
+  recipientIdentifier: z.string().min(1, VALIDATION_MESSAGES.recipientRequired),
   amount: z
     .string()
-    .regex(/^\d+$/, "Enter a valid amount")
-    .refine((value) => BigInt(value) > BigInt(0), "Amount must be greater than zero"),
-  narration: z.string().max(128, "Keep it under 128 characters").optional(),
-  transactionPin: z.string().regex(/^\d{4}$/, "Enter your 4-digit transaction PIN"),
+    .regex(/^\d+$/, VALIDATION_MESSAGES.amountInvalid)
+    .refine((value) => BigInt(value) > BigInt(0), VALIDATION_MESSAGES.amountNotPositive),
+  narration: z.string().max(128, VALIDATION_MESSAGES.tooLong(128)).optional(),
+  transactionPin: z.string().regex(/^\d{4}$/, VALIDATION_MESSAGES.transactionPinRequired),
 });
 export type TransferInput = z.infer<typeof transferSchema>;

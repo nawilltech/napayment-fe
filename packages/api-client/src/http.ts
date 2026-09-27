@@ -1,19 +1,39 @@
+import { CLIENT_ERROR_MESSAGES, ErrorCode, errorCodeForStatus, HTTP_STATUS } from "./errors";
 import type { ErrorResponse, PageParams } from "./types";
 
 export class ApiError extends Error {
   readonly status: number;
-  readonly errorCode: string;
+  readonly errorCode: ErrorCode;
   readonly requestId: string | null;
   readonly details: string[];
 
-  constructor(body: ErrorResponse, status: number) {
-    super(body.message || `Request failed with status ${status}`);
+  /** `body` is undefined when the response had no parseable error body. */
+  constructor(body: Partial<ErrorResponse> | undefined, status: number) {
+    super(body?.message || CLIENT_ERROR_MESSAGES.unexpected);
     this.name = "ApiError";
     this.status = status;
-    this.errorCode = body.errorCode ?? "UNKNOWN_ERROR";
-    this.requestId = body.requestId ?? null;
-    this.details = body.details ?? [];
+    this.errorCode = body?.errorCode ?? errorCodeForStatus(status);
+    this.requestId = body?.requestId ?? null;
+    this.details = body?.details ?? [];
   }
+
+  is(code: ErrorCode): boolean {
+    return this.errorCode === code;
+  }
+}
+
+/** JSON body, or undefined for an empty/non-JSON one (e.g. a proxy's HTML error page). */
+export function parseJsonBody(text: string): unknown {
+  if (!text) return undefined;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return undefined;
+  }
+}
+
+async function toApiError(response: Response): Promise<ApiError> {
+  return new ApiError(parseJsonBody(await response.text()) as Partial<ErrorResponse> | undefined, response.status);
 }
 
 export interface ApiClientConfig {
@@ -24,6 +44,9 @@ export interface ApiClientConfig {
   /** Extra headers merged into every request (used for the HMAC-signed third-party surface). */
   extraHeaders?: Record<string, string>;
 }
+
+/** For browser code calling its own app's /api/* routes (same origin, so no base URL). */
+export const SAME_ORIGIN: ApiClientConfig = { baseUrl: "" };
 
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
@@ -76,18 +99,9 @@ export async function apiRequest<TResponse>(
     body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
   });
 
-  if (response.status === 204) {
-    return undefined as TResponse;
-  }
-
-  const text = await response.text();
-  const json = text ? JSON.parse(text) : undefined;
-
-  if (!response.ok) {
-    throw new ApiError(json as ErrorResponse, response.status);
-  }
-
-  return json as TResponse;
+  if (!response.ok) throw await toApiError(response);
+  if (response.status === HTTP_STATUS.NO_CONTENT) return undefined as TResponse;
+  return parseJsonBody(await response.text()) as TResponse;
 }
 
 /**
@@ -103,11 +117,7 @@ export async function apiRequestBinary(
   const response = await fetch(`${config.baseUrl}${path}`, {
     headers: config.accessToken ? { Authorization: `Bearer ${config.accessToken}` } : undefined,
   });
-  if (!response.ok) {
-    const text = await response.text();
-    const json = text ? JSON.parse(text) : { message: `Request failed with status ${response.status}` };
-    throw new ApiError(json as ErrorResponse, response.status);
-  }
+  if (!response.ok) throw await toApiError(response);
   return response;
 }
 

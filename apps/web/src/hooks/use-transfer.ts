@@ -17,7 +17,7 @@ export function useTransfer() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ input, idempotencyKey }: { input: TransferInput; idempotencyKey: string }) =>
-      api.post<TransferResponse>("/api/transfers", input, { "Idempotency-Key": idempotencyKey }),
+      api.post<TransferResponse>("/api/transfers", input, idempotencyKey),
     onSuccess: () => {
       // The sender's transaction history changed; the response's own
       // senderNewBalance is what the confirmation screen shows directly, so

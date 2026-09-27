@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { ChevronDown, Loader2 } from "lucide-react";
-import type { BankResponse } from "@napayment/api-client";
+import { CLIENT_ERROR_MESSAGES, type BankResponse } from "@napayment/api-client";
 import { cn } from "../lib/cn";
 
 const SEARCH_DEBOUNCE_MS = 250;
@@ -147,7 +147,7 @@ export function BankCombobox({
           className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-[10px] border border-line bg-surface p-1 shadow-[0_12px_30px_rgba(32,38,74,0.15)]"
         >
           {failed ? (
-            <li className="px-3 py-2 text-[13.5px] text-danger">Couldn&apos;t load banks. Try again.</li>
+            <li className="px-3 py-2 text-[13.5px] text-danger">{CLIENT_ERROR_MESSAGES.bankSearchFailed}</li>
           ) : results.length === 0 && !loading ? (
             <li className="px-3 py-2 text-[13.5px] text-subtle">No banks match &ldquo;{term}&rdquo;</li>
           ) : (

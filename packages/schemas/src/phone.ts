@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VALIDATION_MESSAGES } from "./messages";
 
 /**
  * A deliberately small, curated list rather than all ~246 countries the
@@ -30,7 +31,7 @@ export const DEFAULT_CALLING_CODE = COUNTRY_CALLING_CODES[0]; // Nigeria
  */
 export const phoneNoSchema = z
   .string()
-  .regex(/^\+[1-9]\d{6,14}$/, "Enter a valid phone number");
+  .regex(/^\+[1-9]\d{6,14}$/, VALIDATION_MESSAGES.phoneInvalid);
 
 /** Strips everything but digits, and a leading national trunk "0" (0801... -> 801...). */
 export function normalizeLocalNumber(raw: string): string {

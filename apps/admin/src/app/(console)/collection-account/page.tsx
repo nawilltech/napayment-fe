@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ApiError } from "@napayment/api-client";
+import { ApiError, ErrorCode } from "@napayment/api-client";
 import { formatNaira, groupAccountNumber } from "@napayment/format";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
 import { DetailList } from "@napayment/ui/detail-list";
@@ -8,12 +8,12 @@ import { authedBackendClient } from "@/server/backend-client";
 
 export const metadata: Metadata = { title: "Collection account — Napayment Admin" };
 
-/** 404 from the backend just means "not set up yet". */
+/** COLLECTION_ACCOUNT_NOT_FOUND just means "not set up yet". */
 export default async function CollectionAccountPage() {
   const client = await authedBackendClient();
   const [account, banks] = await Promise.all([
     client.collectionAccount.get().catch((error) => {
-      if (error instanceof ApiError && error.status === 404) return null;
+      if (error instanceof ApiError && error.is(ErrorCode.COLLECTION_ACCOUNT_NOT_FOUND)) return null;
       throw error;
     }),
     client.referenceData.listBanks({ size: 500 }),

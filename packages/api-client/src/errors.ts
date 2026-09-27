@@ -1,0 +1,162 @@
+/**
+ * Error catalogue shared by every app. Nothing else writes an error code, an
+ * HTTP status number or a fallback error message inline - import from here.
+ *
+ * `ErrorCode` mirrors the backend's `ErrorCode` enum
+ * (napayment common-core `ng.com.nawill.pay.common.exception.ErrorCode`) one
+ * to one; the backend owns each code's user-facing message and sends it in
+ * `ErrorResponse.message`, so apps display that message and only branch on
+ * the code. `UNKNOWN_ERROR` and `NETWORK_ERROR` are client-side only.
+ */
+
+export const HTTP_STATUS = {
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  LOCKED: 423,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  SERVICE_UNAVAILABLE: 503,
+} as const;
+
+export type HttpStatus = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
+
+export const ErrorCode = {
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  ROUTE_NOT_FOUND: "ROUTE_NOT_FOUND",
+  METHOD_NOT_ALLOWED: "METHOD_NOT_ALLOWED",
+  UNSUPPORTED_MEDIA_TYPE: "UNSUPPORTED_MEDIA_TYPE",
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+  RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
+  IDEMPOTENCY_KEY_REQUIRED: "IDEMPOTENCY_KEY_REQUIRED",
+  IDEMPOTENCY_IN_PROGRESS: "IDEMPOTENCY_IN_PROGRESS",
+  UNAUTHENTICATED: "UNAUTHENTICATED",
+  FORBIDDEN: "FORBIDDEN",
+  BUSINESS_ACCOUNT_REQUIRED: "BUSINESS_ACCOUNT_REQUIRED",
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  ACCOUNT_LOCKED: "ACCOUNT_LOCKED",
+  INVALID_REFRESH_TOKEN: "INVALID_REFRESH_TOKEN",
+  REFRESH_TOKEN_REUSED: "REFRESH_TOKEN_REUSED",
+  REFRESH_TOKEN_EXPIRED: "REFRESH_TOKEN_EXPIRED",
+  INCORRECT_CURRENT_PASSWORD: "INCORRECT_CURRENT_PASSWORD",
+  PASSWORD_MISMATCH: "PASSWORD_MISMATCH",
+  PASSWORD_REUSED: "PASSWORD_REUSED",
+  INVALID_RESET_TOKEN: "INVALID_RESET_TOKEN",
+  EMAIL_TAKEN: "EMAIL_TAKEN",
+  PHONE_TAKEN: "PHONE_TAKEN",
+  INVALID_INVITE: "INVALID_INVITE",
+  INVITATION_NOT_FOUND: "INVITATION_NOT_FOUND",
+  PIN_MISMATCH: "PIN_MISMATCH",
+  PIN_NOT_SET: "PIN_NOT_SET",
+  INCORRECT_CURRENT_PIN: "INCORRECT_CURRENT_PIN",
+  INVALID_PIN: "INVALID_PIN",
+  UNKNOWN_PERMISSION: "UNKNOWN_PERMISSION",
+  MISSING_SIGNATURE_HEADERS: "MISSING_SIGNATURE_HEADERS",
+  INVALID_API_KEY: "INVALID_API_KEY",
+  STALE_TIMESTAMP: "STALE_TIMESTAMP",
+  INVALID_SIGNATURE: "INVALID_SIGNATURE",
+  IP_NOT_WHITELISTED: "IP_NOT_WHITELISTED",
+  API_KEY_ALREADY_EXISTS: "API_KEY_ALREADY_EXISTS",
+  API_KEY_NOT_FOUND: "API_KEY_NOT_FOUND",
+  INVALID_URL: "INVALID_URL",
+  BUSINESS_NOT_FOUND: "BUSINESS_NOT_FOUND",
+  UNKNOWN_COUNTRY: "UNKNOWN_COUNTRY",
+  UNKNOWN_STATE: "UNKNOWN_STATE",
+  COUNTRY_NOT_FOUND: "COUNTRY_NOT_FOUND",
+  KYC_DETAILS_INCOMPLETE: "KYC_DETAILS_INCOMPLETE",
+  KYC_DOCUMENTS_MISSING: "KYC_DOCUMENTS_MISSING",
+  KYC_NOT_AWAITING_REVIEW: "KYC_NOT_AWAITING_REVIEW",
+  FILE_REQUIRED: "FILE_REQUIRED",
+  FILE_TOO_LARGE: "FILE_TOO_LARGE",
+  FILE_TYPE_NOT_ALLOWED: "FILE_TYPE_NOT_ALLOWED",
+  DOCUMENT_NOT_FOUND: "DOCUMENT_NOT_FOUND",
+  OWNER_ID_REQUIRED: "OWNER_ID_REQUIRED",
+  INVALID_BVN: "INVALID_BVN",
+  INVALID_NIN: "INVALID_NIN",
+  UNKNOWN_BANK: "UNKNOWN_BANK",
+  BANK_VERIFICATION_FAILED: "BANK_VERIFICATION_FAILED",
+  BANK_VERIFICATION_UNAVAILABLE: "BANK_VERIFICATION_UNAVAILABLE",
+  BANK_ACCOUNT_NOT_FOUND: "BANK_ACCOUNT_NOT_FOUND",
+  BANK_ACCOUNT_ALREADY_REGISTERED: "BANK_ACCOUNT_ALREADY_REGISTERED",
+  COLLECTION_ACCOUNT_NOT_FOUND: "COLLECTION_ACCOUNT_NOT_FOUND",
+  COLLECTION_ACCOUNT_ALREADY_ACTIVE: "COLLECTION_ACCOUNT_ALREADY_ACTIVE",
+  VIRTUAL_ACCOUNT_NOT_FOUND: "VIRTUAL_ACCOUNT_NOT_FOUND",
+  DYNAMIC_ACCOUNT_NOT_FOUND: "DYNAMIC_ACCOUNT_NOT_FOUND",
+  DYNAMIC_ACCOUNT_NOT_DEPOSITABLE: "DYNAMIC_ACCOUNT_NOT_DEPOSITABLE",
+  PAYMENTS_UNAVAILABLE: "PAYMENTS_UNAVAILABLE",
+  PAYMENT_PROCESSOR_NOT_FOUND: "PAYMENT_PROCESSOR_NOT_FOUND",
+  TRANSACTION_NOT_FOUND: "TRANSACTION_NOT_FOUND",
+  INVALID_DATE_RANGE: "INVALID_DATE_RANGE",
+  INVALID_AMOUNT_RANGE: "INVALID_AMOUNT_RANGE",
+  INSUFFICIENT_BALANCE: "INSUFFICIENT_BALANCE",
+  SPLIT_PERCENTAGE_EXCEEDED: "SPLIT_PERCENTAGE_EXCEEDED",
+  NO_SETTLEMENT_ACCOUNTS: "NO_SETTLEMENT_ACCOUNTS",
+  NOTHING_TO_SETTLE: "NOTHING_TO_SETTLE",
+  RECIPIENT_NOT_FOUND: "RECIPIENT_NOT_FOUND",
+  SELF_TRANSFER: "SELF_TRANSFER",
+  CURRENCY_MISMATCH: "CURRENCY_MISMATCH",
+  PAYMENT_LINK_NOT_FOUND: "PAYMENT_LINK_NOT_FOUND",
+  PAYMENT_LINK_NOT_PAYABLE: "PAYMENT_LINK_NOT_PAYABLE",
+  PAYMENT_LINK_EXPIRY_NOT_ALLOWED: "PAYMENT_LINK_EXPIRY_NOT_ALLOWED",
+  AMOUNT_REQUIRED: "AMOUNT_REQUIRED",
+  // Client-side only: no usable error body, or the request never reached the server.
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+  NETWORK_ERROR: "NETWORK_ERROR",
+} as const;
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+/** Messages for failures the backend never got to describe (no/garbled body, network, BFF-level). */
+export const CLIENT_ERROR_MESSAGES = {
+  unexpected: "Something went wrong. Please try again.",
+  network: "Can't reach Napayment. Check your connection and try again.",
+  notAuthenticated: "Your session has expired. Please sign in again.",
+  invalidJsonBody: "The request body must be valid JSON.",
+  invalidInput: "Some details are missing or invalid.",
+  bankSearchFailed: "Couldn't load banks. Try again.",
+  loadActivityFailed: "Couldn't load activity",
+  loadBankFailed: "Couldn't load your bank",
+  loadLinksFailed: "Couldn't load links",
+  revokeLinkFailed: "Couldn't revoke link",
+  forbiddenTransactions: "Your role can't view transactions",
+  forbiddenPaymentLinks: "Your role can't manage payment links",
+  forbiddenWithdraw: "Your role can't withdraw",
+  offlineSend: "You're offline. Sending money needs a connection.",
+  offlineOneTimeAccount: "One-time accounts need a connection. Try again when you are back online.",
+} as const;
+
+/** Codes that mean the session itself is gone - worth one refresh/sign-in, unlike a wrong password or PIN. */
+export const SESSION_ERROR_CODES: ReadonlySet<ErrorCode> = new Set([
+  ErrorCode.UNAUTHENTICATED,
+  ErrorCode.INVALID_REFRESH_TOKEN,
+  ErrorCode.REFRESH_TOKEN_EXPIRED,
+  ErrorCode.REFRESH_TOKEN_REUSED,
+]);
+
+/** Transfer failures about the transaction PIN itself - the PIN prompt stays open for these. */
+export const PIN_ERROR_CODES: ReadonlySet<ErrorCode> = new Set([
+  ErrorCode.INVALID_PIN,
+  ErrorCode.PIN_NOT_SET,
+  ErrorCode.ACCOUNT_LOCKED,
+]);
+
+/** Best-effort code for a response that carried no error body (e.g. a proxy's HTML error page). */
+export function errorCodeForStatus(status: number): ErrorCode {
+  switch (status) {
+    case HTTP_STATUS.UNAUTHORIZED:
+      return ErrorCode.UNAUTHENTICATED;
+    case HTTP_STATUS.FORBIDDEN:
+      return ErrorCode.FORBIDDEN;
+    case HTTP_STATUS.NOT_FOUND:
+      return ErrorCode.ROUTE_NOT_FOUND;
+    case HTTP_STATUS.TOO_MANY_REQUESTS:
+      return ErrorCode.RATE_LIMIT_EXCEEDED;
+    default:
+      return status >= HTTP_STATUS.INTERNAL_SERVER_ERROR ? ErrorCode.INTERNAL_ERROR : ErrorCode.UNKNOWN_ERROR;
+  }
+}

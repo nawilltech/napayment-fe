@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { ApiError, type TransferResolveResponse, type TransferResponse } from '@napayment/api-client';
-import { transferSchema } from '@napayment/schemas';
+import {
+  ApiError,
+  CLIENT_ERROR_MESSAGES,
+  PIN_ERROR_CODES,
+  type TransferResolveResponse,
+  type TransferResponse,
+} from '@napayment/api-client';
+import { transferSchema, VALIDATION_MESSAGES } from '@napayment/schemas';
 import { AmountField } from '@/components/amount-field';
 import { BackHeader } from '@/components/back-header';
 import { Button } from '@/components/button';
@@ -46,16 +52,16 @@ export default function SendScreen() {
   function findRecipient() {
     setError(null);
     const id = identifier.replace(/\s/g, '');
-    if (!id) return setError('Enter an account number or phone number.');
-    if (!online) return setError("You're offline. Sending money needs a connection.");
+    if (!id) return setError(VALIDATION_MESSAGES.recipientRequired);
+    if (!online) return setError(CLIENT_ERROR_MESSAGES.offlineSend);
     resolve.mutate(id, { onSuccess: setRecipient, onError: (e) => setError(errorMessage(e)) });
   }
 
   function review() {
     setError(null);
-    if (!amountKobo) return setError('Enter an amount.');
-    if (wallet.data && BigInt(amountKobo) > BigInt(wallet.data.balance)) return setError('That is more than your balance.');
-    if (!online) return setError("You're offline. Sending money needs a connection.");
+    if (!amountKobo) return setError(VALIDATION_MESSAGES.amountRequired);
+    if (wallet.data && BigInt(amountKobo) > BigInt(wallet.data.balance)) return setError(VALIDATION_MESSAGES.amountExceedsBalance);
+    if (!online) return setError(CLIENT_ERROR_MESSAGES.offlineSend);
     setPinError(null);
     setPinOpen(true);
   }
@@ -67,7 +73,7 @@ export default function SendScreen() {
       narration: narration.trim() || undefined,
       transactionPin: pin,
     });
-    if (!parsed.success) return setPinError(parsed.error.issues[0]?.message ?? 'Check the details.');
+    if (!parsed.success) return setPinError(parsed.error.issues[0]?.message ?? CLIENT_ERROR_MESSAGES.invalidInput);
     transfer.mutate(
       { body: parsed.data, idempotencyKey },
       {
@@ -77,7 +83,7 @@ export default function SendScreen() {
         },
         onError: (e) => {
           // Wrong PIN: stay in the sheet. Anything else: close it and show why.
-          if (e instanceof ApiError && e.status < 500 && /pin/i.test(e.message)) {
+          if (e instanceof ApiError && PIN_ERROR_CODES.has(e.errorCode)) {
             setPinError(errorMessage(e));
           } else {
             setPinOpen(false);

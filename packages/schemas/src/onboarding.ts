@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { VALIDATION_MESSAGES } from "./messages";
 
 /**
  * Client-side validation for the onboarding flow, mirroring the backend's own
@@ -12,11 +13,11 @@ import { z } from "zod";
 // ---- Business KYC ----------------------------------------------------------
 
 export const businessDetailsSchema = z.object({
-  registeredName: z.string().min(2, "Required"),
+  registeredName: z.string().min(2, VALIDATION_MESSAGES.required),
   cacNumber: z
     .string()
-    .min(1, "Required")
-    .regex(/^(RC|BN|IT)\d{4,10}$/i, "Format like RC1234567"),
+    .min(1, VALIDATION_MESSAGES.required)
+    .regex(/^(RC|BN|IT)\d{4,10}$/i, VALIDATION_MESSAGES.cacNumberFormat),
   businessType: z.enum([
     "SOLE_PROPRIETORSHIP",
     "LIMITED_LIABILITY",
@@ -24,10 +25,10 @@ export const businessDetailsSchema = z.object({
     "NGO",
     "OTHER",
   ]),
-  industry: z.string().min(1, "Required"),
-  countryId: z.string().uuid("Select a country"),
-  stateId: z.string().uuid("Select a state"),
-  addressLine: z.string().min(3, "Required"),
+  industry: z.string().min(1, VALIDATION_MESSAGES.required),
+  countryId: z.string().uuid(VALIDATION_MESSAGES.countryRequired),
+  stateId: z.string().uuid(VALIDATION_MESSAGES.stateRequired),
+  addressLine: z.string().min(3, VALIDATION_MESSAGES.required),
 });
 export type BusinessDetailsInput = z.infer<typeof businessDetailsSchema>;
 
@@ -50,17 +51,17 @@ export const ownerIdentitySchema = z
   .object({
     bvn: z
       .string()
-      .regex(/^\d{11}$/, "BVN must be 11 digits")
+      .regex(/^\d{11}$/, VALIDATION_MESSAGES.bvnInvalid)
       .optional()
       .or(z.literal("")),
     nin: z
       .string()
-      .regex(/^\d{11}$/, "NIN must be 11 digits")
+      .regex(/^\d{11}$/, VALIDATION_MESSAGES.ninInvalid)
       .optional()
       .or(z.literal("")),
   })
   .refine((data) => !!data.bvn || !!data.nin, {
-    message: "Provide either a BVN or an NIN",
+    message: VALIDATION_MESSAGES.ownerIdRequired,
     path: ["bvn"],
   });
 export type OwnerIdentityInput = z.infer<typeof ownerIdentitySchema>;
@@ -113,9 +114,9 @@ export const ROLE_TEMPLATE_META: Record<
 };
 
 export const inviteTeamMemberSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().email(VALIDATION_MESSAGES.emailInvalid),
   roleTemplate: z.enum(ROLE_TEMPLATES),
-  message: z.string().max(280, "Keep it under 280 characters").optional(),
+  message: z.string().max(280, VALIDATION_MESSAGES.tooLong(280)).optional(),
 });
 export type InviteTeamMemberInput = z.infer<typeof inviteTeamMemberSchema>;
 
@@ -129,14 +130,14 @@ export const ipWhitelistEntrySchema = z.object({
     .string()
     .regex(
       /^(\d{1,3}\.){3}\d{1,3}(\/(\d|[1-2]\d|3[0-2]))?$/,
-      "Enter a valid IP address or CIDR range, e.g. 192.168.1.0/24",
+      VALIDATION_MESSAGES.cidrInvalid,
     ),
 });
 export type IpWhitelistEntryInput = z.infer<typeof ipWhitelistEntrySchema>;
 
 export const webhookConfigSchema = z.object({
-  callbackUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
-  webhookUrl: z.string().url("Enter a valid URL").optional().or(z.literal("")),
+  callbackUrl: z.string().url(VALIDATION_MESSAGES.urlInvalid).optional().or(z.literal("")),
+  webhookUrl: z.string().url(VALIDATION_MESSAGES.urlInvalid).optional().or(z.literal("")),
 });
 export type WebhookConfigInput = z.infer<typeof webhookConfigSchema>;
 
@@ -145,7 +146,7 @@ export type WebhookConfigInput = z.infer<typeof webhookConfigSchema>;
 export const contactSettingsSchema = z.object({
   disputeEmails: z.array(z.string().email()).default([]),
   refundEmails: z.array(z.string().email()).default([]),
-  supportEmail: z.string().email("Enter a valid email").optional().or(z.literal("")),
-  generalEmail: z.string().email("Enter a valid email"),
+  supportEmail: z.string().email(VALIDATION_MESSAGES.emailInvalid).optional().or(z.literal("")),
+  generalEmail: z.string().email(VALIDATION_MESSAGES.emailInvalid),
 });
 export type ContactSettingsInput = z.infer<typeof contactSettingsSchema>;

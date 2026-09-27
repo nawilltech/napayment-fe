@@ -9,6 +9,8 @@
  * should be replaced by it - see doc F4 "API client & type generation".
  */
 
+import type { ErrorCode } from "./errors";
+
 export interface PageResponse<T> {
   content: T[];
   page: number;
@@ -20,7 +22,7 @@ export interface PageResponse<T> {
 export interface ErrorResponse {
   timestamp: string;
   status: number;
-  errorCode: string;
+  errorCode: ErrorCode;
   message: string;
   requestId: string | null;
   details: string[];
