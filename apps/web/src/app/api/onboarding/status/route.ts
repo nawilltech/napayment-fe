@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/server/session";
 import { computeOnboardingStatus } from "@/server/onboarding-status";
-import { handleRouteError } from "@/server/route-helpers";
+import { handleRouteError } from "@napayment/bff/route-helpers";
 
 export async function GET() {
   try {

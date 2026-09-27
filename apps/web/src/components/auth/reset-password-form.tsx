@@ -5,10 +5,10 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resetPasswordSchema, type ResetPasswordInput } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Label } from "@/components/ui/label";
-import { Alert } from "@/components/ui/alert";
+import { Button } from "@napayment/ui/button";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { Label } from "@napayment/ui/label";
+import { Alert } from "@napayment/ui/alert";
 import { useResetPassword } from "@/hooks/use-auth";
 
 /**

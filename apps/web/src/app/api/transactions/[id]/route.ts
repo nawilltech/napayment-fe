@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { authedBackendClient } from "@/server/backend-client";
-import { handleRouteError } from "@/server/route-helpers";
+import { handleRouteError } from "@napayment/bff/route-helpers";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

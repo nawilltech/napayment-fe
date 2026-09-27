@@ -1,21 +1,16 @@
 import { NextResponse } from "next/server";
 import { acceptInviteSchema } from "@napayment/schemas";
 import { publicBackendClient } from "@/server/backend-client";
+import { sessionFromAuth } from "@napayment/bff/session-cookie";
 import { setSession } from "@/server/session";
-import { handleRouteError, parseBody } from "@/server/route-helpers";
+import { handleRouteError, parseBody } from "@napayment/bff/route-helpers";
 
 export async function POST(request: Request) {
   try {
     const body = await parseBody(request, acceptInviteSchema);
     const auth = await (await publicBackendClient()).auth.signupViaInvite(body);
 
-    await setSession({
-      accessToken: auth.accessToken,
-      refreshToken: auth.refreshToken,
-      userId: auth.userId,
-      businessId: auth.businessId,
-      accessTokenExpiresAt: Date.now() + auth.expiresInSeconds * 1000,
-    });
+    await setSession(sessionFromAuth(auth));
 
     return NextResponse.json({ userId: auth.userId, businessId: auth.businessId });
   } catch (error) {

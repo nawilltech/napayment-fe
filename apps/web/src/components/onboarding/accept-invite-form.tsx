@@ -3,11 +3,11 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { acceptInviteSchema, DEFAULT_CALLING_CODE, type AcceptInviteInput } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { PhoneInput } from "@/components/ui/phone-input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { PhoneInput } from "@napayment/ui/phone-input";
+import { Label } from "@napayment/ui/label";
 import { useAcceptInvite } from "@/hooks/use-auth";
 
 export function AcceptInviteForm({ token }: { token: string }) {

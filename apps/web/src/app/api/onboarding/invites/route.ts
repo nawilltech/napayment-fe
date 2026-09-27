@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { inviteTeamMemberSchema } from "@napayment/schemas";
 import type { InviteResponse, RoleResponse } from "@napayment/api-client";
 import { authedBackendClient } from "@/server/backend-client";
-import { handleRouteError, parseBody } from "@/server/route-helpers";
+import { handleRouteError, parseBody } from "@napayment/bff/route-helpers";
 
 /**
  * The backend's InviteResponse carries `roleId`, not the `roleTemplate` that

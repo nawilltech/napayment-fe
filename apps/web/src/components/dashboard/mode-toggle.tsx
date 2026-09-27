@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@napayment/ui/lib/cn";
 
 const STORAGE_KEY = "napayment_mode";
 

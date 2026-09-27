@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useScrollActiveIntoView } from "@/hooks/use-scroll-active-into-view";
+import { cn } from "@napayment/ui/lib/cn";
+import { useScrollActiveIntoView } from "@napayment/ui/lib/use-scroll-active-into-view";
 
 export interface OnboardingStep {
   key: string;

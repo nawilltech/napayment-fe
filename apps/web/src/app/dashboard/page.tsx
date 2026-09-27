@@ -2,38 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { authedBackendClient } from "@/server/backend-client";
-import { safeCall } from "@/server/safe-call";
+import { safeCall } from "@napayment/bff/safe-call";
 import { loadConsole } from "@/server/console";
-import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/badge";
-import { CollectionsChart } from "@/components/dashboard/collections-chart";
-import { CopyButton } from "@/components/dashboard/copy-button";
-import type { TransactionDailyVolume } from "@napayment/api-client";
+import { Card } from "@napayment/ui/card";
+import { buttonVariants } from "@napayment/ui/button";
+import { StatusBadge } from "@napayment/ui/badge";
+import { CollectionsChart } from "@napayment/ui/collections-chart";
+import { lastNDays, windowStart } from "@napayment/ui/lib/daily-series";
+import { CopyButton } from "@napayment/ui/copy-button";
 import { describeTransaction, displayName, formatDateTime, formatNaira, groupAccountNumber } from "@napayment/format";
-import { cn } from "@/lib/utils";
+import { cn } from "@napayment/ui/lib/cn";
 
 export const metadata: Metadata = { title: "Home — Napayment" };
 
 const CHART_DAYS = 14;
 
-// Backend buckets daily volume by Lagos calendar day.
-const lagosDay = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Lagos" });
-
-/** Every day in the window, zero-filled - the analytics endpoint omits empty days. */
-function lastNDays(n: number, data: TransactionDailyVolume[]): TransactionDailyVolume[] {
-  const byDate = new Map(data.map((d) => [d.date, d]));
-  return Array.from({ length: n }, (_, i) => {
-    const date = lagosDay.format(new Date(Date.now() - (n - 1 - i) * 86_400_000));
-    return byDate.get(date) ?? { date, count: 0, volume: "0" };
-  });
-}
-
 export default async function DashboardPage() {
   const { me, kind, steps, activation } = await loadConsole();
 
-  const since = new Date(Date.now() - (CHART_DAYS - 1) * 86_400_000);
-  since.setHours(0, 0, 0, 0);
+  const since = windowStart(CHART_DAYS);
 
   const client = await authedBackendClient();
   // virtualaccounts:read and transactions:read aren't in every role

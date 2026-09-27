@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@napayment/ui/button";
 import { useLogout } from "@/hooks/use-auth";
 
 export function SignOutButton(props: Omit<ButtonProps, "onClick" | "loading">) {

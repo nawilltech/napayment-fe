@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { accountKind } from "@/lib/account";
+import { accountKind } from "@napayment/bff/account";
 import { authedBackendClient } from "./backend-client";
 import { activationSteps, computeOnboardingStatus, isActivationDone } from "./onboarding-status";
 import { getSession } from "./session";

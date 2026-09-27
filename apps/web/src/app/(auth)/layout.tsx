@@ -1,4 +1,4 @@
-import { Logo } from "@/components/brand/logo";
+import { Logo } from "@napayment/ui/logo";
 
 // Who collects with Napayment, and what they collect. Kept to four so the
 // grid reads at a glance; "associations" covers unions, estates, churches.

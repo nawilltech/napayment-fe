@@ -1,4 +1,4 @@
-import { Logo } from "@/components/brand/logo";
+import { Logo } from "@napayment/ui/logo";
 import { AcceptInviteForm } from "@/components/onboarding/accept-invite-form";
 
 /**

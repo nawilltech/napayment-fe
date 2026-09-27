@@ -3,11 +3,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { changePasswordSchema, type ChangePasswordInput } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { Label } from "@napayment/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@napayment/ui/card";
 import { useChangePassword, useMe } from "@/hooks/use-auth";
 
 export function ProfileForm() {

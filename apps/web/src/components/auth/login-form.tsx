@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { PasswordInput } from "@napayment/ui/password-input";
+import { Label } from "@napayment/ui/label";
 import { useLogin } from "@/hooks/use-auth";
 
 export function LoginForm() {

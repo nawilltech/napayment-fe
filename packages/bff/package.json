@@ -1,0 +1,17 @@
+{
+  "name": "@napayment/bff",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js server-side glue shared by apps/web and apps/admin: session cookie, backend client, auth, middleware, route helpers.",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@napayment/api-client": "*",
+    "server-only": "0.0.1",
+    "zod": "3.25.76"
+  },
+  "peerDependencies": {
+    "next": "15.5.25"
+  }
+}

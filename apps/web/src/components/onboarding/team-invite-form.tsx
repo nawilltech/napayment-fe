@@ -10,14 +10,14 @@ import {
   ROLE_TEMPLATES,
   type InviteTeamMemberInput,
 } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { StatusBadge } from "@/components/ui/badge";
-import { CopyField } from "@/components/ui/copy-field";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { Label } from "@napayment/ui/label";
+import { Select } from "@napayment/ui/select";
+import { Textarea } from "@napayment/ui/textarea";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
+import { StatusBadge } from "@napayment/ui/badge";
+import { CopyField } from "@napayment/ui/copy-field";
 import { formatDateTime as formatDate } from "@napayment/format";
 import { useCreateInvite, useInvites, useRevokeInvite } from "@/hooks/use-onboarding";
 

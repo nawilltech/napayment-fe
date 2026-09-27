@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { businessSignupSchema, individualSignupSchema } from "@napayment/schemas";
 import { publicBackendClient } from "@/server/backend-client";
+import { sessionFromAuth } from "@napayment/bff/session-cookie";
 import { setSession } from "@/server/session";
-import { handleRouteError, ValidationError } from "@/server/route-helpers";
+import { handleRouteError, ValidationError } from "@napayment/bff/route-helpers";
 
 export async function POST(request: Request) {
   try {
@@ -16,13 +17,7 @@ export async function POST(request: Request) {
 
     const auth = await (await publicBackendClient()).auth.signup(parsed.data);
 
-    await setSession({
-      accessToken: auth.accessToken,
-      refreshToken: auth.refreshToken,
-      userId: auth.userId,
-      businessId: auth.businessId,
-      accessTokenExpiresAt: Date.now() + auth.expiresInSeconds * 1000,
-    });
+    await setSession(sessionFromAuth(auth));
 
     return NextResponse.json({ userId: auth.userId, businessId: auth.businessId, isBusiness });
   } catch (error) {

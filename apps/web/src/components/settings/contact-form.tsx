@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { contactSettingsSchema } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { Label } from "@napayment/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
 import { useContactSettings, useSaveContactSettings } from "@/hooks/use-onboarding";
 
 function parseEmails(value: string): string[] {

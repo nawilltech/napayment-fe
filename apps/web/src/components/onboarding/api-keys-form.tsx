@@ -11,13 +11,13 @@ import {
   type IpWhitelistEntryInput,
   type WebhookConfigInput,
 } from "@napayment/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert } from "@/components/ui/alert";
-import { CopyField } from "@/components/ui/copy-field";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@napayment/ui/button";
+import { Input } from "@napayment/ui/input";
+import { Label } from "@napayment/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
+import { Alert } from "@napayment/ui/alert";
+import { CopyField } from "@napayment/ui/copy-field";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@napayment/ui/dialog";
 import {
   useApiKeys,
   useAddIpWhitelist,

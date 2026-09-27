@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { authedBackendClient } from "./backend-client";
-import { safeCall } from "./safe-call";
+import { safeCall } from "@napayment/bff/safe-call";
 import type { OnboardingStep } from "@/components/onboarding/stepper";
 
 /**
