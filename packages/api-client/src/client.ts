@@ -344,8 +344,24 @@ export function createBackendClient(config: ApiClientConfig) {
         }),
       activateBusiness: (id: string) =>
         apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/activate`, { method: "POST" }),
-      /** Every payment method the platform supports (for the processor form). */
-      paymentMethods: () => apiRequest<T.PaymentMethodOption[]>(config, "/api/v1/admin/payment-methods"),
+      /** The payment method catalogue (FR-Proc-2). */
+      paymentMethods: {
+        list: () => apiRequest<T.PaymentMethodResponse[]>(config, "/api/v1/admin/payment-methods"),
+        get: (id: string) => apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}`),
+        create: (body: T.CreatePaymentMethodRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, "/api/v1/admin/payment-methods", { method: "POST", body }),
+        update: (id: string, body: T.UpdatePaymentMethodRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}`, { method: "PATCH", body }),
+        /** Platform switch (requires the staff password). */
+        setActive: (id: string, active: boolean, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentMethodResponse>(
+            config,
+            `/api/v1/admin/payment-methods/${id}/${active ? "activate" : "deactivate"}`,
+            { method: "POST", body },
+          ),
+        /** Only while unused - otherwise PAYMENT_METHOD_IN_USE; deactivate instead. */
+        delete: (id: string) => apiRequest<void>(config, `/api/v1/admin/payment-methods/${id}`, { method: "DELETE" }),
+      },
       paymentProcessors: {
         list: (params?: T.PageParams) =>
           apiRequest<T.PageResponse<T.PaymentProcessorResponse>>(config, "/api/v1/admin/payment-processors", {
@@ -368,11 +384,11 @@ export function createBackendClient(config: ApiClientConfig) {
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
             method: "DELETE",
           }),
-        enableMethod: (id: string, method: T.PaymentMethod) =>
+        enableMethod: (id: string, method: T.PaymentMethodCode) =>
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
             method: "PUT",
           }),
-        disableMethod: (id: string, method: T.PaymentMethod) =>
+        disableMethod: (id: string, method: T.PaymentMethodCode) =>
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
             method: "DELETE",
           }),

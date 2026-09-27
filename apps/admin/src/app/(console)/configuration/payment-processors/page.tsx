@@ -14,7 +14,7 @@ export default async function PaymentProcessorsPage() {
   const client = await authedBackendClient();
   const [processors, methods] = await Promise.all([
     client.admin.paymentProcessors.list({ size: 100 }),
-    client.admin.paymentMethods(),
+    client.admin.paymentMethods.list(),
   ]);
 
   return (

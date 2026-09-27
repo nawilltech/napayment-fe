@@ -232,7 +232,7 @@ export interface CreateTransactionRequest {
   /** Optional: omitted, the highest-priority processor available for the method is used (FR-Proc-4). */
   paymentProcessorId?: string;
   /** Defaults to TRANSFER. */
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: PaymentMethodCode;
   transactionType: TransactionType;
   amount: string;
 }
@@ -248,7 +248,7 @@ export interface TransactionResponse {
   /** Null for a peer-to-peer transfer leg (FR-Auth-1) - no external processor is involved. */
   paymentProcessorId: string | null;
   /** How the payer paid; null for a peer-to-peer transfer leg. */
-  paymentMethod: PaymentMethod | null;
+  paymentMethod: PaymentMethodCode | null;
   /** Set only on transfer-sourced rows: a transfer produces one DEBIT + one CREDIT sharing this id. */
   transferGroupId: string | null;
   /** The other side's virtual account id, set only on transfer-sourced rows. */
@@ -419,7 +419,7 @@ export interface PaymentLinkCheckoutResponse extends PaymentLinkResponse {
 export interface PayLinkRequest {
   amount?: string;
   /** Defaults to TRANSFER; must be one of the link's availableMethods. */
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: PaymentMethodCode;
 }
 
 // ---- Dynamic (Temporary) Virtual Accounts ---------------------------------------
@@ -450,7 +450,7 @@ export interface DynamicVirtualAccountResponse {
 export interface CollectRequest {
   amount: string;
   /** Defaults to TRANSFER. */
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: PaymentMethodCode;
 }
 
 export interface WithdrawRequest {
@@ -459,14 +459,43 @@ export interface WithdrawRequest {
 
 // ---- Payment Processor ----------------------------------------------------------
 
-/** The fixed platform list of payment methods (backend PaymentMethod); labels come from the API. */
-export const PAYMENT_METHODS = ["TRANSFER", "CARD", "USSD", "BANK_DEBIT", "QR"] as const;
-export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+/** A payment method's permanent code in the catalogue (e.g. "TRANSFER", "CARD"); managed in the admin console. */
+export type PaymentMethodCode = string;
+
+/** A payment method in the platform catalogue (FR-Proc-2). */
+export interface PaymentMethodResponse {
+  id: string;
+  code: PaymentMethodCode;
+  name: string;
+  description: string | null;
+  /** Lower shows first. */
+  displayOrder: number;
+  /** Platform switch: INACTIVE = no processor may take new payments with it. */
+  status: EntityStatus;
+  /** Processors that list it; a method is deletable only while unused. */
+  processorCount: number;
+  createdAt: string;
+}
+
+export interface CreatePaymentMethodRequest {
+  /** Letters, digits, underscores; stored upper-case, never changed after creation. */
+  code: string;
+  name: string;
+  description?: string;
+  displayOrder?: number;
+}
+
+/** Only the fields present change; an empty description clears it. */
+export interface UpdatePaymentMethodRequest {
+  name?: string;
+  description?: string;
+  displayOrder?: number;
+}
 
 export type EntityStatus = "ACTIVE" | "INACTIVE";
 
 export interface PaymentMethodOption {
-  method: PaymentMethod;
+  method: PaymentMethodCode;
   label: string;
   /** False for a method a processor has disabled (kept for history). */
   active: boolean;
@@ -493,7 +522,7 @@ export interface CreatePaymentProcessorRequest {
   priority?: number;
   /** ON for every business without its own setting. Defaults to true. */
   defaultEnabled?: boolean;
-  methods: PaymentMethod[];
+  methods: PaymentMethodCode[];
 }
 
 export interface UpdatePaymentProcessorRequest {
@@ -787,6 +816,11 @@ export const AUDIT_EVENT_TYPES = [
   "PAYMENT_PROCESSOR_DEACTIVATED",
   "PAYMENT_METHOD_ENABLED",
   "PAYMENT_METHOD_DISABLED",
+  "PAYMENT_METHOD_CREATED",
+  "PAYMENT_METHOD_UPDATED",
+  "PAYMENT_METHOD_ACTIVATED",
+  "PAYMENT_METHOD_DEACTIVATED",
+  "PAYMENT_METHOD_DELETED",
   "PAYMENT_PROCESSOR_ENABLED_FOR_ALL",
   "PAYMENT_PROCESSOR_DISABLED_FOR_ALL",
   "BUSINESS_PAYMENT_PROCESSOR_SET",

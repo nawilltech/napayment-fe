@@ -25,7 +25,7 @@ export default async function PaymentProcessorPage({ params }: { params: Promise
       if (error instanceof ApiError && error.is(ErrorCode.PAYMENT_PROCESSOR_NOT_FOUND)) notFound();
       throw error;
     }),
-    client.admin.paymentMethods(),
+    client.admin.paymentMethods.list(),
   ]);
 
   return (

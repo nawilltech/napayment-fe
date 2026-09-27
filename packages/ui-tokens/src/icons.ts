@@ -21,6 +21,7 @@ export const ICON_NAMES = [
   "kycReview",
   "businesses",
   "processors",
+  "paymentMethods",
   "bank",
   "auditLogs",
   // Account & settings

@@ -27,6 +27,7 @@ import {
   ShieldCheck,
   UserRound,
   Users,
+  WalletCards,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -50,6 +51,7 @@ export const ICONS = {
   kycReview: ShieldCheck,
   businesses: Building2,
   processors: CreditCard,
+  paymentMethods: WalletCards,
   bank: Landmark,
   auditLogs: ScrollText,
   profile: UserRound,

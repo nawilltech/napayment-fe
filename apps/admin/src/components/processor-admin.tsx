@@ -1,7 +1,12 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import type { PaymentMethod, PaymentMethodOption, PaymentProcessorResponse } from "@napayment/api-client";
+import type {
+  PaymentMethodCode,
+  PaymentMethodOption,
+  PaymentMethodResponse,
+  PaymentProcessorResponse,
+} from "@napayment/api-client";
 import type { ActionState } from "@napayment/bff/actions";
 import { plural } from "@napayment/format";
 import { Badge } from "@napayment/ui/badge";
@@ -35,7 +40,7 @@ export function MethodChips({ methods }: { methods: PaymentMethodOption[] }) {
 }
 
 /** Configuration -> Payment processors: add one with the methods it offers (FR-Proc-1/2). */
-export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[] }) {
+export function CreateProcessorForm({ methods }: { methods: PaymentMethodResponse[] }) {
   const [state, action] = useActionState(createProcessorAction, {});
   const [logo, setLogo] = useState<string | null>(null);
   return (
@@ -58,12 +63,14 @@ export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[
       <fieldset>
         <legend className="mb-1.5 text-[13px] font-semibold text-ink">Payment methods</legend>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          {methods.map((m) => (
-            <label key={m.method} className="flex items-center gap-2 text-[13.5px] text-ink">
-              <input type="checkbox" name="methods" value={m.method} className="size-4 accent-brand" />
-              {m.label}
-            </label>
-          ))}
+          {methods
+            .filter((m) => m.status === "ACTIVE")
+            .map((m) => (
+              <label key={m.code} className="flex items-center gap-2 text-[13.5px] text-ink">
+                <input type="checkbox" name="methods" value={m.code} className="size-4 accent-brand" />
+                {m.name}
+              </label>
+            ))}
         </div>
       </fieldset>
       <label className="flex items-start gap-2 text-[13.5px] text-ink">
@@ -119,20 +126,21 @@ export function ProcessorDetailsForm({ processor }: { processor: PaymentProcesso
   );
 }
 
-/** Every platform method: offered, disabled (kept for history) or not offered, with the matching action. */
+/** Every catalogue method: offered, disabled (kept for history) or not offered, with the matching action. */
 export function ProcessorMethodsEditor({
   processor,
   allMethods,
 }: {
   processor: PaymentProcessorResponse;
-  allMethods: PaymentMethodOption[];
+  allMethods: PaymentMethodResponse[];
 }) {
   const [state, setState] = useState<ActionState>({});
   const [pending, startTransition] = useTransition();
-  const [busy, setBusy] = useState<PaymentMethod | null>(null);
+  const [busy, setBusy] = useState<PaymentMethodCode | null>(null);
+  // Processor-level state; `active` here is false when either the processor or the platform switched it off.
   const offered = new Map(processor.methods.map((m) => [m.method, m.active]));
 
-  function toggle(method: PaymentMethod, enable: boolean) {
+  function toggle(method: PaymentMethodCode, enable: boolean) {
     setBusy(method);
     startTransition(async () => {
       setState(await setProcessorMethodAction(processor.id, method, enable));
@@ -143,9 +151,16 @@ export function ProcessorMethodsEditor({
   return (
     <div className="space-y-3">
       <ul className="divide-y divide-line-soft">
-        {allMethods.map(({ method, label }) => {
+        {allMethods.map(({ code: method, name: label, status: platformStatus }) => {
           const active = offered.get(method);
-          const status = active === undefined ? "Not offered" : active ? "Offered" : "Disabled";
+          const platformOff = platformStatus !== "ACTIVE";
+          const status = platformOff
+            ? "Deactivated platform-wide"
+            : active === undefined
+              ? "Not offered"
+              : active
+                ? "Offered"
+                : "Disabled";
           return (
             <li key={method} className="flex items-center justify-between gap-3 py-2.5">
               <span className="min-w-0">
@@ -156,7 +171,7 @@ export function ProcessorMethodsEditor({
                 size="sm"
                 variant={active ? "outline" : "secondary"}
                 loading={pending && busy === method}
-                disabled={pending}
+                disabled={pending || platformOff}
                 onClick={() => toggle(method, !active)}
               >
                 {active ? "Disable" : active === undefined ? "Add" : "Enable"}
