@@ -34,15 +34,17 @@ contracts this was built against (see that folder's own README for status).
 ```bash
 # from the repo root
 npm install                      # installs every workspace (apps/* and packages/*) in one pass
-cp .env.example apps/web/.env.local   # point the web app at your local backend
+cp .env.example apps/web/.env.local              # point the web app at your local backend
+cp apps/admin/.env.example apps/admin/.env.local # ...and the admin console (Next.js only reads its own app folder)
 ```
 
 ## Running
 
 ```bash
-npm run dev:web       # Next.js dev server at http://localhost:3000
+npm run dev:web       # Business Console at http://localhost:3000
+npm run dev:admin     # Admin console (staff only) at http://localhost:3001
 npm run dev:mobile     # Expo CLI — press i/a/w for iOS/Android/web, or scan the QR code
-npm run dev            # both, via Turborepo (turbo run dev)
+npm run dev            # everything, via Turborepo (turbo run dev)
 ```
 
 Installing a package into just one workspace (don't run `npm install <pkg>`
@@ -66,10 +68,14 @@ npm run lint          # turbo run lint
 ```
 apps/
   web/          Next.js 15 App Router — Business Console
+  admin/        Next.js 15 App Router — admin console for Napayment staff
   mobile/        Expo (React Native) — Consumer Wallet App (scaffold)
 packages/
   api-client/    Typed fetch wrapper over the napayment backend (doc F6)
+  bff/           Next.js server layer shared by web and admin (session, auth, middleware)
+  format/        Money/date/label formatting shared by all apps
   schemas/       Zod validation schemas shared by both apps' forms
+  ui/            Design system shared by web and admin (theme, components, AppShell)
   ui-tokens/     Brand colors/spacing - single source of truth for both apps' themes
 docs/
   nawill-pay-frontend.md   Architecture handbook
