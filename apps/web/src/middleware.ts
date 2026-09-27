@@ -22,7 +22,7 @@ const SESSION_COOKIE_NAME = "napayment_session";
 const REFRESH_TOKEN_LIFETIME_DAYS = 30; // must match session.ts's own constant
 const REFRESH_BUFFER_MS = 2 * 60 * 1000; // rotate once the access token has <2 min left
 
-const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
+const PROTECTED_PREFIXES = ["/dashboard", "/onboarding", "/admin-account"];
 const AUTH_ONLY_PREFIXES = ["/login", "/signup"];
 
 interface SessionCookie {
@@ -138,5 +138,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/login", "/signup", "/api/:path*"],
+  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/admin-account", "/login", "/signup", "/api/:path*"],
 };

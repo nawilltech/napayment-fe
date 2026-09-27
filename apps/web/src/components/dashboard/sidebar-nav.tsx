@@ -57,7 +57,7 @@ export function SidebarNav({
             {group.title}
           </p>
           <div className="space-y-0.5">
-            {group.items.map((item) => {
+            {group.items.filter((item) => item.tag !== "activation" || activation).map((item) => {
               const active = item.matchPrefix ? pathname.startsWith(item.matchPrefix) : pathname === item.href;
               const tag =
                 item.tag === "activation" && activation && !activation.complete

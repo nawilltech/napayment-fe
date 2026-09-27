@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { getSession } from "@/server/session";
 import { authedBackendClient } from "@/server/backend-client";
 import { safeCall } from "@/server/safe-call";
-import { activationSteps, computeOnboardingStatus, isActivationDone } from "@/server/onboarding-status";
+import { loadConsole } from "@/server/console";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/badge";
@@ -31,8 +30,7 @@ function lastNDays(n: number, data: TransactionDailyVolume[]): TransactionDailyV
 }
 
 export default async function DashboardPage() {
-  const session = await getSession();
-  if (!session) return null;
+  const { me, kind, steps, activation } = await loadConsole();
 
   const since = new Date(Date.now() - (CHART_DAYS - 1) * 86_400_000);
   since.setHours(0, 0, 0, 0);
@@ -42,19 +40,14 @@ export default async function DashboardPage() {
   // template's fixed permission set (doc F6 - DEVELOPER has neither) - an
   // invited teammate under that role legitimately 403s on both. safeCall
   // degrades that to an empty state instead of crashing the page.
-  const [me, virtualAccounts, recentTransactions, collected, status] = await Promise.all([
-    client.users.me(),
+  const [virtualAccounts, recentTransactions, collected] = await Promise.all([
     safeCall(client.virtualAccounts.listMine({ size: 5 })),
     safeCall(client.transactions.list({}, { page: 0, size: 5 })),
     safeCall(client.transactions.analytics({ type: "CREDIT", fromDate: since.toISOString() })),
-    computeOnboardingStatus(),
   ]);
   const account = virtualAccounts?.content[0];
   const name = displayName(me);
-  const steps = activationSteps(status);
-  const doneCount = steps.filter((s) => s.done).length;
-  const nextStep = steps.find((s) => !s.done);
-  const activationComplete = isActivationDone(status);
+  const nextStep = steps?.find((s) => !s.done);
 
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
@@ -159,23 +152,23 @@ export default async function DashboardPage() {
       </div>
 
       <div className="flex min-w-0 flex-col gap-5">
-        {!activationComplete ? (
+        {steps && activation && !activation.complete ? (
           <Card className="p-[22px]">
             <div className="flex items-baseline justify-between">
               <h2 className="text-[15px] font-bold text-ink">Finish activation</h2>
               <p className="font-mono text-xs text-subtle">
-                {doneCount} of {steps.length}
+                {activation.done} of {activation.total}
               </p>
             </div>
             <div
               className="mb-3.5 mt-3 h-1.5 overflow-hidden rounded-full bg-line-soft"
               role="progressbar"
               aria-valuemin={0}
-              aria-valuemax={steps.length}
-              aria-valuenow={doneCount}
+              aria-valuemax={activation.total}
+              aria-valuenow={activation.done}
               aria-label="Activation progress"
             >
-              <div className="h-full bg-brand" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+              <div className="h-full bg-brand" style={{ width: `${(activation.done / activation.total) * 100}%` }} />
             </div>
             <ul className="space-y-2.5">
               {steps.map((step) => (
@@ -209,9 +202,11 @@ export default async function DashboardPage() {
             {[
               { href: "/dashboard/send", label: "Send money", hint: "Pay another Napayment account" },
               { href: "/dashboard/transactions", label: "Transactions", hint: "Search, filter and inspect payments" },
-              { href: "/dashboard/settings/api-keys", label: "API keys & webhooks", hint: "Connect your own server" },
-              { href: "/dashboard/settings/team", label: "Team", hint: "Invite people and manage roles" },
-            ].map((item) => (
+              { href: "/dashboard/settings/api-keys", label: "API keys & webhooks", hint: "Connect your own server", businessOnly: true },
+              { href: "/dashboard/settings/team", label: "Team", hint: "Invite people and manage roles", businessOnly: true },
+            ]
+              .filter((item) => kind === "business" || !item.businessOnly)
+              .map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="group flex items-center justify-between gap-3 py-2.5">
                   <span className="min-w-0">
