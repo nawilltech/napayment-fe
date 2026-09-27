@@ -41,7 +41,7 @@ export default async function CollectionAccountPage() {
               ]}
             />
           ) : (
-            <CreateCollectionAccountForm banks={banks.content} />
+            <CreateCollectionAccountForm />
           )}
         </CardContent>
       </Card>
