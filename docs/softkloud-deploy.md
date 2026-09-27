@@ -16,7 +16,7 @@ branch. Nothing here happens automatically - each step below is one-time.
 /opt/apps/napayment-fe`.
 
 **DNS.** `dev.napayment.nawill.ng` (Business Console) and
-`dev.napayment-admin.nawill.ng` (admin console) both point at the server.
+`dev.npadmin.nawill.ng` (admin console) both point at the server.
 
 **Caddy site blocks**, added to `/opt/stack/Caddyfile`:
 
@@ -27,7 +27,7 @@ dev.napayment.nawill.ng {
 
 # Staff-only admin console (apps/admin). Consider restricting it further,
 # e.g. `@outside not remote_ip <office/VPN CIDRs>` + `respond @outside 403`.
-dev.napayment-admin.nawill.ng {
+dev.npadmin.nawill.ng {
 	reverse_proxy napayment-admin:3001
 }
 ```
@@ -57,7 +57,7 @@ GitHub **Environment** `dev`, with these environment secrets:
 
 ```env
 NAWILL_API_BASE_URL=http://napayment-api:8080
-ADMIN_CONSOLE_URL=https://dev.napayment-admin.nawill.ng
+ADMIN_CONSOLE_URL=https://dev.npadmin.nawill.ng
 ```
 
 Both containers read this one file (docker-compose.prod.yml), so there's no
