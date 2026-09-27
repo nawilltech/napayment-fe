@@ -5,12 +5,13 @@ import { ApiError, ErrorCode } from "@napayment/api-client";
 import { formatDate, formatDateTime } from "@napayment/format";
 import { KYC_DOCUMENT_LABELS } from "@napayment/schemas";
 import { Alert } from "@napayment/ui/alert";
-import { StatusBadge } from "@napayment/ui/badge";
+import { Badge, StatusBadge } from "@napayment/ui/badge";
 import { buttonVariants } from "@napayment/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@napayment/ui/card";
 import { DetailList } from "@napayment/ui/detail-list";
 import { TableCard } from "@napayment/ui/table";
 import { AuditLogTable } from "@/components/audit-log-table";
+import { BusinessProcessorsTable, BusinessStatusControl } from "@/components/business-admin";
 import { KycReview } from "@/components/kyc-review";
 import { authedBackendClient } from "@/server/backend-client";
 
@@ -19,15 +20,17 @@ export const metadata: Metadata = { title: "Business — Napayment Admin" };
 export default async function BusinessPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const client = await authedBackendClient();
-  const [business, activity] = await Promise.all([
+  const [business, activity, processors] = await Promise.all([
     client.admin.getBusiness(id).catch((error) => {
       if (error instanceof ApiError && error.is(ErrorCode.BUSINESS_NOT_FOUND)) notFound();
       throw error;
     }),
     client.admin.listAuditLogs({ businessId: id }, { size: 15 }),
+    client.admin.businessPaymentProcessors.list(id),
   ]);
   const { summary } = business;
   const awaiting = summary.kycStatus === "PENDING_REVIEW";
+  const active = summary.status === "ACTIVE";
 
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
@@ -41,7 +44,10 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
                   {summary.ownerName} · {summary.ownerEmail} · joined {formatDate(summary.createdAt)}
                 </CardDescription>
               </div>
-              <StatusBadge status={summary.kycStatus} />
+              <span className="flex items-center gap-2">
+                {!active && <Badge variant="danger">Deactivated</Badge>}
+                <StatusBadge status={summary.kycStatus} />
+              </span>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -98,6 +104,18 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment processors</CardTitle>
+            <CardDescription>
+              Default follows the platform setting for each processor; On or Off applies to this business only.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BusinessProcessorsTable businessId={summary.id} rows={processors} />
+          </CardContent>
+        </Card>
+
         <div className="space-y-2.5">
           <h2 className="text-[15px] font-bold text-ink">Activity</h2>
           <TableCard>
@@ -107,6 +125,20 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
       </div>
 
       <div className="flex min-w-0 flex-col gap-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BusinessStatusControl
+              businessId={summary.id}
+              active={active}
+              reason={business.statusReason}
+              changedAt={business.statusChangedAt}
+            />
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Owner identity</CardTitle>

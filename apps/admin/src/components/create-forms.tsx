@@ -11,24 +11,8 @@ import {
 import { BankCombobox } from "@napayment/ui/bank-combobox";
 import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
-import { createCollectionAccountAction, createProcessorAction } from "@/app/actions";
+import { createCollectionAccountAction } from "@/app/actions";
 import { FormFeedback, SubmitButton } from "./form-feedback";
-
-export function CreateProcessorForm() {
-  const [state, action] = useActionState(createProcessorAction, {});
-  return (
-    <form action={action} className="flex flex-wrap items-end gap-2.5">
-      <div className="min-w-[220px] flex-1">
-        <Label htmlFor="name">New processor</Label>
-        <Input id="name" name="name" placeholder="e.g. Paystack" required />
-      </div>
-      <SubmitButton>Add processor</SubmitButton>
-      <div className="basis-full">
-        <FormFeedback state={state} success="Processor added." />
-      </div>
-    </form>
-  );
-}
 
 async function searchBanks(term: string): Promise<BankResponse[]> {
   return (await apiRequest<PageResponse<BankResponse>>(SAME_ORIGIN, "/api/banks", { query: { term } })).content;

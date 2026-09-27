@@ -1,8 +1,8 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import { cn } from "../lib/cn";
+import { Icon } from "./icon";
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
@@ -24,7 +24,7 @@ export function DialogContent({
       >
         {children}
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-subtle hover:bg-line-soft hover:text-ink sm:right-5 sm:top-5">
-          <X className="size-4" />
+          <Icon name="close" className="size-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
