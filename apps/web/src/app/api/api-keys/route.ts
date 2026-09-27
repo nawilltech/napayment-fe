@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { authedBackendClient } from "@/server/backend-client";
 import { handleRouteError } from "@napayment/bff/route-helpers";
+import { HTTP_STATUS } from "@napayment/api-client";
 
 export async function GET(request: Request) {
   try {
@@ -20,7 +21,7 @@ export async function POST() {
   try {
     const client = await authedBackendClient();
     const result = await client.apiKeys.generate();
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(result, { status: HTTP_STATUS.CREATED });
   } catch (error) {
     return handleRouteError(error);
   }

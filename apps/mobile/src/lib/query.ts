@@ -3,7 +3,7 @@ import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { QueryClient, focusManager, onlineManager } from '@tanstack/react-query';
-import { ApiError } from '@napayment/api-client';
+import { ApiError, HTTP_STATUS } from '@napayment/api-client';
 
 /**
  * Offline resilience per doc F5:
@@ -38,7 +38,7 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 30_000,
       gcTime: DAY, // must be >= persister maxAge or cached reads get dropped before they're saved
-      retry: (count, error) => !(error instanceof ApiError && error.status < 500) && count < 2,
+      retry: (count, error) => !(error instanceof ApiError && error.status < HTTP_STATUS.INTERNAL_SERVER_ERROR) && count < 2,
     },
   },
 });

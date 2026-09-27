@@ -16,6 +16,7 @@ import { formatDate, formatNaira } from '@napayment/format';
 import { linkLabel, linkMessage, linkUrl, shareSms, shareText, shareWhatsApp } from '@/lib/share';
 import { radius } from '@/theme';
 import { makeStyles, useColors } from '@/theme/theme-provider';
+import { CLIENT_ERROR_MESSAGES } from '@napayment/api-client';
 
 const linkKind = (l: PaymentLinkResponse) =>
   `${l.linkType === 'PERMANENT' ? 'Permanent' : 'Temporary'} · ${l.singleUse ? 'Single use' : 'Multi-use'}`;
@@ -51,7 +52,7 @@ export default function CollectScreen() {
               text: 'Revoke',
               style: 'destructive' as const,
               onPress: () =>
-                revoke.mutate(link.id, { onError: (e) => Alert.alert("Couldn't revoke link", errorMessage(e)) }),
+                revoke.mutate(link.id, { onError: (e) => Alert.alert(CLIENT_ERROR_MESSAGES.revokeLinkFailed, errorMessage(e)) }),
             },
           ]
         : []),
@@ -181,7 +182,7 @@ export default function CollectScreen() {
           <Empty title="No payment links yet" body="Create one and share it by WhatsApp or SMS." />
         )}
         {links.isError && !links.data && (
-          <Empty title={isForbidden(links.error) ? "Your role can't manage payment links" : "Couldn't load links"} />
+          <Empty title={isForbidden(links.error) ? CLIENT_ERROR_MESSAGES.forbiddenPaymentLinks : CLIENT_ERROR_MESSAGES.loadLinksFailed} />
         )}
         {links.isLoading && <Empty title="Loading…" />}
       </Card>

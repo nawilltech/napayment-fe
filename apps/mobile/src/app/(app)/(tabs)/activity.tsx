@@ -13,6 +13,7 @@ import { isForbidden } from '@/lib/api';
 import { dayLabel, formatNaira } from '@napayment/format';
 import { radius } from '@/theme';
 import { makeStyles, useColors } from '@/theme/theme-provider';
+import { CLIENT_ERROR_MESSAGES } from '@napayment/api-client';
 
 /** Monday 00:00 local - "this week" for both the chip and the tiles. */
 function startOfWeek() {
@@ -140,7 +141,7 @@ export default function ActivityScreen() {
           feed.isLoading ? (
             <ActivityIndicator color={colors.link} style={{ marginTop: 32 }} />
           ) : feed.isError && !feed.data ? (
-            <Empty title={isForbidden(feed.error) ? "Your role can't view transactions" : "Couldn't load activity"} body="Pull down to try again." />
+            <Empty title={isForbidden(feed.error) ? CLIENT_ERROR_MESSAGES.forbiddenTransactions : CLIENT_ERROR_MESSAGES.loadActivityFailed} body="Pull down to try again." />
           ) : (
             <Empty title="Nothing here yet" body={term || type || thisWeek ? 'Try a different filter.' : 'Payments will show here.'} />
           )

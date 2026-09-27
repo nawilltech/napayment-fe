@@ -1,5 +1,5 @@
 import "server-only";
-import { ApiError } from "@napayment/api-client";
+import { ApiError, HTTP_STATUS } from "@napayment/api-client";
 
 /**
  * Some backend endpoints are gated behind business-owner-only permissions
@@ -29,7 +29,7 @@ export async function safeCall<T>(promise: Promise<T>, extraStatuses: number[] =
   try {
     return await promise;
   } catch (error) {
-    if (error instanceof ApiError && (error.status === 403 || error.status === 401 || extraStatuses.includes(error.status))) {
+    if (error instanceof ApiError && ([HTTP_STATUS.FORBIDDEN, HTTP_STATUS.UNAUTHORIZED, ...extraStatuses] as number[]).includes(error.status)) {
       return undefined;
     }
     throw error;

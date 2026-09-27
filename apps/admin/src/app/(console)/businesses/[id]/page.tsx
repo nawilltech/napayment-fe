@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ApiError } from "@napayment/api-client";
+import { ApiError, ErrorCode } from "@napayment/api-client";
 import { formatDate, formatDateTime } from "@napayment/format";
 import { KYC_DOCUMENT_LABELS } from "@napayment/schemas";
 import { Alert } from "@napayment/ui/alert";
@@ -21,7 +21,7 @@ export default async function BusinessPage({ params }: { params: Promise<{ id: s
   const client = await authedBackendClient();
   const [business, activity] = await Promise.all([
     client.admin.getBusiness(id).catch((error) => {
-      if (error instanceof ApiError && error.status === 404) notFound();
+      if (error instanceof ApiError && error.is(ErrorCode.BUSINESS_NOT_FOUND)) notFound();
       throw error;
     }),
     client.admin.listAuditLogs({ businessId: id }, { size: 15 }),

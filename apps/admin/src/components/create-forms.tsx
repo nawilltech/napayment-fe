@@ -1,7 +1,13 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import type { BankResponse, PageResponse, ResolvedBankAccountResponse } from "@napayment/api-client";
+import {
+  apiRequest,
+  SAME_ORIGIN,
+  type BankResponse,
+  type PageResponse,
+  type ResolvedBankAccountResponse,
+} from "@napayment/api-client";
 import { BankCombobox } from "@napayment/ui/bank-combobox";
 import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
@@ -25,9 +31,7 @@ export function CreateProcessorForm() {
 }
 
 async function searchBanks(term: string): Promise<BankResponse[]> {
-  const response = await fetch(`/api/banks?term=${encodeURIComponent(term)}`);
-  if (!response.ok) throw new Error(`Bank search failed: ${response.status}`);
-  return ((await response.json()) as PageResponse<BankResponse>).content;
+  return (await apiRequest<PageResponse<BankResponse>>(SAME_ORIGIN, "/api/banks", { query: { term } })).content;
 }
 
 type NameLookup =
@@ -36,12 +40,10 @@ type NameLookup =
   | { status: "resolved"; accountName: string }
   | { status: "failed"; message: string };
 
-async function resolveAccountName(bankId: string, accountNumber: string): Promise<ResolvedBankAccountResponse> {
-  const query = new URLSearchParams({ bankId, accountNumber });
-  const response = await fetch(`/api/banks/resolve-account?${query}`);
-  const body = await response.json();
-  if (!response.ok) throw new Error(body?.message ?? "Couldn't verify this account");
-  return body as ResolvedBankAccountResponse;
+function resolveAccountName(bankId: string, accountNumber: string): Promise<ResolvedBankAccountResponse> {
+  return apiRequest<ResolvedBankAccountResponse>(SAME_ORIGIN, "/api/banks/resolve-account", {
+    query: { bankId, accountNumber },
+  });
 }
 
 /**

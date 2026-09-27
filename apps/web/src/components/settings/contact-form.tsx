@@ -7,6 +7,7 @@ import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
 import { useContactSettings, useSaveContactSettings } from "@/hooks/use-onboarding";
+import { CLIENT_ERROR_MESSAGES } from "@napayment/api-client";
 
 function parseEmails(value: string): string[] {
   return value
@@ -42,7 +43,7 @@ export function ContactForm() {
       generalEmail,
     });
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Invalid input");
+      setError(parsed.error.issues[0]?.message ?? CLIENT_ERROR_MESSAGES.invalidInput);
       return;
     }
     setError(null);

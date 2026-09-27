@@ -1,6 +1,14 @@
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { ApiError, createBackendClient, type AuthResponse, type BackendClient } from '@napayment/api-client';
+import {
+  ApiError,
+  CLIENT_ERROR_MESSAGES,
+  createBackendClient,
+  HTTP_STATUS,
+  SESSION_ERROR_CODES,
+  type AuthResponse,
+  type BackendClient,
+} from '@napayment/api-client';
 
 /**
  * Direct-to-backend client for the Wallet App (doc F4). Tokens live in
@@ -76,13 +84,13 @@ async function refreshSession(): Promise<Session | null> {
   return refreshing;
 }
 
-/** Run a call as the signed-in user, refreshing the access token once on a 401. */
+/** Run a call as the signed-in user, refreshing once when the session itself is rejected (not on a wrong password/PIN). */
 export async function api<T>(call: (client: BackendClient) => Promise<T>): Promise<T> {
   const attempt = () => call(createBackendClient({ baseUrl: BASE_URL, accessToken: session?.accessToken }));
   try {
     return await attempt();
   } catch (error) {
-    if (error instanceof ApiError && error.status === 401 && session) {
+    if (error instanceof ApiError && SESSION_ERROR_CODES.has(error.errorCode) && session) {
       if (await refreshSession()) return attempt();
     }
     throw error;
@@ -92,10 +100,10 @@ export async function api<T>(call: (client: BackendClient) => Promise<T>): Promi
 /** A human sentence for any thrown error - backend message, else a network hint. */
 export function errorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.details[0] ?? error.message;
-  if (error instanceof TypeError) return "Can't reach Napayment. Check your connection and try again.";
-  return error instanceof Error ? error.message : 'Something went wrong.';
+  if (error instanceof TypeError) return CLIENT_ERROR_MESSAGES.network;
+  return error instanceof Error ? error.message : CLIENT_ERROR_MESSAGES.unexpected;
 }
 
 export function isForbidden(error: unknown) {
-  return error instanceof ApiError && error.status === 403;
+  return error instanceof ApiError && error.status === HTTP_STATUS.FORBIDDEN;
 }

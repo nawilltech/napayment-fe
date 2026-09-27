@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { ipWhitelistEntrySchema } from "@napayment/schemas";
+import { ipWhitelistEntrySchema, VALIDATION_MESSAGES } from "@napayment/schemas";
 import { authedBackendClient } from "@/server/backend-client";
-import { handleRouteError, parseBody } from "@napayment/bff/route-helpers";
+import { parseBody, handleRouteError, ValidationError } from "@napayment/bff/route-helpers";
+import { HTTP_STATUS } from "@napayment/api-client";
 
 export async function GET(request: Request) {
   try {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     const body = await parseBody(request, ipWhitelistEntrySchema);
     const client = await authedBackendClient();
     await client.apiKeys.addIpWhitelist(body);
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json({ ok: true }, { status: HTTP_STATUS.CREATED });
   } catch (error) {
     return handleRouteError(error);
   }
@@ -32,9 +33,7 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const cidr = searchParams.get("cidr");
-    if (!cidr) {
-      return NextResponse.json({ message: "cidr is required" }, { status: 400 });
-    }
+    if (!cidr) throw new ValidationError([VALIDATION_MESSAGES.cidrInvalid]);
     const client = await authedBackendClient();
     await client.apiKeys.removeIpWhitelist(cidr);
     return NextResponse.json({ ok: true });

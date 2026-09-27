@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { loginSchema } from "@napayment/schemas";
+import { loginSchema, VALIDATION_MESSAGES } from "@napayment/schemas";
 import { accountKind } from "@napayment/bff/account";
 import { toActionState, type ActionState } from "@napayment/bff/actions";
 import { signIn, SignInNotAllowedError, signOut } from "@napayment/bff/auth";
@@ -44,7 +44,7 @@ export async function approveKycAction(businessId: string): Promise<ActionState>
   return state;
 }
 
-const rejectSchema = z.object({ reason: z.string().trim().min(1, "Give a reason - the business sees it").max(512) });
+const rejectSchema = z.object({ reason: z.string().trim().min(1, VALIDATION_MESSAGES.kycRejectReasonRequired).max(512) });
 
 export async function rejectKycAction(businessId: string, _prev: ActionState, form: FormData): Promise<ActionState> {
   const parsed = rejectSchema.safeParse({ reason: form.get("reason") });
@@ -56,7 +56,7 @@ export async function rejectKycAction(businessId: string, _prev: ActionState, fo
   return state;
 }
 
-const processorSchema = z.object({ name: z.string().trim().min(2, "Name the processor").max(64) });
+const processorSchema = z.object({ name: z.string().trim().min(2, VALIDATION_MESSAGES.processorNameRequired).max(64) });
 
 export async function createProcessorAction(_prev: ActionState, form: FormData): Promise<ActionState> {
   const parsed = processorSchema.safeParse({ name: form.get("name") });
@@ -69,8 +69,8 @@ export async function createProcessorAction(_prev: ActionState, form: FormData):
 }
 
 const collectionAccountSchema = z.object({
-  bankId: z.string().min(1, "Choose the bank"),
-  accountNumber: z.string().regex(/^\d{10}$/, "Account number is 10 digits"),
+  bankId: z.string().min(1, VALIDATION_MESSAGES.bankRequired),
+  accountNumber: z.string().regex(/^\d{10}$/, VALIDATION_MESSAGES.accountNumberInvalid),
 });
 
 export async function createCollectionAccountAction(_prev: ActionState, form: FormData): Promise<ActionState> {

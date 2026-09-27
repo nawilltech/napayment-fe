@@ -19,6 +19,7 @@ import type {
   OwnerIdentityResponse,
   WebhookConfigResponse,
 } from "@napayment/api-client";
+import { apiRequest, SAME_ORIGIN } from "@napayment/api-client";
 import { api } from "@/lib/api";
 
 export interface OnboardingStatus {
@@ -96,10 +97,7 @@ export function useUploadKycDocument() {
       const form = new FormData();
       form.set("type", type);
       form.set("file", file);
-      const response = await fetch("/api/onboarding/kyc/documents", { method: "POST", body: form });
-      const json = await response.json();
-      if (!response.ok) throw new Error(json.message ?? "Upload failed");
-      return json as KycDocumentResponse;
+      return apiRequest<KycDocumentResponse>(SAME_ORIGIN, "/api/onboarding/kyc/documents", { method: "POST", body: form });
     },
     onSuccess: () => {
       toast.success("Document uploaded");

@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import { transferSchema } from "@napayment/schemas";
+import { transferSchema, VALIDATION_MESSAGES } from "@napayment/schemas";
 import { Button } from "@napayment/ui/button";
 import { Input } from "@napayment/ui/input";
 import { Textarea } from "@napayment/ui/textarea";
@@ -13,6 +13,7 @@ import { Alert } from "@napayment/ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@napayment/ui/card";
 import { useResolveRecipient, useTransfer } from "@/hooks/use-transfer";
 import { formatNaira, nairaToKobo } from "@napayment/format";
+import { CLIENT_ERROR_MESSAGES } from "@napayment/api-client";
 
 type Step = "details" | "confirm" | "success";
 
@@ -44,11 +45,11 @@ export function SendMoneyForm() {
     setFormError(null);
     const amountKobo = nairaToKobo(amountNaira);
     if (!recipientIdentifier.trim()) {
-      setFormError("Enter an account number or phone number");
+      setFormError(VALIDATION_MESSAGES.recipientRequired);
       return;
     }
     if (!amountKobo) {
-      setFormError("Enter a valid amount");
+      setFormError(VALIDATION_MESSAGES.amountInvalid);
       return;
     }
     resolveRecipient.mutate(recipientIdentifier.trim(), {
@@ -66,7 +67,7 @@ export function SendMoneyForm() {
     };
     const parsed = transferSchema.safeParse(payload);
     if (!parsed.success) {
-      setFormError(parsed.error.issues[0]?.message ?? "Check the details above");
+      setFormError(parsed.error.issues[0]?.message ?? CLIENT_ERROR_MESSAGES.invalidInput);
       return;
     }
     setFormError(null);

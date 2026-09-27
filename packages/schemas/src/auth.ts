@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { phoneNoSchema } from "./phone";
+import { VALIDATION_MESSAGES } from "./messages";
 
 /**
  * Mirrors the backend's @StrongPassword bean-validation constraint
@@ -11,11 +12,11 @@ import { phoneNoSchema } from "./phone";
  */
 export const strongPasswordSchema = z
   .string()
-  .min(8, "Must be at least 8 characters")
-  .regex(/[a-z]/, "Must include a lowercase letter")
-  .regex(/[A-Z]/, "Must include an uppercase letter")
-  .regex(/\d/, "Must include a digit")
-  .regex(/[^A-Za-z0-9]/, "Must include a special character");
+  .min(8, VALIDATION_MESSAGES.passwordTooShort)
+  .regex(/[a-z]/, VALIDATION_MESSAGES.passwordNeedsLowercase)
+  .regex(/[A-Z]/, VALIDATION_MESSAGES.passwordNeedsUppercase)
+  .regex(/\d/, VALIDATION_MESSAGES.passwordNeedsDigit)
+  .regex(/[^A-Za-z0-9]/, VALIDATION_MESSAGES.passwordNeedsSpecial);
 
 /**
  * Base object fields, kept separate from the exported schemas below: Zod's
@@ -26,29 +27,29 @@ export const strongPasswordSchema = z
  * own `.refine()`, not the other way around.
  */
 const baseSignupFields = z.object({
-  firstName: z.string().min(1, "Required"),
+  firstName: z.string().min(1, VALIDATION_MESSAGES.required),
   middleName: z.string().optional(),
-  lastName: z.string().min(1, "Required"),
-  email: z.string().email("Enter a valid email"),
+  lastName: z.string().min(1, VALIDATION_MESSAGES.required),
+  email: z.string().email(VALIDATION_MESSAGES.emailInvalid),
   phoneNo: phoneNoSchema,
   password: strongPasswordSchema,
-  confirmPassword: z.string().min(1, "Required"),
+  confirmPassword: z.string().min(1, VALIDATION_MESSAGES.required),
 });
 
 function passwordsMatch(data: { password: string; confirmPassword: string }) {
   return data.password === data.confirmPassword;
 }
-const PASSWORDS_MATCH_ISSUE = { message: "Passwords don't match", path: ["confirmPassword"] };
+const PASSWORDS_MATCH_ISSUE = { message: VALIDATION_MESSAGES.passwordsMismatch, path: ["confirmPassword"] };
 
 export const individualSignupSchema = baseSignupFields.refine(passwordsMatch, PASSWORDS_MATCH_ISSUE);
 
 export const businessSignupSchema = baseSignupFields
   .extend({
-    businessName: z.string().min(2, "Required"),
+    businessName: z.string().min(2, VALIDATION_MESSAGES.required),
     cacNumber: z
       .string()
-      .min(1, "Required")
-      .regex(/^(RC|BN|IT)\d{4,10}$/i, "Format like RC1234567"),
+      .min(1, VALIDATION_MESSAGES.required)
+      .regex(/^(RC|BN|IT)\d{4,10}$/i, VALIDATION_MESSAGES.cacNumberFormat),
   })
   .refine(passwordsMatch, PASSWORDS_MATCH_ISSUE);
 
@@ -56,37 +57,37 @@ export type IndividualSignupInput = z.infer<typeof individualSignupSchema>;
 export type BusinessSignupInput = z.infer<typeof businessSignupSchema>;
 
 export const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(1, "Required"),
+  email: z.string().email(VALIDATION_MESSAGES.emailInvalid),
+  password: z.string().min(1, VALIDATION_MESSAGES.required),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().email(VALIDATION_MESSAGES.emailInvalid),
 });
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z
   .object({
-    email: z.string().email("Enter a valid email"),
-    token: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
+    email: z.string().email(VALIDATION_MESSAGES.emailInvalid),
+    token: z.string().regex(/^\d{6}$/, VALIDATION_MESSAGES.resetCodeInvalid),
     newPassword: strongPasswordSchema,
-    confirmNewPassword: z.string().min(1, "Required"),
+    confirmNewPassword: z.string().min(1, VALIDATION_MESSAGES.required),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "Passwords don't match",
+    message: VALIDATION_MESSAGES.passwordsMismatch,
     path: ["confirmNewPassword"],
   });
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Required"),
+    currentPassword: z.string().min(1, VALIDATION_MESSAGES.required),
     newPassword: strongPasswordSchema,
-    confirmPassword: z.string().min(1, "Required"),
+    confirmPassword: z.string().min(1, VALIDATION_MESSAGES.required),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: VALIDATION_MESSAGES.passwordsMismatch,
     path: ["confirmPassword"],
   });
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
@@ -101,17 +102,17 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
  */
 export const setTransactionPinSchema = z
   .object({
-    currentPassword: z.string().min(1, "Required"),
+    currentPassword: z.string().min(1, VALIDATION_MESSAGES.required),
     currentPin: z
       .string()
-      .regex(/^\d{4}$/, "Enter your current 4-digit PIN")
+      .regex(/^\d{4}$/, VALIDATION_MESSAGES.currentPinRequired)
       .optional()
       .or(z.literal("")),
-    pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
-    confirmPin: z.string().min(1, "Required"),
+    pin: z.string().regex(/^\d{4}$/, VALIDATION_MESSAGES.pinInvalid),
+    confirmPin: z.string().min(1, VALIDATION_MESSAGES.required),
   })
   .refine((data) => data.pin === data.confirmPin, {
-    message: "PINs don't match",
+    message: VALIDATION_MESSAGES.pinsMismatch,
     path: ["confirmPin"],
   });
 export type SetTransactionPinInput = z.infer<typeof setTransactionPinSchema>;
@@ -123,9 +124,9 @@ export type SetTransactionPinInput = z.infer<typeof setTransactionPinSchema>;
  */
 export const acceptInviteSchema = z.object({
   token: z.string().min(1),
-  firstName: z.string().min(1, "Required"),
+  firstName: z.string().min(1, VALIDATION_MESSAGES.required),
   middleName: z.string().optional(),
-  lastName: z.string().min(1, "Required"),
+  lastName: z.string().min(1, VALIDATION_MESSAGES.required),
   phoneNo: phoneNoSchema,
   password: strongPasswordSchema,
 });

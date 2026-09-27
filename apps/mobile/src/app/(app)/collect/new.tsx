@@ -14,6 +14,8 @@ import { AppText } from '@/components/text';
 import { useCreateDynamicAccount } from '@/hooks/queries';
 import { useOnline } from '@/hooks/use-online';
 import { errorMessage } from '@/lib/api';
+import { CLIENT_ERROR_MESSAGES } from '@napayment/api-client';
+import { VALIDATION_MESSAGES } from '@napayment/schemas';
 import { formatNaira, nairaToKobo } from '@napayment/format';
 import { newIdempotencyKey, outboxKeys, type CreateLinkVars } from '@/lib/outbox';
 import { radius } from '@/theme';
@@ -42,10 +44,10 @@ export default function NewCollectionScreen() {
 
   function submit() {
     setError(null);
-    if (amountInvalid) return setError('Enter a valid amount, or leave it empty.');
+    if (amountInvalid) return setError(VALIDATION_MESSAGES.amountInvalidOrEmpty);
 
     if (method === 'account') {
-      if (!online) return setError('One-time accounts need a connection. Try again when you are back online.');
+      if (!online) return setError(CLIENT_ERROR_MESSAGES.offlineOneTimeAccount);
       createAccount.mutate(
         { expectedAmount: amountKobo, reference: reference.trim() || undefined },
         {

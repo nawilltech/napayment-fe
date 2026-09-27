@@ -3,6 +3,7 @@ import { inviteTeamMemberSchema } from "@napayment/schemas";
 import type { InviteResponse, RoleResponse } from "@napayment/api-client";
 import { authedBackendClient } from "@/server/backend-client";
 import { handleRouteError, parseBody } from "@napayment/bff/route-helpers";
+import { HTTP_STATUS } from "@napayment/api-client";
 
 /**
  * The backend's InviteResponse carries `roleId`, not the `roleTemplate` that
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       client.team.createInvite(body),
       client.roles.list({ size: 100 }),
     ]);
-    return NextResponse.json(withRoleName(invite, roles.content), { status: 201 });
+    return NextResponse.json(withRoleName(invite, roles.content), { status: HTTP_STATUS.CREATED });
   } catch (error) {
     return handleRouteError(error);
   }
