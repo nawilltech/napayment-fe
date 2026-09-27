@@ -1,8 +1,7 @@
 "use client";
 
-import { Settings } from "lucide-react";
 import { displayName } from "@napayment/format";
-import { AppShell, type NavGroup, type ShellTitle } from "@napayment/ui/app-shell";
+import { AppShell, type NavGroup, type ShellMenuItem, type ShellTitle } from "@napayment/ui/app-shell";
 import { ModeToggle } from "./mode-toggle";
 import { useLogout, useMe } from "@/hooks/use-auth";
 
@@ -20,7 +19,7 @@ const TITLES: ShellTitle[] = [
   { prefix: "/dashboard", title: "Home" },
 ];
 
-const MENU = [{ href: "/dashboard/settings/profile", label: "Profile settings", icon: Settings }];
+const MENU: ShellMenuItem[] = [{ href: "/dashboard/settings/profile", label: "Profile settings", icon: "settings" }];
 
 /**
  * Grouped as in the "Console Sidebar" design. Activation only exists for
@@ -33,11 +32,11 @@ function consoleNav(activation?: ActivationProgress): NavGroup[] {
     {
       title: "Overview",
       items: [
-        { href: "/dashboard", label: "Home" },
-        { href: "/dashboard/transactions", label: "Transactions" },
+        { href: "/dashboard", label: "Home", icon: "home" },
+        { href: "/dashboard/transactions", label: "Transactions", icon: "transactions" },
       ],
     },
-    { title: "Money out", items: [{ href: "/dashboard/send", label: "Send money" }] },
+    { title: "Money out", items: [{ href: "/dashboard/send", label: "Send money", icon: "send" }] },
     {
       title: "Account",
       items: [
@@ -46,12 +45,13 @@ function consoleNav(activation?: ActivationProgress): NavGroup[] {
               {
                 href: "/onboarding",
                 label: "Activation",
+                icon: "activation" as const,
                 matchPrefix: "/onboarding",
                 badge: activation.complete ? undefined : `${activation.done}/${activation.total}`,
               },
             ]
           : []),
-        { href: "/dashboard/settings/profile", label: "Settings", matchPrefix: "/dashboard/settings" },
+        { href: "/dashboard/settings/profile", label: "Settings", icon: "settings", matchPrefix: "/dashboard/settings" },
       ],
     },
   ];

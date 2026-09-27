@@ -12,11 +12,13 @@ import { useMe, useRecentTransactions, useWallet } from '@/hooks/queries';
 import { isForbidden } from '@/lib/api';
 import { displayName, formatNaira, greeting, groupAccountNumber, initials } from '@napayment/format';
 import { colors, radius } from '@/theme';
+import { Icon } from '@/components/icon';
+import type { IconName } from '@napayment/ui-tokens';
 
-const ACTIONS: { label: string; glyph: string; href: Href; primary?: boolean }[] = [
-  { label: 'Collect', glyph: '+', href: '/collect/new', primary: true },
-  { label: 'Send', glyph: '↗', href: '/send' },
-  { label: 'Withdraw', glyph: '↓', href: '/withdraw' },
+const ACTIONS: { label: string; icon: IconName; href: Href; primary?: boolean }[] = [
+  { label: 'Collect', icon: 'collect', href: '/collect/new', primary: true },
+  { label: 'Send', icon: 'send', href: '/send' },
+  { label: 'Withdraw', icon: 'withdraw', href: '/withdraw' },
 ];
 
 export default function HomeScreen() {
@@ -100,9 +102,7 @@ export default function HomeScreen() {
             accessibilityLabel={a.label}
             style={({ pressed }) => [styles.action, a.primary ? styles.actionPrimary : styles.actionPlain, pressed && { opacity: 0.85 }]}
           >
-            <AppText size={18} color={a.primary ? colors.cream : colors.ink} style={{ lineHeight: 20 }}>
-              {a.glyph}
-            </AppText>
+            <Icon name={a.icon} color={a.primary ? colors.cream : colors.ink} />
             <AppText size={13} weight="semibold" color={a.primary ? colors.cream : colors.ink}>
               {a.label}
             </AppText>

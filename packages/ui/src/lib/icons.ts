@@ -1,0 +1,62 @@
+import {
+  ArrowDownToLine,
+  ArrowLeftRight,
+  ArrowUpRight,
+  Building2,
+  CloudUpload,
+  CreditCard,
+  HandCoins,
+  History,
+  House,
+  KeyRound,
+  Landmark,
+  LayoutDashboard,
+  LockKeyhole,
+  LogOut,
+  Mail,
+  Menu,
+  RectangleEllipsis,
+  Rocket,
+  ScrollText,
+  Settings,
+  Shield,
+  ShieldCheck,
+  UserRound,
+  Users,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import type { IconName } from "@napayment/ui-tokens";
+
+/**
+ * Web/admin rendering of the shared icon vocabulary (@napayment/ui-tokens
+ * ICON_NAMES). Keep in step with apps/mobile/src/lib/icons.ts - same Lucide
+ * glyph per name; `satisfies` fails the build if a name is missing here.
+ */
+export const ICONS = {
+  home: House,
+  overview: LayoutDashboard,
+  transactions: ArrowLeftRight,
+  activity: History,
+  collect: HandCoins,
+  send: ArrowUpRight,
+  withdraw: ArrowDownToLine,
+  activation: Rocket,
+  settings: Settings,
+  kycReview: ShieldCheck,
+  businesses: Building2,
+  processors: CreditCard,
+  bank: Landmark,
+  auditLogs: ScrollText,
+  profile: UserRound,
+  contact: Mail,
+  team: Users,
+  apiKeys: KeyRound,
+  security: Shield,
+  password: LockKeyhole,
+  pin: RectangleEllipsis,
+  queue: CloudUpload,
+  signOut: LogOut,
+  menu: Menu,
+  close: X,
+} satisfies Record<IconName, LucideIcon>;

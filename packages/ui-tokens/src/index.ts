@@ -81,3 +81,4 @@ export const spacing = {
 } as const;
 
 export type ColorScale = typeof colors;
+export * from "./icons";
