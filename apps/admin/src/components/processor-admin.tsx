@@ -1,7 +1,12 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
-import type { PaymentMethod, PaymentMethodOption, PaymentProcessorResponse } from "@napayment/api-client";
+import { useActionState, useEffect, useState, useTransition } from "react";
+import type {
+  PaymentMethodCode,
+  PaymentMethodOption,
+  PaymentMethodResponse,
+  PaymentProcessorResponse,
+} from "@napayment/api-client";
 import type { ActionState } from "@napayment/bff/actions";
 import { plural } from "@napayment/format";
 import { Badge } from "@napayment/ui/badge";
@@ -10,14 +15,14 @@ import { Input } from "@napayment/ui/input";
 import { Label } from "@napayment/ui/label";
 import {
   createProcessorAction,
-  setProcessorActiveAction,
   setProcessorForAllAction,
   setProcessorLogoAction,
   setProcessorMethodAction,
   updateProcessorAction,
 } from "@/app/actions";
+import { CreateDialog } from "./create-dialog";
 import { FormFeedback, SubmitButton } from "./form-feedback";
-import { PasswordConfirmButton } from "./password-confirm-button";
+import { ConfirmAction } from "./confirm-action";
 import { LogoPicker } from "./processor-logo";
 
 /** Payment method chips; retired methods are struck through. */
@@ -34,10 +39,27 @@ export function MethodChips({ methods }: { methods: PaymentMethodOption[] }) {
   );
 }
 
+/** "+ Add processor": the create form in a dialog. */
+export function AddProcessorButton({ methods }: { methods: PaymentMethodResponse[] }) {
+  return (
+    <CreateDialog
+      label="Add processor"
+      title="Add a payment processor"
+      description="Its API keys live in the deployment configuration under the processor's code - never here."
+      wide
+    >
+      {(close) => <CreateProcessorForm methods={methods} onSaved={close} />}
+    </CreateDialog>
+  );
+}
+
 /** Configuration -> Payment processors: add one with the methods it offers (FR-Proc-1/2). */
-export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[] }) {
+export function CreateProcessorForm({ methods, onSaved }: { methods: PaymentMethodResponse[]; onSaved?: () => void }) {
   const [state, action] = useActionState(createProcessorAction, {});
   const [logo, setLogo] = useState<string | null>(null);
+  useEffect(() => {
+    if (state.ok) onSaved?.();
+  }, [state, onSaved]);
   return (
     <form action={action} className="space-y-4">
       <LogoPicker name="logo" label="New processor" value={logo} onChange={setLogo} />
@@ -58,12 +80,14 @@ export function CreateProcessorForm({ methods }: { methods: PaymentMethodOption[
       <fieldset>
         <legend className="mb-1.5 text-[13px] font-semibold text-ink">Payment methods</legend>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
-          {methods.map((m) => (
-            <label key={m.method} className="flex items-center gap-2 text-[13.5px] text-ink">
-              <input type="checkbox" name="methods" value={m.method} className="size-4 accent-brand" />
-              {m.label}
-            </label>
-          ))}
+          {methods
+            .filter((m) => m.status === "ACTIVE")
+            .map((m) => (
+              <label key={m.code} className="flex items-center gap-2 text-[13.5px] text-ink">
+                <input type="checkbox" name="methods" value={m.code} className="size-4 accent-brand" />
+                {m.name}
+              </label>
+            ))}
         </div>
       </fieldset>
       <label className="flex items-start gap-2 text-[13.5px] text-ink">
@@ -119,20 +143,21 @@ export function ProcessorDetailsForm({ processor }: { processor: PaymentProcesso
   );
 }
 
-/** Every platform method: offered, disabled (kept for history) or not offered, with the matching action. */
+/** Every catalogue method: offered, disabled (kept for history) or not offered, with the matching action. */
 export function ProcessorMethodsEditor({
   processor,
   allMethods,
 }: {
   processor: PaymentProcessorResponse;
-  allMethods: PaymentMethodOption[];
+  allMethods: PaymentMethodResponse[];
 }) {
   const [state, setState] = useState<ActionState>({});
   const [pending, startTransition] = useTransition();
-  const [busy, setBusy] = useState<PaymentMethod | null>(null);
+  const [busy, setBusy] = useState<PaymentMethodCode | null>(null);
+  // Processor-level state; `active` here is false when either the processor or the platform switched it off.
   const offered = new Map(processor.methods.map((m) => [m.method, m.active]));
 
-  function toggle(method: PaymentMethod, enable: boolean) {
+  function toggle(method: PaymentMethodCode, enable: boolean) {
     setBusy(method);
     startTransition(async () => {
       setState(await setProcessorMethodAction(processor.id, method, enable));
@@ -143,9 +168,16 @@ export function ProcessorMethodsEditor({
   return (
     <div className="space-y-3">
       <ul className="divide-y divide-line-soft">
-        {allMethods.map(({ method, label }) => {
+        {allMethods.map(({ code: method, name: label, status: platformStatus }) => {
           const active = offered.get(method);
-          const status = active === undefined ? "Not offered" : active ? "Offered" : "Disabled";
+          const platformOff = platformStatus !== "ACTIVE";
+          const status = platformOff
+            ? "Deactivated platform-wide"
+            : active === undefined
+              ? "Not offered"
+              : active
+                ? "Offered"
+                : "Disabled";
           return (
             <li key={method} className="flex items-center justify-between gap-3 py-2.5">
               <span className="min-w-0">
@@ -156,7 +188,7 @@ export function ProcessorMethodsEditor({
                 size="sm"
                 variant={active ? "outline" : "secondary"}
                 loading={pending && busy === method}
-                disabled={pending}
+                disabled={pending || platformOff}
                 onClick={() => toggle(method, !active)}
               >
                 {active ? "Disable" : active === undefined ? "Add" : "Enable"}
@@ -166,31 +198,6 @@ export function ProcessorMethodsEditor({
         })}
       </ul>
       <FormFeedback state={state} />
-    </div>
-  );
-}
-
-export function ProcessorPlatformSwitch({ processor }: { processor: PaymentProcessorResponse }) {
-  const active = processor.status === "ACTIVE";
-  return (
-    <div className="space-y-3">
-      <p className="text-[13.5px] text-muted">
-        {active
-          ? "Active: businesses can use it according to their settings below."
-          : "Inactive: no business can use it. Each business's own setting is kept for when it's reactivated."}
-      </p>
-      <PasswordConfirmButton
-        label={active ? "Deactivate for the platform" : "Activate for the platform"}
-        title={active ? `Deactivate ${processor.name}?` : `Activate ${processor.name}?`}
-        description={
-          active
-            ? "No business will be able to take payments through it until it's reactivated."
-            : "Businesses will be able to use it again, following their own settings or the default."
-        }
-        confirmLabel={active ? "Deactivate" : "Activate"}
-        variant={active ? "destructive" : "primary"}
-        onConfirm={(password) => setProcessorActiveAction(processor.id, !active, password)}
-      />
     </div>
   );
 }
@@ -205,19 +212,21 @@ export function ProcessorForAllSwitch({ processor }: { processor: PaymentProcess
         {processor.businessesSwitchedOn} switched on and {processor.businessesSwitchedOff} switched off individually.
       </p>
       <div className="flex flex-wrap items-start gap-2">
-        <PasswordConfirmButton
+        <ConfirmAction
+          icon="activate"
           label="Switch on for all businesses"
           title={`Switch ${processor.name} on for all businesses?`}
           description={`Every business will be able to use it.${clears}`}
           confirmLabel="Switch on for all"
           onConfirm={(password) => setProcessorForAllAction(processor.id, true, password)}
         />
-        <PasswordConfirmButton
+        <ConfirmAction
+          icon="deactivate"
           label="Switch off for all businesses"
           title={`Switch ${processor.name} off for all businesses?`}
           description={`No business will be able to use it unless switched on individually later.${clears}`}
           confirmLabel="Switch off for all"
-          variant="destructive"
+          destructive
           onConfirm={(password) => setProcessorForAllAction(processor.id, false, password)}
         />
       </div>

@@ -11,6 +11,7 @@ const TITLES: ShellTitle[] = [
   { prefix: "/businesses", title: "Businesses" },
   { prefix: "/transactions", title: "Platform transactions", short: "Transactions" },
   { prefix: ROUTES.paymentProcessors, title: "Configuration · Payment processors", short: "Processors" },
+  { prefix: ROUTES.paymentMethods, title: "Configuration · Payment methods", short: "Payment methods" },
   { prefix: ROUTES.collectionAccount, title: "Configuration · Collection account", short: "Collection account" },
   { prefix: "/audit-logs", title: "Audit logs" },
   { prefix: "/settings", title: "Settings" },
@@ -31,6 +32,7 @@ function adminNav(pendingKyc: number): NavGroup[] {
       title: "Configuration",
       items: [
         { href: ROUTES.paymentProcessors, label: "Payment processors", icon: "processors", matchPrefix: ROUTES.paymentProcessors },
+        { href: ROUTES.paymentMethods, label: "Payment methods", icon: "paymentMethods", matchPrefix: ROUTES.paymentMethods },
         { href: ROUTES.collectionAccount, label: "Collection account", icon: "bank", matchPrefix: ROUTES.collectionAccount },
       ],
     },

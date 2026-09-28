@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { PAYMENT_METHODS, type BackendClient, type PaymentMethod } from "@napayment/api-client";
+import type { BackendClient, PaymentMethodCode } from "@napayment/api-client";
 import { plural } from "@napayment/format";
 import { loginSchema, VALIDATION_MESSAGES } from "@napayment/schemas";
 import { accountKind } from "@napayment/bff/account";
@@ -59,16 +59,20 @@ export async function rejectKycAction(businessId: string, _prev: ActionState, fo
   return state;
 }
 
-const optionalPriority = z
-  .union([z.literal(""), z.coerce.number().int().min(0).max(1000)], { message: VALIDATION_MESSAGES.priorityInvalid })
-  .transform((value) => (value === "" ? undefined : value));
+/** Optional 0-1000 form number; "" (left blank) means "use the default". */
+const optionalOrder = (message: string) =>
+  z
+    .union([z.literal(""), z.coerce.number().int().min(0).max(1000)], { message })
+    .transform((value) => (value === "" ? undefined : value));
+
+const optionalPriority = optionalOrder(VALIDATION_MESSAGES.priorityInvalid);
 
 const processorSchema = z.object({
   name: z.string().trim().min(2, VALIDATION_MESSAGES.processorNameRequired).max(64),
-  code: z.string().trim().regex(/^[A-Za-z][A-Za-z0-9_]{1,31}$/, VALIDATION_MESSAGES.processorCodeInvalid),
+  code: z.string().trim().regex(/^[A-Za-z][A-Za-z0-9_]{1,31}$/, VALIDATION_MESSAGES.codeInvalid),
   priority: optionalPriority,
   defaultEnabled: z.boolean(),
-  methods: z.array(z.enum(PAYMENT_METHODS)).min(1, VALIDATION_MESSAGES.processorMethodsRequired),
+  methods: z.array(z.string().min(1)).min(1, VALIDATION_MESSAGES.processorMethodsRequired),
   logo: z.string().optional().transform((value) => value || undefined),
 });
 
@@ -107,7 +111,7 @@ export async function setProcessorLogoAction(id: string, logo: string | null): P
   );
 }
 
-export async function setProcessorMethodAction(id: string, method: PaymentMethod, enabled: boolean): Promise<ActionState> {
+export async function setProcessorMethodAction(id: string, method: PaymentMethodCode, enabled: boolean): Promise<ActionState> {
   return processorChange(id, (client) =>
     enabled
       ? client.admin.paymentProcessors.enableMethod(id, method)
@@ -135,6 +139,81 @@ export async function setProcessorForAllAction(id: string, enabled: boolean, pas
   });
   revalidateProcessor(id);
   return state;
+}
+
+const paymentMethodSchema = z.object({
+  code: z.string().trim().regex(/^[A-Za-z][A-Za-z0-9_]{1,31}$/, VALIDATION_MESSAGES.codeInvalid),
+  name: z.string().trim().min(2, VALIDATION_MESSAGES.paymentMethodNameRequired).max(64),
+  description: z.string().trim().max(256),
+  displayOrder: optionalOrder(VALIDATION_MESSAGES.displayOrderInvalid),
+});
+
+export async function createPaymentMethodAction(_prev: ActionState, form: FormData): Promise<ActionState> {
+  const parsed = paymentMethodSchema.safeParse({
+    code: form.get("code"),
+    name: form.get("name"),
+    description: form.get("description") ?? "",
+    displayOrder: form.get("displayOrder") ?? "",
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  const { description, ...rest } = parsed.data;
+  const state = await toActionState(async () => {
+    await (await authedBackendClient()).admin.paymentMethods.create({ ...rest, description: description || undefined });
+  });
+  revalidatePath(ROUTES.paymentMethods);
+  return state;
+}
+
+const paymentMethodUpdateSchema = paymentMethodSchema.omit({ code: true });
+
+export async function updatePaymentMethodAction(id: string, _prev: ActionState, form: FormData): Promise<ActionState> {
+  const parsed = paymentMethodUpdateSchema.safeParse({
+    name: form.get("name"),
+    description: form.get("description") ?? "",
+    displayOrder: form.get("displayOrder") ?? "",
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.update(id, parsed.data));
+}
+
+/** Platform switch for a payment method - the staff member re-enters their password. */
+export async function setPaymentMethodActiveAction(id: string, active: boolean, password: string): Promise<ActionState> {
+  const parsed = passwordSchema.safeParse({ password });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.setActive(id, active, parsed.data));
+}
+
+/** Soft delete - deactivates and hides it; password-confirmed. */
+export async function archivePaymentMethodAction(id: string, password: string): Promise<ActionState> {
+  const parsed = passwordSchema.safeParse({ password });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.archive(id, parsed.data));
+}
+
+export async function restorePaymentMethodAction(id: string): Promise<ActionState> {
+  return paymentMethodChange(id, (client) => client.admin.paymentMethods.restore(id));
+}
+
+async function paymentMethodChange(id: string, change: (client: BackendClient) => Promise<unknown>): Promise<ActionState> {
+  const state = await toActionState(async () => {
+    await change(await authedBackendClient());
+  });
+  revalidatePath(ROUTES.paymentMethods);
+  revalidatePath(ROUTES.paymentMethod(id));
+  // Processor pages label methods from the catalogue.
+  revalidatePath(ROUTES.paymentProcessors);
+  return state;
+}
+
+/** Soft delete - deactivates and hides it from lists and business settings; password-confirmed. */
+export async function archiveProcessorAction(id: string, password: string): Promise<ActionState> {
+  const parsed = passwordSchema.safeParse({ password });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
+  return processorChange(id, (client) => client.admin.paymentProcessors.archive(id, parsed.data));
+}
+
+export async function restoreProcessorAction(id: string): Promise<ActionState> {
+  return processorChange(id, (client) => client.admin.paymentProcessors.restore(id));
 }
 
 export type BusinessProcessorSetting = "on" | "off" | "default";

@@ -344,12 +344,48 @@ export function createBackendClient(config: ApiClientConfig) {
         }),
       activateBusiness: (id: string) =>
         apiRequest<T.AdminBusinessDetail>(config, `/api/v1/admin/businesses/${id}/activate`, { method: "POST" }),
-      /** Every payment method the platform supports (for the processor form). */
-      paymentMethods: () => apiRequest<T.PaymentMethodOption[]>(config, "/api/v1/admin/payment-methods"),
+      /** The payment method catalogue (FR-Proc-2). */
+      paymentMethods: {
+        /** Archived methods are hidden unless `archived` asks for exactly those. */
+        list: (filter?: { archived?: boolean }) =>
+          apiRequest<T.PaymentMethodResponse[]>(config, "/api/v1/admin/payment-methods", {
+            query: { archived: filter?.archived },
+          }),
+        get: (id: string) => apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}`),
+        create: (body: T.CreatePaymentMethodRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, "/api/v1/admin/payment-methods", { method: "POST", body }),
+        update: (id: string, body: T.UpdatePaymentMethodRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}`, { method: "PATCH", body }),
+        /** Platform switch (requires the staff password). */
+        setActive: (id: string, active: boolean, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentMethodResponse>(
+            config,
+            `/api/v1/admin/payment-methods/${id}/${active ? "activate" : "deactivate"}`,
+            { method: "POST", body },
+          ),
+        /** Soft delete: deactivates and hides it (requires the staff password). */
+        archive: (id: string, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}/archive`, { method: "POST", body }),
+        /** Back in the catalogue, still inactive. */
+        restore: (id: string) =>
+          apiRequest<T.PaymentMethodResponse>(config, `/api/v1/admin/payment-methods/${id}/restore`, { method: "POST" }),
+      },
       paymentProcessors: {
-        list: (params?: T.PageParams) =>
+        /** Archived processors are hidden unless `archived` asks for exactly those. */
+        list: (params?: T.PageParams, filter?: { archived?: boolean }) =>
           apiRequest<T.PageResponse<T.PaymentProcessorResponse>>(config, "/api/v1/admin/payment-processors", {
-            query: toPageQuery(params),
+            query: { ...toPageQuery(params), archived: filter?.archived },
+          }),
+        /** Soft delete: deactivates and hides it (requires the staff password). */
+        archive: (id: string, body: T.PasswordConfirmationRequest) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/archive`, {
+            method: "POST",
+            body,
+          }),
+        /** Back in the lists, still inactive. */
+        restore: (id: string) =>
+          apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/restore`, {
+            method: "POST",
           }),
         get: (id: string) => apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}`),
         create: (body: T.CreatePaymentProcessorRequest) =>
@@ -368,11 +404,11 @@ export function createBackendClient(config: ApiClientConfig) {
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/logo`, {
             method: "DELETE",
           }),
-        enableMethod: (id: string, method: T.PaymentMethod) =>
+        enableMethod: (id: string, method: T.PaymentMethodCode) =>
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
             method: "PUT",
           }),
-        disableMethod: (id: string, method: T.PaymentMethod) =>
+        disableMethod: (id: string, method: T.PaymentMethodCode) =>
           apiRequest<T.PaymentProcessorResponse>(config, `/api/v1/admin/payment-processors/${id}/methods/${method}`, {
             method: "DELETE",
           }),

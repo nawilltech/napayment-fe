@@ -21,6 +21,7 @@ export const ICON_NAMES = [
   "kycReview",
   "businesses",
   "processors",
+  "paymentMethods",
   "bank",
   "auditLogs",
   // Account & settings
@@ -37,7 +38,13 @@ export const ICON_NAMES = [
   "themeAuto",
   "themeLight",
   "themeDark",
-  // Chrome
+  // Row actions & chrome
+  "add",
+  "edit",
+  "activate",
+  "deactivate",
+  "archive",
+  "restore",
   "menu",
   "close",
 ] as const;
